@@ -7,6 +7,20 @@ body {
     overflow: hidden;
 }
 
+/* Hidden class utility */
+.hidden {
+    display: none !important;
+}
+
+/* Game canvas */
+#gameCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 /* Customization Screen */
 .customization-screen {
     position: fixed;
@@ -165,10 +179,12 @@ canvas {
     padding: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
+    z-index: 100;
 }
 
 /* World selector */
 .world-selector {
+    position: absolute;
     top: 10px;
     left: 10px;
     right: 10px;
@@ -177,6 +193,7 @@ canvas {
     gap: 5px;
     max-width: calc(100% - 20px);
     width: auto;
+    z-index: 200;
 }
 
 .world-btn {
