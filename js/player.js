@@ -8,7 +8,7 @@ export class Player {
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = null;
         this.targetY = null;
-        this.coins = 0;
+        this.coins = 50; // Starting coins
         
         // Apply customization or use defaults
         this.colors = {

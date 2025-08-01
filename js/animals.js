@@ -4,52 +4,52 @@ import { CONFIG } from './config.js';
 // Animal definitions for each world
 export const ANIMALS = {
     stad: [
-        { type: 'hond', name: 'Hond', emoji: '🐕', x: 300, y: 520 },
-        { type: 'kat', name: 'Kat', emoji: '🐈', x: 600, y: 520 },
-        { type: 'cavia', name: 'Cavia', emoji: '🐹', x: 900, y: 520 },
-        { type: 'duif', name: 'Duif', emoji: '🕊️', x: 1200, y: 400 }
+        { type: 'hond', name: 'Hond', emoji: '🐕', x: 300, y: 520, color: { body: '#8B4513', belly: '#D2691E' } },
+        { type: 'kat', name: 'Kat', emoji: '🐈', x: 600, y: 520, color: { body: '#696969', belly: '#A9A9A9' } },
+        { type: 'cavia', name: 'Cavia', emoji: '🐹', x: 900, y: 520, color: { body: '#DEB887', belly: '#F5DEB3' } },
+        { type: 'duif', name: 'Duif', emoji: '🕊️', x: 1200, y: 400, color: { body: '#778899', belly: '#B0C4DE' } }
     ],
     natuur: [
-        { type: 'das', name: 'Das', emoji: '🦡', x: 400, y: 480 },
-        { type: 'vos', name: 'Vos', emoji: '🦊', x: 700, y: 480 },
-        { type: 'konijn', name: 'Konijn', emoji: '🐰', x: 1000, y: 480 },
-        { type: 'hert', name: 'Hert', emoji: '🦌', x: 1300, y: 470 }
+        { type: 'das', name: 'Das', emoji: '🦡', x: 400, y: 480, color: { body: '#2F4F4F', belly: '#FFFFFF' } },
+        { type: 'vos', name: 'Vos', emoji: '🦊', x: 700, y: 480, color: { body: '#FF6347', belly: '#FFDAB9' } },
+        { type: 'konijn', name: 'Konijn', emoji: '🐰', x: 1000, y: 480, color: { body: '#F5F5DC', belly: '#FFFFFF' } },
+        { type: 'hert', name: 'Hert', emoji: '🦌', x: 1300, y: 470, color: { body: '#8B4513', belly: '#DEB887' } }
     ],
     strand: [
-        { type: 'schildpad', name: 'Schildpad', emoji: '🐢', x: 350, y: 550 },
-        { type: 'krab', name: 'Krab', emoji: '🦀', x: 650, y: 550 },
-        { type: 'zeehond', name: 'Zeehond', emoji: '🦭', x: 950, y: 480 },
-        { type: 'meeuw', name: 'Meeuw', emoji: '🦅', x: 1250, y: 350 }
+        { type: 'schildpad', name: 'Schildpad', emoji: '🐢', x: 350, y: 550, color: { body: '#228B22', belly: '#90EE90' } },
+        { type: 'krab', name: 'Krab', emoji: '🦀', x: 650, y: 550, color: { body: '#DC143C', belly: '#FA8072' } },
+        { type: 'zeehond', name: 'Zeehond', emoji: '🦭', x: 950, y: 480, color: { body: '#708090', belly: '#DCDCDC' } },
+        { type: 'meeuw', name: 'Meeuw', emoji: '🦅', x: 1250, y: 350, color: { body: '#FFFFFF', belly: '#F5F5F5' } }
     ],
     winter: [
-        { type: 'pinguin', name: 'Pinguïn', emoji: '🐧', x: 400, y: 480 },
-        { type: 'ijsbeer', name: 'IJsbeer', emoji: '🐻‍❄️', x: 700, y: 480 },
-        { type: 'rendier', name: 'Rendier', emoji: '🦌', x: 1000, y: 480 },
-        { type: 'sneeuwuil', name: 'Sneeuwuil', emoji: '🦉', x: 1300, y: 400 }
+        { type: 'pinguin', name: 'Pinguïn', emoji: '🐧', x: 400, y: 480, color: { body: '#000000', belly: '#FFFFFF' } },
+        { type: 'ijsbeer', name: 'IJsbeer', emoji: '🐻‍❄️', x: 700, y: 480, color: { body: '#FFFFFF', belly: '#F8F8FF' } },
+        { type: 'rendier', name: 'Rendier', emoji: '🦌', x: 1000, y: 480, color: { body: '#8B4513', belly: '#DEB887' } },
+        { type: 'sneeuwuil', name: 'Sneeuwuil', emoji: '🦉', x: 1300, y: 400, color: { body: '#FFFFFF', belly: '#F0F8FF' } }
     ],
     woestijn: [
-        { type: 'kameel', name: 'Kameel', emoji: '🐪', x: 450, y: 480 },
-        { type: 'slang', name: 'Slang', emoji: '🐍', x: 750, y: 520 },
-        { type: 'schorpioen', name: 'Schorpioen', emoji: '🦂', x: 1050, y: 520 },
-        { type: 'hagedis', name: 'Hagedis', emoji: '🦎', x: 1350, y: 510 }
+        { type: 'kameel', name: 'Kameel', emoji: '🐪', x: 450, y: 480, color: { body: '#D2691E', belly: '#F4A460' } },
+        { type: 'slang', name: 'Slang', emoji: '🐍', x: 750, y: 520, color: { body: '#556B2F', belly: '#8FBC8F' } },
+        { type: 'schorpioen', name: 'Schorpioen', emoji: '🦂', x: 1050, y: 520, color: { body: '#8B4513', belly: '#A0522D' } },
+        { type: 'hagedis', name: 'Hagedis', emoji: '🦎', x: 1350, y: 510, color: { body: '#228B22', belly: '#90EE90' } }
     ],
     jungle: [
-        { type: 'aap', name: 'Aap', emoji: '🐵', x: 400, y: 400 },
-        { type: 'leeuw', name: 'Leeuw', emoji: '🦁', x: 700, y: 480 },
-        { type: 'tijger', name: 'Tijger', emoji: '🐅', x: 1000, y: 480 },
-        { type: 'papegaai', name: 'Papegaai', emoji: '🦜', x: 1300, y: 350 }
+        { type: 'aap', name: 'Aap', emoji: '🐵', x: 400, y: 400, color: { body: '#8B4513', belly: '#D2691E' } },
+        { type: 'leeuw', name: 'Leeuw', emoji: '🦁', x: 700, y: 480, color: { body: '#DAA520', belly: '#F0E68C' } },
+        { type: 'tijger', name: 'Tijger', emoji: '🐅', x: 1000, y: 480, color: { body: '#FF8C00', belly: '#FFDAB9' } },
+        { type: 'papegaai', name: 'Papegaai', emoji: '🦜', x: 1300, y: 350, color: { body: '#FF0000', belly: '#FFFF00' } }
     ],
     zwembad: [
-        { type: 'eend', name: 'Eend', emoji: '🦆', x: 500, y: 450 },
-        { type: 'kikker', name: 'Kikker', emoji: '🐸', x: 800, y: 520 },
-        { type: 'vis', name: 'Vis', emoji: '🐠', x: 650, y: 480 },
-        { type: 'flamingo', name: 'Flamingo', emoji: '🦩', x: 1100, y: 470 }
+        { type: 'eend', name: 'Eend', emoji: '🦆', x: 500, y: 450, color: { body: '#FFFF00', belly: '#FFFFFF' } },
+        { type: 'kikker', name: 'Kikker', emoji: '🐸', x: 800, y: 520, color: { body: '#228B22', belly: '#90EE90' } },
+        { type: 'vis', name: 'Vis', emoji: '🐠', x: 650, y: 480, color: { body: '#FF6347', belly: '#FFA07A' } },
+        { type: 'flamingo', name: 'Flamingo', emoji: '🦩', x: 1100, y: 470, color: { body: '#FF69B4', belly: '#FFB6C1' } }
     ],
     dierenstad: [
-        { type: 'paard', name: 'Paard', emoji: '🐴', x: 350, y: 480 },
-        { type: 'ezel', name: 'Ezel', emoji: '🫏', x: 650, y: 480 },
-        { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 480 },
-        { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 480 }
+        { type: 'paard', name: 'Paard', emoji: '🐴', x: 350, y: 480, color: { body: '#8B4513', belly: '#A0522D' } },
+        { type: 'ezel', name: 'Ezel', emoji: '🫏', x: 650, y: 480, color: { body: '#808080', belly: '#A9A9A9' } },
+        { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 480, color: { body: '#000000', belly: '#FFFFFF' } },
+        { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 480, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
     ]
 };
 
@@ -248,6 +248,143 @@ export class AnimalChallenge {
     }
 }
 
+// Draw guinea pig style animal
+function drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY, scale = 0.4) {
+    ctx.save();
+    ctx.translate(screenX, screenY);
+    ctx.scale(scale, scale);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, 35, 30, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Body
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 40, 30, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly
+    ctx.fillStyle = animal.color.belly;
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 25, 15, 0, 0, Math.PI);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.ellipse(0, -20, 30, 25, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears - adjusted for different animals
+    ctx.fillStyle = animal.color.body;
+    if (animal.type === 'konijn' || animal.type === 'ezel') {
+        // Long ears
+        ctx.beginPath();
+        ctx.ellipse(-12, -35, 8, 20, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(12, -35, 8, 20, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (animal.type === 'kat' || animal.type === 'leeuw' || animal.type === 'tijger') {
+        // Pointed ears
+        ctx.beginPath();
+        ctx.moveTo(-15, -30);
+        ctx.lineTo(-10, -45);
+        ctx.lineTo(-5, -30);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(15, -30);
+        ctx.lineTo(10, -45);
+        ctx.lineTo(5, -30);
+        ctx.closePath();
+        ctx.fill();
+    } else {
+        // Regular ears
+        ctx.beginPath();
+        ctx.ellipse(-15, -30, 10, 15, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(15, -30, 10, 15, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Feet
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.ellipse(-20, 20, 10, 15, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(20, 20, 10, 15, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(-10, -20, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(10, -20, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nose
+    ctx.fillStyle = '#FF69B4';
+    ctx.beginPath();
+    ctx.ellipse(0, -10, 3, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Special features for certain animals
+    if (animal.type === 'leeuw') {
+        // Mane
+        ctx.fillStyle = '#B8860B';
+        ctx.beginPath();
+        ctx.arc(0, -20, 35, 0, Math.PI * 2);
+        ctx.fill();
+        // Redraw head on top
+        ctx.fillStyle = animal.color.body;
+        ctx.beginPath();
+        ctx.ellipse(0, -20, 30, 25, 0, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (animal.type === 'tijger') {
+        // Stripes
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-20, -10);
+        ctx.lineTo(-15, -5);
+        ctx.moveTo(20, -10);
+        ctx.lineTo(15, -5);
+        ctx.moveTo(-10, 5);
+        ctx.lineTo(-5, 10);
+        ctx.moveTo(10, 5);
+        ctx.lineTo(5, 10);
+        ctx.stroke();
+    }
+
+    // Name label
+    ctx.restore();
+    ctx.fillStyle = 'black';
+    ctx.font = '12px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(animal.name, screenX, screenY + 40);
+
+    ctx.save();
+    ctx.translate(screenX, screenY);
+    ctx.scale(scale, scale);
+
+    // Interactive glow
+    ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 50, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 // Draw animals in the world
 export function drawAnimals(ctx, worldType, cameraX, cameraY) {
     const animals = ANIMALS[worldType] || [];
@@ -259,18 +396,8 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
         
         // Only draw if on screen
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
-            // Draw animal emoji
-            ctx.font = '40px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(animal.emoji, screenX, screenY);
-            
-            // Draw interactive glow
-            ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(screenX, screenY, 30, 0, Math.PI * 2);
-            ctx.stroke();
+            // Draw guinea pig style animal instead of emoji
+            drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY);
         }
     });
 }
