@@ -8,6 +8,7 @@ export class Player {
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = null;
         this.targetY = null;
+        this.coins = 0;
         
         // Apply customization or use defaults
         this.colors = {
@@ -69,6 +70,12 @@ export class Player {
     constrainToBounds(minX, maxX, minY, maxY) {
         this.x = Math.max(minX, Math.min(maxX, this.x));
         this.y = Math.max(minY, Math.min(maxY, this.y));
+    }
+    
+    addCoins(amount) {
+        this.coins += amount;
+        // Dispatch event for UI update
+        window.dispatchEvent(new CustomEvent('coinsUpdated', { detail: { coins: this.coins } }));
     }
 
     setColor(part, color) {

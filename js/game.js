@@ -5,6 +5,7 @@ import { Camera } from './camera.js';
 import { UI } from './ui.js';
 import { drawWorld } from './worlds.js';
 import { createDierenstadBuildings, drawInterior } from './buildings.js';
+import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
@@ -19,6 +20,7 @@ export class Game {
         this.player = new Player(customization);
         this.camera = new Camera(canvas);
         this.ui = new UI(this.player);
+        this.animalChallenge = new AnimalChallenge(this);
         
         // Game state
         this.currentWorld = DEFAULT_WORLD;
@@ -125,7 +127,17 @@ export class Game {
                 }
             }
             
-            // If not clicked on building, move player
+            // Check if clicked on an animal
+            if (!clickedBuilding) {
+                const clickedAnimal = checkAnimalClick(this.currentWorld, worldCoords.x, worldCoords.y);
+                if (clickedAnimal) {
+                    // Show challenge modal
+                    this.animalChallenge.showChallenge(clickedAnimal);
+                    clickedBuilding = true; // Prevent player movement
+                }
+            }
+            
+            // If not clicked on building or animal, move player
             if (!clickedBuilding) {
                 this.player.setTarget(worldCoords.x, worldCoords.y);
             }
@@ -246,6 +258,9 @@ export class Game {
             this.camera.applyTransform(this.ctx);
             
             drawWorld(this.ctx, this.currentWorld, this.buildings);
+            
+            // Draw animals
+            drawAnimals(this.ctx, this.currentWorld, this.camera.x, this.camera.y);
             
             // Draw click target
             if (this.player.targetX !== null && this.player.targetY !== null) {
