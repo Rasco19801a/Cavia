@@ -8,7 +8,7 @@ export class Player {
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = null;
         this.targetY = null;
-        this.coins = 50; // Starting coins
+        this.carrots = 50; // Starting carrots
         
         // Apply customization or use defaults
         this.colors = {
@@ -72,10 +72,10 @@ export class Player {
         this.y = Math.max(minY, Math.min(maxY, this.y));
     }
     
-    addCoins(amount) {
-        this.coins += amount;
+    addCarrots(amount) {
+        this.carrots += amount;
         // Dispatch event for UI update
-        window.dispatchEvent(new CustomEvent('coinsUpdated', { detail: { coins: this.coins } }));
+        window.dispatchEvent(new CustomEvent('carrotsUpdated', { detail: { carrots: this.carrots } }));
     }
 
     setColor(part, color) {

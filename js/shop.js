@@ -54,10 +54,10 @@ export class Shop {
         this.shopModal.innerHTML = `
             <div class="shop-content">
                 <h2 id="shopTitle">Winkel</h2>
-                <div class="shop-coins">
-                    <span class="coin-icon">🪙</span>
-                    <span id="shopCoinsAmount">0</span>
-                </div>
+                            <div class="shop-carrots">
+                <span class="carrot-icon">🥕</span>
+                <span id="shopCarrotsAmount">0</span>
+            </div>
                 <div id="shopItems" class="shop-items-grid"></div>
                 <button class="close-btn" id="closeShop">✖</button>
                 <div id="shopMessage" class="shop-message hidden"></div>
@@ -88,8 +88,8 @@ export class Shop {
         // Update shop title
         document.getElementById('shopTitle').textContent = shopName;
         
-        // Update coins display
-        document.getElementById('shopCoinsAmount').textContent = this.game.player.coins;
+        // Update carrots display
+        document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
         
         // Clear and populate items
         const itemsContainer = document.getElementById('shopItems');
@@ -103,7 +103,7 @@ export class Shop {
                 <div class="item-name">${item.name}</div>
                 <div class="item-description">${item.description}</div>
                 <div class="item-price">
-                    <span class="coin-icon">🪙</span>
+                    <span class="carrot-icon">🥕</span>
                     <span>${item.price}</span>
                 </div>
                 <button class="buy-btn" data-item-id="${item.id}">Kopen</button>
@@ -112,8 +112,8 @@ export class Shop {
             const buyBtn = itemDiv.querySelector('.buy-btn');
             buyBtn.addEventListener('click', () => this.buyItem(item));
             
-            // Disable button if not enough coins
-            if (this.game.player.coins < item.price) {
+            // Disable button if not enough carrots
+            if (this.game.player.carrots < item.price) {
                 buyBtn.disabled = true;
                 buyBtn.textContent = 'Te duur';
             }
@@ -126,19 +126,19 @@ export class Shop {
     }
 
     buyItem(item) {
-        if (this.game.player.coins < item.price) {
-            this.showMessage('Je hebt niet genoeg muntjes!', 'error');
+        if (this.game.player.carrots < item.price) {
+            this.showMessage('Je hebt niet genoeg wortels!', 'error');
             return;
         }
         
-        // Deduct coins
-        this.game.player.addCoins(-item.price);
+                    // Deduct carrots
+            this.game.player.addCarrots(-item.price);
         
         // Add to inventory
         this.inventory.push(item);
         
-        // Update coins display
-        document.getElementById('shopCoinsAmount').textContent = this.game.player.coins;
+        // Update carrots display
+        document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
         
         // Show success message
         this.showMessage(`Je hebt ${item.name} gekocht!`, 'success');
@@ -159,7 +159,7 @@ export class Shop {
         
         buyButtons.forEach((btn, index) => {
             const item = items[index];
-            if (this.game.player.coins < item.price) {
+            if (this.game.player.carrots < item.price) {
                 btn.disabled = true;
                 btn.textContent = 'Te duur';
             } else {
