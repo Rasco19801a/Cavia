@@ -45,4 +45,4 @@ export const WORLDS = {
 };
 
 // Default world
-export const DEFAULT_WORLD = WORLDS.STAD;
+export const DEFAULT_WORLD = WORLDS.DIERENSTAD;
