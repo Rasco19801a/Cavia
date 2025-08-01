@@ -1,0 +1,125 @@
+/* Base styles */
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #87CEEB;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Game container */
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Canvas styles */
+canvas {
+    border: none;
+    display: block;
+    cursor: pointer;
+}
+
+/* UI Panel base styles */
+.ui-panel {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* World selector */
+.world-selector {
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 400px;
+}
+
+.world-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    background: #667eea;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.world-btn:hover {
+    background: #5a67d8;
+}
+
+.world-btn.active {
+    background: #764ba2;
+}
+
+/* Controls panel */
+.controls {
+    bottom: 10px;
+    left: 10px;
+}
+
+.controls p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Design panel */
+.design-panel {
+    top: 10px;
+    right: 10px;
+    max-width: 200px;
+}
+
+.design-panel h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* Color picker */
+#colorPicker {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#colorPicker > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+#colorPicker strong {
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.color-btn {
+    width: 25px;
+    height: 25px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    margin: 2px;
+    transition: border-color 0.3s ease;
+}
+
+.color-btn:hover {
+    border-color: #a0a0a0;
+}
+
+.color-btn.active {
+    border-color: #764ba2;
+    box-shadow: 0 0 5px rgba(118, 75, 162, 0.5);
+}
