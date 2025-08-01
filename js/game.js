@@ -30,6 +30,11 @@ export class Game {
         // Setup world
         this.setupWorld();
         
+        // Show UI panels
+        document.getElementById('worldSelector').classList.remove('hidden');
+        document.querySelector('.controls').classList.remove('hidden');
+        document.querySelector('.design-panel').classList.remove('hidden');
+        
         // Setup event listeners
         this.setupEventListeners();
         
@@ -136,6 +141,7 @@ export class Game {
     }
 
     changeWorld(world) {
+        console.log(`Changing world to: ${world}`);
         this.currentWorld = world;
         this.player.x = CONFIG.PLAYER_START_X;
         this.player.y = CONFIG.PLAYER_START_Y;
@@ -144,6 +150,7 @@ export class Game {
         this.isInside = false;
         this.currentBuilding = null;
         this.setupWorld();
+        console.log(`World changed to: ${this.currentWorld}`);
     }
 
     setupWorld() {

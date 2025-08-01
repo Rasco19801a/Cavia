@@ -193,7 +193,7 @@ canvas {
     gap: 5px;
     max-width: calc(100% - 20px);
     width: auto;
-    z-index: 200;
+    z-index: 500;
 }
 
 .world-btn {

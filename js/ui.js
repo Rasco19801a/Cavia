@@ -5,7 +5,8 @@ export class UI {
     constructor(player) {
         this.player = player;
         this.setupColorPicker();
-        this.setupWorldSelector();
+        // Delay world selector setup to ensure DOM is ready
+        setTimeout(() => this.setupWorldSelector(), 100);
     }
 
     setupColorPicker() {
@@ -41,14 +42,18 @@ export class UI {
         const worldButtons = document.querySelectorAll('.world-btn');
         
         if (worldButtons.length === 0) {
+            console.error('World buttons not found');
             // Retry if buttons not found yet
             setTimeout(() => this.setupWorldSelector(), 100);
             return;
         }
         
+        console.log(`Found ${worldButtons.length} world buttons`);
+        
         worldButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const world = btn.getAttribute('data-world');
+                console.log(`World button clicked: ${world}`);
                 
                 // Update active state
                 worldButtons.forEach(b => b.classList.remove('active'));
