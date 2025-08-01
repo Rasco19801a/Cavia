@@ -6,6 +6,7 @@ import { UI } from './ui.js';
 import { drawWorld } from './worlds.js';
 import { createDierenstadBuildings, drawInterior } from './buildings.js';
 import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
+import { Shop } from './shop.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
@@ -21,6 +22,7 @@ export class Game {
         this.camera = new Camera(canvas);
         this.ui = new UI(this.player);
         this.animalChallenge = new AnimalChallenge(this);
+        this.shop = new Shop(this);
         
         // Game state
         this.currentWorld = DEFAULT_WORLD;
@@ -154,6 +156,17 @@ export class Game {
     }
 
     enterBuilding(building) {
+        // Check if building is a shop
+        const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 
+                             'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+        
+        if (shopBuildings.includes(building.name)) {
+            // Open shop interface instead of entering building
+            this.shop.openShop(building.name);
+            return;
+        }
+        
+        // Regular building entry for non-shops
         this.isInside = true;
         this.currentBuilding = building;
         this.player.x = 400;
