@@ -4,7 +4,7 @@ import { Player } from './player.js';
 import { Camera } from './camera.js';
 import { UI } from './ui.js';
 import { drawWorld } from './worlds.js';
-import { createStadBuildings, createDierenstadBuildings, drawInterior } from './buildings.js';
+import { createDierenstadBuildings, drawInterior } from './buildings.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
@@ -72,14 +72,19 @@ export class Game {
         // Mouse/touch controls
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
         
+        // Touch events for mobile
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
-            const rect = this.canvas.getBoundingClientRect();
             this.handleClick({
                 clientX: touch.clientX,
                 clientY: touch.clientY
             });
+        });
+        
+        // Also handle touchend for better mobile experience
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
         });
         
         // World change event
@@ -100,7 +105,7 @@ export class Game {
             // Check if clicked on a building
             let clickedBuilding = false;
             
-            if (this.currentWorld === WORLDS.STAD || this.currentWorld === WORLDS.DIERENSTAD) {
+            if (this.currentWorld === WORLDS.DIERENSTAD) {
                 for (const building of this.buildings) {
                     if (building.contains && building.contains(worldCoords.x, worldCoords.y)) {
                         // Enter building
@@ -194,7 +199,6 @@ export class Game {
     
     getWorldName(world) {
         const names = {
-            'stad': 'de Stad',
             'natuur': 'de Natuur',
             'strand': 'het Strand',
             'winter': 'de Winter',
@@ -210,9 +214,6 @@ export class Game {
         this.buildings = [];
         
         switch (this.currentWorld) {
-            case WORLDS.STAD:
-                this.buildings = createStadBuildings();
-                break;
             case WORLDS.DIERENSTAD:
                 this.buildings = createDierenstadBuildings();
                 break;
