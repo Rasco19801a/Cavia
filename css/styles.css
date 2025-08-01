@@ -825,3 +825,32 @@ body {
         opacity: 1;
     }
 }
+
+/* Shop button inside buildings */
+.shop-button-inside {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 40px;
+    font-size: 24px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 1000;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.shop-button-inside:hover {
+    background: #45a049;
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.shop-button-inside:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
