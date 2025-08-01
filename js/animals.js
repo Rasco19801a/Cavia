@@ -390,14 +390,14 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
     const animals = ANIMALS[worldType] || [];
     
     animals.forEach(animal => {
-        // Calculate screen position
+        // Draw at world coordinates - camera transform is already applied
+        // Only draw if on screen
         const screenX = animal.x - cameraX;
         const screenY = animal.y - cameraY;
         
-        // Only draw if on screen
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
-            // Draw guinea pig style animal instead of emoji
-            drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY);
+            // Draw guinea pig style animal at world coordinates
+            drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
         }
     });
 }

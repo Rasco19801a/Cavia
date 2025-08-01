@@ -183,5 +183,15 @@ export class Shop {
     closeShop() {
         this.shopModal.classList.add('hidden');
         this.currentShop = null;
+        
+        // Show the shop button again if we're still inside a shop building
+        if (this.game.isInside && this.game.currentBuilding) {
+            const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 
+                                 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+            
+            if (shopBuildings.includes(this.game.currentBuilding.name)) {
+                this.game.showShopButton(this.game.currentBuilding.name);
+            }
+        }
     }
 }
