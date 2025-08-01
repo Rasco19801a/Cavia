@@ -587,16 +587,23 @@ body {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: none;
+    background: white;
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #999;
-    transition: color 0.2s;
+    color: black;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-btn:hover {
-    color: #666;
+    background: #f0f0f0;
+    transform: scale(1.1);
 }
 
 .feedback {
@@ -778,8 +785,8 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: #ff4444;
-    color: white;
+    background: white;
+    color: black;
     border: none;
     width: 40px;
     height: 40px;
@@ -790,7 +797,7 @@ body {
 }
 
 .close-btn:hover {
-    background: #ff6666;
+    background: #f0f0f0;
     transform: scale(1.1);
 }
 
