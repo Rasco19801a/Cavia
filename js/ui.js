@@ -40,6 +40,12 @@ export class UI {
     setupWorldSelector() {
         const worldButtons = document.querySelectorAll('.world-btn');
         
+        if (worldButtons.length === 0) {
+            // Retry if buttons not found yet
+            setTimeout(() => this.setupWorldSelector(), 100);
+            return;
+        }
+        
         worldButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const world = btn.getAttribute('data-world');
