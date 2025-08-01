@@ -7,6 +7,9 @@ export class UI {
         this.setupColorPicker();
         // Delay world selector setup to ensure DOM is ready
         setTimeout(() => this.setupWorldSelector(), 100);
+        
+        // Also try to set it up immediately in case DOM is already ready
+        this.setupWorldSelector();
     }
 
     setupColorPicker() {
@@ -52,19 +55,32 @@ export class UI {
         
         worldButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent any default behavior
+                e.stopPropagation(); // Stop event bubbling
+                
                 const world = btn.getAttribute('data-world');
                 console.log(`World button clicked: ${world}`);
+                console.log('Button element:', btn);
+                console.log('Current active buttons:', document.querySelectorAll('.world-btn.active'));
                 
                 // Update active state
                 worldButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
+                console.log('Dispatching worldChange event...');
+                
                 // Dispatch custom event for world change
-                window.dispatchEvent(new CustomEvent('worldChange', { 
-                    detail: { world } 
-                }));
+                const event = new CustomEvent('worldChange', { 
+                    detail: { world },
+                    bubbles: true
+                });
+                window.dispatchEvent(event);
+                
+                console.log('worldChange event dispatched');
             });
         });
+        
+        console.log('World selector setup complete');
     }
 
     translatePart(part) {

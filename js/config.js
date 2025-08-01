@@ -43,3 +43,6 @@ export const WORLDS = {
     ZWEMBAD: 'zwembad',
     DIERENSTAD: 'dierenstad'
 };
+
+// Default world
+export const DEFAULT_WORLD = WORLDS.STAD;
