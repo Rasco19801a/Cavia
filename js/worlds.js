@@ -320,10 +320,29 @@ function drawJungle(ctx) {
     ctx.fillStyle = '#654321';
     ctx.fillRect(0, 700, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 700);
 
+    // Fixed tree positions
+    const treePositions = [
+        {x: 150, y: 400},
+        {x: 300, y: 350},
+        {x: 450, y: 500},
+        {x: 600, y: 300},
+        {x: 750, y: 450},
+        {x: 900, y: 380},
+        {x: 1050, y: 520},
+        {x: 1200, y: 320},
+        {x: 1350, y: 480},
+        {x: 200, y: 550},
+        {x: 500, y: 380},
+        {x: 800, y: 350},
+        {x: 1100, y: 400},
+        {x: 1300, y: 330},
+        {x: 100, y: 450}
+    ];
+
     // Large trees
-    for (let i = 0; i < 15; i++) {
-        const x = Math.random() * CONFIG.WORLD_WIDTH;
-        const y = 300 + Math.random() * 300;
+    treePositions.forEach(pos => {
+        const x = pos.x;
+        const y = pos.y;
 
         // Tree trunk
         ctx.fillStyle = '#654321';
@@ -342,7 +361,7 @@ function drawJungle(ctx) {
         ctx.moveTo(x + 20, y);
         ctx.quadraticCurveTo(x + 30, y + 50, x + 20, y + 100);
         ctx.stroke();
-    }
+    });
 
     // Monkeys
     for (let i = 0; i < 3; i++) {
@@ -369,10 +388,24 @@ function drawJungle(ctx) {
         ctx.stroke();
     }
 
+    // Fixed flower positions
+    const flowerPositions = [
+        {x: 100, y: 670},
+        {x: 250, y: 680},
+        {x: 400, y: 665},
+        {x: 550, y: 690},
+        {x: 700, y: 675},
+        {x: 850, y: 685},
+        {x: 1000, y: 660},
+        {x: 1150, y: 695},
+        {x: 1300, y: 670},
+        {x: 1450, y: 680}
+    ];
+
     // Exotic flowers
-    for (let i = 0; i < 10; i++) {
-        const x = Math.random() * CONFIG.WORLD_WIDTH;
-        const y = 650 + Math.random() * 50;
+    flowerPositions.forEach((pos, i) => {
+        const x = pos.x;
+        const y = pos.y;
 
         ctx.fillStyle = ['#FF1493', '#FF69B4', '#FFD700', '#FF4500'][i % 4];
         for (let j = 0; j < 5; j++) {
@@ -391,7 +424,7 @@ function drawJungle(ctx) {
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fill();
-    }
+    });
 }
 
 function drawZwembad(ctx) {
@@ -443,7 +476,7 @@ function drawZwembad(ctx) {
 
         // Pool name
         ctx.fillStyle = 'black';
-        ctx.font = '16px Arial';
+        ctx.font = '16px Nunito, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(pool.name + ' bad', pool.x + pool.w/2, pool.y - 10);
     });
@@ -496,7 +529,7 @@ function drawDierenstad(ctx, buildings) {
 
         // Shop name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Arial';
+        ctx.font = '18px Nunito, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(shop.name, shop.x + shop.w/2, shop.y + 30);
     });

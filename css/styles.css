@@ -1,10 +1,141 @@
 /* Base styles */
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-family: 'Nunito', sans-serif;
     background: #87CEEB;
     margin: 0;
     padding: 0;
     overflow: hidden;
+}
+
+/* Customization Screen */
+.customization-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.customization-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+}
+
+.customization-content h1 {
+    color: #764ba2;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+.cavia-preview {
+    margin: 20px auto;
+    background: #f0f0f0;
+    border-radius: 15px;
+    padding: 20px;
+    display: inline-block;
+}
+
+.customization-options {
+    margin: 30px 0;
+}
+
+.color-section {
+    margin: 20px 0;
+}
+
+.color-section h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+    border-color: #ddd;
+}
+
+.color-btn.active {
+    border-color: #764ba2;
+    box-shadow: 0 0 10px rgba(118, 75, 162, 0.5);
+}
+
+.accessory-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.accessory-btn {
+    padding: 10px 20px;
+    border: 2px solid #667eea;
+    border-radius: 20px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.accessory-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.accessory-btn.active {
+    background: #764ba2;
+    color: white;
+    border-color: #764ba2;
+}
+
+.start-game-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.start-game-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+}
+
+.customization-screen.hidden {
+    display: none;
 }
 
 /* Game container */

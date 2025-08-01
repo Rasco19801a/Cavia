@@ -4,10 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cavia Avonturen Wereld</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="game-container">
+        <!-- Customization Screen -->
+        <div id="customizationScreen" class="customization-screen">
+            <div class="customization-content">
+                <h1>🐹 Customize je Cavia!</h1>
+                
+                <div class="cavia-preview">
+                    <canvas id="previewCanvas" width="200" height="200"></canvas>
+                </div>
+                
+                <div class="customization-options">
+                    <div class="color-section">
+                        <h3>Lichaam Kleur</h3>
+                        <div class="color-options" id="bodyColors"></div>
+                    </div>
+                    
+                    <div class="color-section">
+                        <h3>Buik Kleur</h3>
+                        <div class="color-options" id="bellyColors"></div>
+                    </div>
+                    
+                    <div class="color-section">
+                        <h3>Accessoire</h3>
+                        <div class="accessory-options" id="accessories">
+                            <button class="accessory-btn" data-accessory="none">Geen</button>
+                            <button class="accessory-btn" data-accessory="bow">🎀 Strik</button>
+                            <button class="accessory-btn" data-accessory="hat">🎩 Hoed</button>
+                            <button class="accessory-btn" data-accessory="glasses">👓 Bril</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="startGameBtn" class="start-game-btn">Klaar! Start het spel</button>
+            </div>
+        </div>
+        
         <canvas id="gameCanvas"></canvas>
         
         <div class="ui-panel world-selector" id="worldSelector">
