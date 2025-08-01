@@ -1,5 +1,5 @@
 // Game module - main game logic and state management
-import { CONFIG, WORLDS } from './config.js';
+import { CONFIG, WORLDS, DEFAULT_WORLD } from './config.js';
 import { Player } from './player.js';
 import { Camera } from './camera.js';
 import { UI } from './ui.js';
@@ -21,7 +21,7 @@ export class Game {
         this.ui = new UI(this.player);
         
         // Game state
-        this.currentWorld = WORLDS.STAD;
+        this.currentWorld = DEFAULT_WORLD;
         this.buildings = [];
         this.isInside = false;
         this.currentBuilding = null;
@@ -30,10 +30,22 @@ export class Game {
         // Setup world
         this.setupWorld();
         
-        // Show UI panels
-        document.getElementById('worldSelector').classList.remove('hidden');
-        document.querySelector('.controls').classList.remove('hidden');
-        document.querySelector('.design-panel').classList.remove('hidden');
+        // Show UI panels with a small delay to ensure DOM is ready
+        setTimeout(() => {
+            const worldSelector = document.getElementById('worldSelector');
+            const controls = document.querySelector('.controls');
+            const designPanel = document.querySelector('.design-panel');
+            
+            if (worldSelector) {
+                worldSelector.classList.remove('hidden');
+                console.log('World selector shown');
+            } else {
+                console.error('World selector element not found!');
+            }
+            
+            if (controls) controls.classList.remove('hidden');
+            if (designPanel) designPanel.classList.remove('hidden');
+        }, 50);
         
         // Setup event listeners
         this.setupEventListeners();
@@ -72,6 +84,7 @@ export class Game {
         
         // World change event
         window.addEventListener('worldChange', (e) => {
+            console.log('worldChange event received in game.js:', e.detail);
             this.changeWorld(e.detail.world);
         });
     }
@@ -141,16 +154,56 @@ export class Game {
     }
 
     changeWorld(world) {
-        console.log(`Changing world to: ${world}`);
+        console.log(`changeWorld called with: ${world}`);
+        console.log(`Current world before change: ${this.currentWorld}`);
+        
+        // Validate world parameter
+        const validWorlds = Object.values(WORLDS);
+        if (!validWorlds.includes(world)) {
+            console.error(`Invalid world: ${world}. Valid worlds are:`, validWorlds);
+            return;
+        }
+        
+        // Don't change if it's the same world
+        if (this.currentWorld === world) {
+            console.log('Already in this world, no change needed');
+            return;
+        }
+        
         this.currentWorld = world;
         this.player.x = CONFIG.PLAYER_START_X;
         this.player.y = CONFIG.PLAYER_START_Y;
+        this.player.clearTarget(); // Clear any movement target
         this.camera.x = 0;
         this.camera.y = 0;
         this.isInside = false;
         this.currentBuilding = null;
         this.setupWorld();
-        console.log(`World changed to: ${this.currentWorld}`);
+        console.log(`World changed successfully to: ${this.currentWorld}`);
+        
+        // Force multiple redraws to ensure the change is visible
+        this.draw();
+        setTimeout(() => this.draw(), 10);
+        setTimeout(() => this.draw(), 50);
+        
+        // Show a notification
+        if (this.ui && this.ui.showNotification) {
+            this.ui.showNotification(`Welkom in ${this.getWorldName(world)}!`);
+        }
+    }
+    
+    getWorldName(world) {
+        const names = {
+            'stad': 'de Stad',
+            'natuur': 'de Natuur',
+            'strand': 'het Strand',
+            'winter': 'de Winter',
+            'woestijn': 'de Woestijn',
+            'jungle': 'de Jungle',
+            'zwembad': 'het Zwembad',
+            'dierenstad': 'de Dierenstad'
+        };
+        return names[world] || world;
     }
 
     setupWorld() {
