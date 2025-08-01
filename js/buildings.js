@@ -329,6 +329,6 @@ function drawAccessoiresShop(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '12px Nunito, sans-serif';
     for (let i = 0; i < accessories.length; i++) {
-        ctx.fillText('€' + (5 + i * 2), 150 + i * 120, 320);
+        ctx.fillText('🥕 ' + (5 + i * 2), 150 + i * 120, 320);
     }
 }
