@@ -14,6 +14,7 @@ export class Player {
             body: customization.bodyColor || DEFAULT_CAVIA_COLORS.body,
             belly: customization.bellyColor || DEFAULT_CAVIA_COLORS.belly,
             ears: customization.bodyColor || DEFAULT_CAVIA_COLORS.ears,
+            feet: customization.bodyColor || DEFAULT_CAVIA_COLORS.feet,
             nose: DEFAULT_CAVIA_COLORS.nose,
             eyes: DEFAULT_CAVIA_COLORS.eyes
         };

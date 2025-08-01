@@ -15,7 +15,8 @@ export const DEFAULT_CAVIA_COLORS = {
     ears: '#FFB6C1',
     belly: '#FFF5EE',
     feet: '#FFB6C1',
-    nose: '#FF69B4'
+    nose: '#FF69B4',
+    eyes: 'black'
 };
 
 // Available colors for customization
