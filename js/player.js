@@ -2,13 +2,23 @@
 import { CONFIG, DEFAULT_CAVIA_COLORS } from './config.js';
 
 export class Player {
-    constructor() {
+    constructor(customization = {}) {
         this.x = CONFIG.PLAYER_START_X;
         this.y = CONFIG.PLAYER_START_Y;
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = null;
         this.targetY = null;
-        this.colors = { ...DEFAULT_CAVIA_COLORS };
+        
+        // Apply customization or use defaults
+        this.colors = {
+            body: customization.bodyColor || DEFAULT_CAVIA_COLORS.body,
+            belly: customization.bellyColor || DEFAULT_CAVIA_COLORS.belly,
+            ears: customization.bodyColor || DEFAULT_CAVIA_COLORS.ears,
+            nose: DEFAULT_CAVIA_COLORS.nose,
+            eyes: DEFAULT_CAVIA_COLORS.eyes
+        };
+        
+        this.accessory = customization.accessory || 'none';
     }
 
     setTarget(x, y) {
@@ -128,7 +138,56 @@ export class Player {
         ctx.ellipse(0, -10, 3, 2, 0, 0, Math.PI * 2);
         ctx.fill();
 
+        // Draw accessory
+        this.drawAccessory(ctx);
+
         ctx.restore();
+    }
+    
+    drawAccessory(ctx) {
+        switch(this.accessory) {
+            case 'bow':
+                // Draw bow
+                ctx.fillStyle = '#FF1493';
+                ctx.beginPath();
+                // Left side of bow
+                ctx.ellipse(-5, -40, 8, 6, -0.3, 0, Math.PI * 2);
+                // Right side of bow
+                ctx.ellipse(5, -40, 8, 6, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                // Center of bow
+                ctx.fillStyle = '#FF69B4';
+                ctx.fillRect(-3, -42, 6, 4);
+                break;
+                
+            case 'hat':
+                // Draw top hat
+                ctx.fillStyle = 'black';
+                // Hat brim
+                ctx.fillRect(-20, -45, 40, 4);
+                // Hat top
+                ctx.fillRect(-15, -60, 30, 15);
+                break;
+                
+            case 'glasses':
+                // Draw glasses
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                // Left lens
+                ctx.beginPath();
+                ctx.arc(-10, -20, 5, 0, Math.PI * 2);
+                ctx.stroke();
+                // Right lens
+                ctx.beginPath();
+                ctx.arc(10, -20, 5, 0, Math.PI * 2);
+                ctx.stroke();
+                // Bridge
+                ctx.beginPath();
+                ctx.moveTo(-5, -20);
+                ctx.lineTo(5, -20);
+                ctx.stroke();
+                break;
+        }
     }
 
     drawTarget(ctx, cameraX, cameraY) {

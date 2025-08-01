@@ -7,7 +7,7 @@ import { drawWorld } from './worlds.js';
 import { createStadBuildings, createDierenstadBuildings, drawInterior } from './buildings.js';
 
 export class Game {
-    constructor(canvas) {
+    constructor(canvas, customization = {}) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
@@ -15,8 +15,8 @@ export class Game {
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
         
-        // Initialize game components
-        this.player = new Player();
+        // Initialize game components with customization
+        this.player = new Player(customization);
         this.camera = new Camera(canvas);
         this.ui = new UI(this.player);
         
