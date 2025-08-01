@@ -5,17 +5,20 @@ export class UI {
     constructor(player) {
         this.player = player;
         this.setupColorPicker();
-        this.setupCoinsDisplay();
+        this.setupCarrotsDisplay();
         // Delay world selector setup to ensure DOM is ready
         setTimeout(() => this.setupWorldSelector(), 100);
         
         // Also try to set it up immediately in case DOM is already ready
         this.setupWorldSelector();
         
-        // Listen for coin updates
-        window.addEventListener('coinsUpdated', (e) => {
-            this.updateCoinsDisplay(e.detail.coins);
+        // Listen for carrot updates
+        window.addEventListener('carrotsUpdated', (e) => {
+            this.updateCarrotsDisplay(e.detail.carrots);
         });
+        
+        // Display initial carrots
+        this.updateCarrotsDisplay(this.player.carrots);
     }
 
     setupColorPicker() {
@@ -140,25 +143,25 @@ export class UI {
         }, 2000);
     }
     
-    setupCoinsDisplay() {
-        // Create coins display element
-        const coinsDisplay = document.createElement('div');
-        coinsDisplay.id = 'coinsDisplay';
-        coinsDisplay.className = 'coins-display';
-        coinsDisplay.innerHTML = `
-            <span class="coin-icon">🪙</span>
-            <span id="coinsAmount">0</span>
+    setupCarrotsDisplay() {
+        // Create carrots display element
+        const carrotsDisplay = document.createElement('div');
+        carrotsDisplay.id = 'carrotsDisplay';
+        carrotsDisplay.className = 'carrots-display';
+        carrotsDisplay.innerHTML = `
+            <span class="carrot-icon">🥕</span>
+            <span id="carrotsAmount">0</span>
         `;
-        document.body.appendChild(coinsDisplay);
+        document.body.appendChild(carrotsDisplay);
     }
     
-    updateCoinsDisplay(coins) {
-        const coinsAmount = document.getElementById('coinsAmount');
-        if (coinsAmount) {
-            coinsAmount.textContent = coins;
+    updateCarrotsDisplay(carrots) {
+        const carrotsAmount = document.getElementById('carrotsAmount');
+        if (carrotsAmount) {
+            carrotsAmount.textContent = carrots;
             // Add animation effect
-            coinsAmount.classList.add('coin-bounce');
-            setTimeout(() => coinsAmount.classList.remove('coin-bounce'), 500);
+            carrotsAmount.classList.add('carrot-bounce');
+            setTimeout(() => carrotsAmount.classList.remove('carrot-bounce'), 500);
         }
     }
 }

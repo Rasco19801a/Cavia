@@ -624,8 +624,8 @@ body {
     color: #721c24;
 }
 
-/* Coins Display */
-.coins-display {
+/* Carrots Display */
+.carrots-display {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -641,20 +641,20 @@ body {
     z-index: 100;
 }
 
-.coin-icon {
+.carrot-icon {
     font-size: 24px;
 }
 
-#coinsAmount {
+#carrotsAmount {
     color: #FFD700;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.coin-bounce {
-    animation: coinBounce 0.5s ease-out;
+.carrot-bounce {
+    animation: carrotBounce 0.5s ease-out;
 }
 
-@keyframes coinBounce {
+@keyframes carrotBounce {
     0%, 100% {
         transform: scale(1);
     }
@@ -695,7 +695,7 @@ body {
     font-size: 2em;
 }
 
-.shop-coins {
+.shop-carrots {
     position: absolute;
     top: 30px;
     right: 60px;

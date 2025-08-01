@@ -213,13 +213,13 @@ export class AnimalChallenge {
             feedback.innerHTML = '<span class="success">🎉 Goed gedaan!</span>';
             feedback.className = 'feedback success';
             
-            // Award coins
-            const coinsEarned = 10;
-            this.game.player.addCoins(coinsEarned);
+            // Award carrots
+            const carrotsEarned = 10;
+            this.game.player.addCarrots(carrotsEarned);
             
-            // Update UI to show coins earned
+            // Update UI to show carrots earned
             setTimeout(() => {
-                feedback.innerHTML += `<br>Je hebt ${coinsEarned} muntjes verdiend!`;
+                feedback.innerHTML += `<br>Je hebt ${carrotsEarned} wortels verdiend!`;
             }, 500);
             
             // Close modal after success
