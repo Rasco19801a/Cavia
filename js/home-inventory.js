@@ -258,22 +258,14 @@ export class HomeInventory {
             // Check if this item is being dragged
             const isDragging = this.draggedItem === item;
             
-            // Apply scale if dragging or animating
-            if (isDragging) {
-                const scale = 1.1;
-                ctx.translate(item.x, item.y);
-                ctx.scale(scale, scale);
-                ctx.translate(-item.x, -item.y);
-                ctx.globalAlpha = 0.8; // Make slightly transparent when dragging
-            } else if (item.scale || item.opacity) {
-                // Apply animation properties
-                const scale = item.scale || 1;
-                const opacity = item.opacity !== undefined ? item.opacity : 1;
-                ctx.translate(item.x, item.y);
-                ctx.scale(scale, scale);
-                ctx.translate(-item.x, -item.y);
-                ctx.globalAlpha = opacity;
-            }
+            // Apply transformations
+            const scale = item.scale || (isDragging ? 1.1 : 1);
+            const opacity = item.opacity !== undefined ? item.opacity : (isDragging ? 0.8 : 1);
+            
+            ctx.translate(item.x, item.y);
+            ctx.scale(scale, scale);
+            ctx.translate(-item.x, -item.y);
+            ctx.globalAlpha = opacity;
             
             if (item.id === 'wheel') {
                 // Draw giant wheel
@@ -457,11 +449,10 @@ export class HomeInventory {
                 console.log('Pig wants:', targetPig.missionItem);
                 console.log('Current progress:', targetPig.missionProgress, '/', targetPig.missionTarget);
                 
-                // Feed the guinea pig
-                this.draggedItem.consumed = true;
-                this.showEatingAnimation(this.draggedItem, targetPig);
+                // Feed the guinea pig - DONT set consumed yet, let animation handle it
+                // this.draggedItem.consumed = true; // REMOVED - let animation handle this
                 
-                // Check mission progress
+                // Check mission progress BEFORE animation
                 if (targetPig.missionItem === this.draggedItem.id) {
                     targetPig.missionProgress++;
                     console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
@@ -472,6 +463,11 @@ export class HomeInventory {
                     // Update mission modal if open with immediate visual feedback
                     if (this.currentMissionPig && this.currentMissionPig.id === targetPig.id) {
                         this.updateMissionModal();
+                    }
+                    
+                    // Force immediate re-render to show updated progress
+                    if (this.game && this.game.draw) {
+                        this.game.draw();
                     }
                     
                     // Show progress feedback
@@ -492,11 +488,16 @@ export class HomeInventory {
                     }
                 }
                 
-                // Remove consumed item from array immediately
-                this.items = this.items.filter(item => item !== this.draggedItem);
+                // Show eating animation - this will handle item removal
+                this.showEatingAnimation(this.draggedItem, targetPig);
+                
+                // DONT Remove consumed item here - let animation handle it
+                // this.items = this.items.filter(item => item !== this.draggedItem); // REMOVED
             } else if (this.isAccessory(this.draggedItem.id)) {
                 // Put accessory on guinea pig
                 targetPig.accessory = this.draggedItem.id;
+                
+                // Mark as consumed and remove immediately for accessories
                 this.draggedItem.consumed = true;
                 
                 // Check mission progress
@@ -512,7 +513,7 @@ export class HomeInventory {
                     this.game.ui.showNotification(`${targetPig.name} draagt nu een ${this.draggedItem.name}! 🎀`);
                 }
                 
-                // Remove consumed item from array immediately
+                // Remove consumed item from array immediately for accessories
                 this.items = this.items.filter(item => item !== this.draggedItem);
             }
         }
@@ -558,19 +559,50 @@ export class HomeInventory {
         if (pig) {
             pig.isEating = true;
             
-            // Create disappearing animation for the item
-            this.createItemDisappearAnimation(item);
+            // Create a simple disappearing effect
+            const startTime = Date.now();
+            const duration = 500; // milliseconds
+            const startX = item.x;
+            const startY = item.y;
+            const targetX = pig.x;
+            const targetY = pig.y;
             
-            setTimeout(() => {
-                pig.isEating = false;
-                // Remove the item from the items array after animation completes
-                this.items = this.items.filter(i => i !== item);
-            }, 500);
+            // Animation loop
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Interpolate position
+                item.x = startX + (targetX - startX) * progress;
+                item.y = startY + (targetY - startY) * progress;
+                
+                // Scale down
+                item.scale = 1 - (progress * 0.8);
+                
+                // Fade out
+                item.opacity = 1 - progress;
+                
+                // Continue animation if not finished
+                if (progress < 1) {
+                    if (this.game && this.game.draw) {
+                        this.game.draw();
+                    }
+                    requestAnimationFrame(animate);
+                } else {
+                    // Animation complete - remove item
+                    item.consumed = true;
+                    this.items = this.items.filter(i => i !== item);
+                    pig.isEating = false;
+                    
+                    // Final render
+                    if (this.game && this.game.draw) {
+                        this.game.draw();
+                    }
+                }
+            };
             
-            // Show notification about eating
-            if (this.game.ui && this.game.ui.showNotification) {
-                this.game.ui.showNotification(`${pig.name} eet ${item.name}! 😊`);
-            }
+            // Start animation
+            animate();
         }
     }
     
@@ -605,22 +637,35 @@ export class HomeInventory {
     
     updateMissionModal() {
         if (this.currentMissionPig && !this.missionModal.classList.contains('hidden')) {
+            console.log('Updating mission modal for:', this.currentMissionPig.name);
+            console.log('Progress:', this.currentMissionPig.missionProgress, '/', this.currentMissionPig.missionTarget);
+            
             // Update progress text
-            document.getElementById('progressText').textContent = `Voortgang: ${this.currentMissionPig.missionProgress}/${this.currentMissionPig.missionTarget}`;
+            const progressText = document.getElementById('progressText');
+            if (progressText) {
+                progressText.textContent = `Voortgang: ${this.currentMissionPig.missionProgress}/${this.currentMissionPig.missionTarget}`;
+            } else {
+                console.error('progressText element not found!');
+            }
             
             // Update progress bar with animation
             const progressPercentage = (this.currentMissionPig.missionProgress / this.currentMissionPig.missionTarget) * 100;
             const progressFill = document.getElementById('progressFill');
             
-            // Add transition for smooth animation
-            progressFill.style.transition = 'width 0.5s ease-in-out';
-            progressFill.style.width = progressPercentage + '%';
-            
-            // Check if mission is complete
-            if (this.currentMissionPig.missionProgress >= this.currentMissionPig.missionTarget) {
-                setTimeout(() => {
-                    progressFill.style.backgroundColor = '#4CAF50';
-                }, 500);
+            if (progressFill) {
+                console.log('Setting progress bar to:', progressPercentage + '%');
+                // Add transition for smooth animation
+                progressFill.style.transition = 'width 0.5s ease-in-out';
+                progressFill.style.width = progressPercentage + '%';
+                
+                // Check if mission is complete
+                if (this.currentMissionPig.missionProgress >= this.currentMissionPig.missionTarget) {
+                    setTimeout(() => {
+                        progressFill.style.backgroundColor = '#4CAF50';
+                    }, 500);
+                }
+            } else {
+                console.error('progressFill element not found!');
             }
         }
     }
@@ -653,8 +698,24 @@ export class HomeInventory {
     }
     
     completeMission(pig) {
+        console.log(`Mission completed for ${pig.name}!`);
+        
         // Update mission modal to show completion
         this.updateMissionModal();
+        
+        // Show completion in modal if it's open
+        if (this.currentMissionPig && this.currentMissionPig.id === pig.id && !this.missionModal.classList.contains('hidden')) {
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = '100%';
+                progressFill.style.backgroundColor = '#4CAF50';
+            }
+            
+            const missionText = document.getElementById('missionText');
+            if (missionText) {
+                missionText.innerHTML = pig.mission + '<br><strong style="color: #4CAF50;">✓ Voltooid!</strong>';
+            }
+        }
         
         // Show heart emoticon and happy message
         if (this.game.ui && this.game.ui.showNotification) {
@@ -670,7 +731,14 @@ export class HomeInventory {
         this.game.player.carrots += 50; // Reward
         
         // Update UI immediately
-        this.game.ui.updateDisplay();
+        if (this.game.ui) {
+            this.game.ui.updateDisplay();
+        }
+        
+        // Force re-render
+        if (this.game && this.game.draw) {
+            this.game.draw();
+        }
         
         // Wait a bit before giving new mission
         setTimeout(() => {
@@ -678,7 +746,9 @@ export class HomeInventory {
             const newMissions = [
                 { mission: 'Ik wil graag 2 komkommers!', item: 'cucumber', target: 2 },
                 { mission: 'Breng me een hoed!', item: 'hat', target: 1 },
-                { mission: 'Ik heb 3 mais nodig!', item: 'corn', target: 3 }
+                { mission: 'Ik heb 3 mais nodig!', item: 'corn', target: 3 },
+                { mission: 'Help me 2 stukken sla te vinden!', item: 'lettuce', target: 2 },
+                { mission: 'Ik heb zo\'n honger! Breng me 3 wortels!', item: 'carrot', target: 3 }
             ];
             
             const newMission = newMissions[Math.floor(Math.random() * newMissions.length)];
@@ -687,6 +757,9 @@ export class HomeInventory {
             pig.missionTarget = newMission.target;
             pig.missionProgress = 0;
             
+            // Save the new mission
+            this.saveProgress();
+            
             // Update the mission modal if it's still open
             if (this.currentMissionPig === pig && !this.missionModal.classList.contains('hidden')) {
                 document.getElementById('missionText').textContent = pig.mission;
@@ -694,8 +767,10 @@ export class HomeInventory {
             }
             
             // Show notification about new mission
-            this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
-        }, 2000); // Give new mission after 2 seconds
+            if (this.game.ui && this.game.ui.showNotification) {
+                this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
+            }
+        }, 3000); // Give new mission after 3 seconds
     }
     
     startWaterBathGame(pig) {
