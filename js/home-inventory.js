@@ -5,9 +5,13 @@ export class HomeInventory {
     constructor(game) {
         this.game = game;
         this.items = [];
-        this.otherGuineaPigs = [];
         this.draggedItem = null;
+        this.dragOffset = { x: 0, y: 0 };
+        this.otherGuineaPigs = [];
+        this.currentMissionPig = null;
         this.missionModal = null;
+        this.isDragging = false; // Add flag to track dragging state
+        this.dragStartTime = 0; // Track when drag started
         this.setupOtherGuineaPigs();
         this.setupMissionModal();
         this.loadProgress();
@@ -122,8 +126,51 @@ export class HomeInventory {
     }
     
     draw(ctx) {
+        // Draw floor
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(0, CONFIG.WORLD_HEIGHT - 100, CONFIG.WORLD_WIDTH, 100);
+        
+        // Draw walls
+        ctx.fillStyle = '#D2691E';
+        ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 100);
+        
         // Draw other guinea pigs first (before items so they appear behind)
         this.otherGuineaPigs.forEach(pig => {
+            const screenX = pig.x - this.game.camera.x;
+            const screenY = pig.y - this.game.camera.y;
+            
+            // Check if this pig is a potential drop target
+            let isDropTarget = false;
+            if (this.draggedItem && this.draggedItem.x && this.draggedItem.y) {
+                const distance = Math.sqrt(
+                    Math.pow(this.draggedItem.x - pig.x, 2) + 
+                    Math.pow(this.draggedItem.y - pig.y, 2)
+                );
+                isDropTarget = distance < 100; // Slightly larger than drop radius for visual feedback
+            }
+            
+            // Draw drop zone indicator if dragging
+            if (isDropTarget) {
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.fillStyle = '#4ECDC4';
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 80, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                // Draw pulsing effect
+                const pulse = Math.sin(Date.now() * 0.005) * 0.2 + 0.8;
+                ctx.strokeStyle = '#4ECDC4';
+                ctx.lineWidth = 3;
+                ctx.globalAlpha = pulse;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 85, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+            
+            // Draw guinea pig body
             ctx.save();
             ctx.translate(pig.x, pig.y);
             
@@ -310,6 +357,13 @@ export class HomeInventory {
     }
     
     handleClick(x, y) {
+        console.log('Click at:', x, y);
+        
+        // Don't handle clicks if we're dragging
+        if (this.isDragging) {
+            return false;
+        }
+        
         // Check if clicking on tunnel
         const tunnel = this.items.find(item => 
             item.id === 'tunnel' && 
@@ -322,14 +376,19 @@ export class HomeInventory {
             return true;
         }
         
-        // Check if clicking on other guinea pigs
+        // Only show mission modal if it's a quick click (not a drag attempt)
         const clickedPig = this.otherGuineaPigs.find(pig => {
             const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
             return distance < 50;
         });
         
-        if (clickedPig) {
-            this.showMission(clickedPig);
+        if (clickedPig && !this.draggedItem) {
+            // Small delay to ensure it's not a drag
+            setTimeout(() => {
+                if (!this.isDragging && !this.draggedItem) {
+                    this.showMission(clickedPig);
+                }
+            }, 100);
             return true;
         }
         
@@ -338,16 +397,19 @@ export class HomeInventory {
     
     handleDragStart(x, y) {
         // Check if clicking on an item to drag it
-        const clickedItem = this.items.find(item => {
+        const item = this.items.find(item => {
             if (item.consumed) return false;
-            
             const distance = Math.sqrt(Math.pow(x - item.x, 2) + Math.pow(y - item.y, 2));
-            return distance < 40;
+            return distance < 30;
         });
         
-        if (clickedItem && !clickedItem.consumed) {
-            this.draggedItem = clickedItem;
-            console.log('Started dragging item:', clickedItem.id, clickedItem.name);
+        if (item) {
+            this.draggedItem = item;
+            this.dragOffset.x = x - item.x;
+            this.dragOffset.y = y - item.y;
+            this.isDragging = true;
+            this.dragStartTime = Date.now();
+            console.log('Started dragging:', item);
             return true;
         }
         
@@ -356,13 +418,16 @@ export class HomeInventory {
     
     handleDragMove(x, y) {
         if (this.draggedItem) {
-            this.draggedItem.x = x;
-            this.draggedItem.y = y;
+            this.draggedItem.x = x - this.dragOffset.x;
+            this.draggedItem.y = y - this.dragOffset.y;
         }
     }
     
     handleDragEnd(x, y) {
-        if (!this.draggedItem) return;
+        if (!this.draggedItem) {
+            this.isDragging = false;
+            return;
+        }
         
         console.log('Drag ended at:', x, y);
         console.log('Dragged item:', this.draggedItem);
@@ -377,6 +442,16 @@ export class HomeInventory {
         console.log('Target pig:', targetPig);
         
         if (targetPig) {
+            // Check if it's a water bath being dropped
+            if (this.draggedItem.id === 'bath') {
+                // Start water bath minigame
+                this.startWaterBathGame(targetPig);
+                // Don't consume the bath item
+                this.draggedItem = null;
+                this.isDragging = false;
+                return;
+            }
+            
             if (this.isEdible(this.draggedItem.id)) {
                 console.log('Item is edible:', this.draggedItem.id);
                 console.log('Pig wants:', targetPig.missionItem);
@@ -442,8 +517,9 @@ export class HomeInventory {
             }
         }
         
-        // Always clear the dragged item reference
+        // Reset dragging state
         this.draggedItem = null;
+        this.isDragging = false;
     }
     
     isEdible(itemId) {
@@ -620,6 +696,137 @@ export class HomeInventory {
             // Show notification about new mission
             this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
         }, 2000); // Give new mission after 2 seconds
+    }
+    
+    startWaterBathGame(pig) {
+        console.log('Starting water bath game with:', pig.name);
+        
+        // Create a simple water bath minigame
+        const modal = document.createElement('div');
+        modal.className = 'mission-modal';
+        modal.innerHTML = `
+            <div class="mission-content">
+                <h2>🛁 Waterbad Minigame - ${pig.name}</h2>
+                <p>Help ${pig.name} een lekker badje nemen!</p>
+                <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
+                    <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px;"></canvas>
+                </div>
+                <p id="bathGameInstructions">Klik op de bubbels om ze te laten knappen! 🫧</p>
+                <p id="bathGameScore">Score: 0</p>
+                <button id="closeBathGame" class="close-button">Sluiten</button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const canvas = document.getElementById('bathGameCanvas');
+        const ctx = canvas.getContext('2d');
+        let score = 0;
+        let bubbles = [];
+        let gameActive = true;
+        
+        // Create bubbles
+        function createBubble() {
+            bubbles.push({
+                x: Math.random() * (canvas.width - 40) + 20,
+                y: canvas.height,
+                radius: Math.random() * 20 + 10,
+                speed: Math.random() * 2 + 1,
+                popped: false
+            });
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (!gameActive) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw water
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+            
+            // Draw guinea pig in bath
+            ctx.fillStyle = pig.color.body;
+            ctx.beginPath();
+            ctx.ellipse(canvas.width / 2, canvas.height * 0.65, 40, 30, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw bubbles
+            bubbles = bubbles.filter(bubble => {
+                if (bubble.popped || bubble.y < -bubble.radius) return false;
+                
+                bubble.y -= bubble.speed;
+                
+                // Draw bubble
+                ctx.strokeStyle = '#4ECDC4';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Add shine
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.arc(bubble.x - bubble.radius * 0.3, bubble.y - bubble.radius * 0.3, bubble.radius * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                return true;
+            });
+            
+            // Create new bubbles randomly
+            if (Math.random() < 0.03) {
+                createBubble();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Handle clicks
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            bubbles.forEach(bubble => {
+                const dist = Math.sqrt(Math.pow(x - bubble.x, 2) + Math.pow(y - bubble.y, 2));
+                if (dist < bubble.radius && !bubble.popped) {
+                    bubble.popped = true;
+                    score++;
+                    document.getElementById('bathGameScore').textContent = `Score: ${score}`;
+                    
+                    // Add pop effect
+                    ctx.fillStyle = 'rgba(78, 205, 196, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(bubble.x, bubble.y, bubble.radius * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        });
+        
+        // Close button
+        document.getElementById('closeBathGame').addEventListener('click', () => {
+            gameActive = false;
+            document.body.removeChild(modal);
+            
+            // Give reward based on score
+            if (score > 0) {
+                const reward = score * 2;
+                this.game.player.carrots += reward;
+                this.game.ui.updateDisplay();
+                this.game.ui.showNotification(`${pig.name} heeft genoten van het badje! Je krijgt ${reward} wortels! 🛁✨`);
+                
+                // Add temporary happiness effect to pig
+                pig.showHeart = true;
+                setTimeout(() => {
+                    pig.showHeart = false;
+                }, 3000);
+            }
+        });
+        
+        // Start the game
+        gameLoop();
     }
     
     startMazeGame() {
