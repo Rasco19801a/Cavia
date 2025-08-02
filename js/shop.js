@@ -126,30 +126,32 @@ export class Shop {
     }
 
     buyItem(item) {
-        if (this.game.player.carrots < item.price) {
-            this.showMessage('Je hebt niet genoeg wortels!', 'error');
-            return;
+        if (this.game.player.carrots >= item.price) {
+            this.game.player.carrots -= item.price;
+            this.inventory.push(item);
+            
+            // Add item to home inventory
+            this.game.homeInventory.addItem(item);
+            
+            this.showMessage(`${item.name} gekocht!`, 'success');
+            this.updateBuyButtons();
+            
+            // Update UI
+            this.game.ui.updateDisplay();
+        } else {
+            this.showMessage('Niet genoeg wortels!', 'error');
         }
         
-                    // Deduct carrots
-            this.game.player.addCarrots(-item.price);
-        
-        // Add to inventory
-        this.inventory.push(item);
-        
-        // Update carrots display
-        document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
-        
-        // Show success message
-        this.showMessage(`Je hebt ${item.name} gekocht!`, 'success');
-        
-        // Update buy buttons
-        this.updateBuyButtons();
-        
-        // If it's an accessory, apply it to the player
+        // Handle immediate use items
         if (this.currentShop === 'Accessoires' && ['bow', 'hat', 'glasses'].includes(item.id)) {
             this.game.player.accessory = item.id;
             this.showMessage(`${item.name} is nu opgezet!`, 'success');
+        }
+        
+        // Handle bath treatment - enter underwater world
+        if (item.id === 'bath') {
+            this.closeShop();
+            this.game.underwaterWorld.enter();
         }
     }
 
