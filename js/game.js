@@ -261,10 +261,16 @@ export class Game {
     enterBuilding(building) {
         // Check if this is the water pool in the swimming pool world
         if (building.isWaterPool) {
-            console.log('Entering water pool - starting underwater mini-game');
-            // Enter underwater mini-game instead of building
-            this.underwaterWorld.enter();
-            this.ui.showNotification('Duik in het water! Verzamel alle wortels!');
+            // Check if player has purchased badbehandeling
+            if (this.shop.hasPurchased('bath')) {
+                console.log('Player has badbehandeling - starting swimming pool feature');
+                // Enter underwater mini-game instead of building
+                this.underwaterWorld.enter();
+                this.ui.showNotification('Je hebt badbehandeling! Duik in het water! Verzamel alle wortels!');
+            } else {
+                console.log('Player needs badbehandeling to use the swimming pool');
+                this.ui.showNotification('Je hebt badbehandeling nodig om te kunnen zwemmen! Koop het in de Cavia Spa.');
+            }
             return;
         }
         

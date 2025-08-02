@@ -482,6 +482,35 @@ function drawZwembad(ctx) {
         ctx.font = '16px Nunito, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(pool.name + ' bad', pool.x + pool.w/2, pool.y - 10);
+        
+        // Special effect for water pool if player has badbehandeling
+        if (pool.name === 'Water' && window.game && window.game.shop && window.game.shop.hasPurchased('bath')) {
+            // Add sparkle effect
+            ctx.save();
+            const time = Date.now() * 0.001;
+            for (let i = 0; i < 3; i++) {
+                const sparkleX = pool.x + pool.w/2 + Math.cos(time + i * 2) * 50;
+                const sparkleY = pool.y + pool.h/2 + Math.sin(time + i * 2) * 30;
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.5 + 0.5 * Math.sin(time * 3 + i)) + ')';
+                ctx.beginPath();
+                ctx.arc(sparkleX, sparkleY, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+            
+            // Add "Ready to swim!" text
+            ctx.fillStyle = '#00FF00';
+            ctx.font = 'bold 14px Nunito, sans-serif';
+            ctx.fillText('✨ Klaar om te zwemmen! ✨', pool.x + pool.w/2, pool.y + pool.h + 20);
+        } else if (pool.name === 'Water') {
+            // Add lock icon if badbehandeling not purchased
+            ctx.fillStyle = '#FF0000';
+            ctx.font = 'bold 20px Nunito, sans-serif';
+            ctx.fillText('🔒', pool.x + pool.w/2, pool.y + pool.h/2);
+            ctx.font = '12px Nunito, sans-serif';
+            ctx.fillStyle = '#333333';
+            ctx.fillText('Badbehandeling nodig', pool.x + pool.w/2, pool.y + pool.h + 20);
+        }
     });
 
     // Diving board

@@ -43,6 +43,7 @@ export class Shop {
             ]
         };
         this.inventory = [];
+        this.purchasedItems = new Set(); // Track purchased item IDs
         this.setupModal();
     }
 
@@ -131,6 +132,7 @@ export class Shop {
             this.game.player.carrots -= item.price;
             console.log('After purchase - Carrots:', this.game.player.carrots);
             this.inventory.push(item);
+            this.purchasedItems.add(item.id); // Track purchased item
             
             // Add item to home inventory
             this.game.homeInventory.addItem(item);
@@ -201,5 +203,9 @@ export class Shop {
                 this.game.showShopButton(this.game.currentBuilding.name);
             }
         }
+    }
+
+    hasPurchased(itemId) {
+        return this.purchasedItems.has(itemId);
     }
 }
