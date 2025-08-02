@@ -8,6 +8,7 @@ export class HomeInventory {
         this.otherGuineaPigs = [];
         this.draggedItem = null;
         this.setupOtherGuineaPigs();
+        this.loadProgress();
     }
     
     setupOtherGuineaPigs() {
@@ -71,6 +72,15 @@ export class HomeInventory {
         }
         
         this.items.push(item);
+        console.log('Item added to home inventory:', item);
+        this.logInventory();
+    }
+    
+    logInventory() {
+        console.log('Current home inventory items:');
+        this.items.forEach((item, index) => {
+            console.log(`${index}: ${item.id} - ${item.name} at (${Math.round(item.x)}, ${Math.round(item.y)}) - consumed: ${item.consumed}`);
+        });
     }
     
     draw(ctx) {
@@ -199,6 +209,13 @@ export class HomeInventory {
             ctx.textAlign = 'center';
             ctx.fillText(pig.name, 0, -50);
             
+            // Mission progress
+            if (pig.missionProgress < pig.missionTarget) {
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.fillText(`${pig.missionProgress}/${pig.missionTarget}`, 0, -35);
+            }
+            
             // Heart effect when happy
             if (pig.showHeart) {
                 ctx.save();
@@ -279,14 +296,24 @@ export class HomeInventory {
     handleDragEnd(x, y) {
         if (!this.draggedItem) return;
         
+        console.log('Drag ended at:', x, y);
+        console.log('Dragged item:', this.draggedItem);
+        
         // Check if dropped on another guinea pig
         const targetPig = this.otherGuineaPigs.find(pig => {
             const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
+            console.log(`Distance to ${pig.name}: ${distance}`);
             return distance < 50;
         });
         
+        console.log('Target pig:', targetPig);
+        
         if (targetPig) {
             if (this.isEdible(this.draggedItem.id)) {
+                console.log('Item is edible:', this.draggedItem.id);
+                console.log('Pig wants:', targetPig.missionItem);
+                console.log('Current progress:', targetPig.missionProgress, '/', targetPig.missionTarget);
+                
                 // Feed the guinea pig
                 this.draggedItem.consumed = true;
                 this.showEatingAnimation(this.draggedItem, targetPig);
@@ -295,6 +322,9 @@ export class HomeInventory {
                 if (targetPig.missionItem === this.draggedItem.id) {
                     targetPig.missionProgress++;
                     console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
+                    
+                    // Save progress
+                    this.saveProgress();
                     
                     // Show progress feedback
                     if (this.game.ui && this.game.ui.showNotification) {
@@ -410,6 +440,32 @@ export class HomeInventory {
         const wheel = this.items.find(item => item.id === 'wheel');
         if (wheel && this.checkPlayerInWheel()) {
             wheel.rotation += 0.05;
+        }
+    }
+
+    saveProgress() {
+        localStorage.setItem('otherGuineaPigs', JSON.stringify(this.otherGuineaPigs));
+        console.log('Guinea pig progress saved.');
+    }
+
+    loadProgress() {
+        const savedPigs = localStorage.getItem('otherGuineaPigs');
+        if (savedPigs) {
+            try {
+                const savedData = JSON.parse(savedPigs);
+                // Merge saved progress with default data
+                this.otherGuineaPigs.forEach((pig, index) => {
+                    const savedPig = savedData.find(sp => sp.id === pig.id);
+                    if (savedPig) {
+                        pig.missionProgress = savedPig.missionProgress || 0;
+                        pig.accessory = savedPig.accessory || null;
+                        pig.showHeart = savedPig.showHeart || false;
+                    }
+                });
+                console.log('Guinea pig progress loaded:', this.otherGuineaPigs);
+            } catch (e) {
+                console.error('Error loading progress:', e);
+            }
         }
     }
 }
