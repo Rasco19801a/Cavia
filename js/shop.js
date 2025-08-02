@@ -126,8 +126,10 @@ export class Shop {
     }
 
     buyItem(item) {
+        console.log('Before purchase - Carrots:', this.game.player.carrots);
         if (this.game.player.carrots >= item.price) {
             this.game.player.carrots -= item.price;
+            console.log('After purchase - Carrots:', this.game.player.carrots);
             this.inventory.push(item);
             
             // Add item to home inventory
@@ -138,6 +140,7 @@ export class Shop {
             
             // Update UI
             this.game.ui.updateDisplay();
+            console.log('UI updateDisplay called');
             
             // Update shop carrots display immediately
             document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
