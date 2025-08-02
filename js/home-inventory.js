@@ -120,6 +120,88 @@ export class HomeInventory {
     }
     
     draw(ctx) {
+        // Draw other guinea pigs first (before items so they appear behind)
+        this.otherGuineaPigs.forEach(pig => {
+            ctx.save();
+            ctx.translate(pig.x, pig.y);
+            
+            // Check if an item is being dragged over this pig
+            let scale = 1;
+            if (this.draggedItem) {
+                const distance = Math.sqrt(
+                    Math.pow(this.draggedItem.x - pig.x, 2) + 
+                    Math.pow(this.draggedItem.y - pig.y, 2)
+                );
+                if (distance < 80) { // Increased detection radius
+                    scale = 1.2; // Scale up when item is near
+                }
+            }
+            
+            // Apply scale
+            ctx.scale(scale, scale);
+            
+            // Draw guinea pig body
+            ctx.fillStyle = pig.color;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 40, 30, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(-25, -10, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-30, -15, 3, 0, Math.PI * 2);
+            ctx.arc(-20, -15, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Nose
+            ctx.fillStyle = '#FFB6C1';
+            ctx.beginPath();
+            ctx.arc(-25, -5, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eating animation
+            if (pig.isEating) {
+                ctx.fillStyle = '#FF6B6B';
+                ctx.beginPath();
+                ctx.arc(-25, 0, 5, 0, Math.PI);
+                ctx.fill();
+            }
+            
+            // Accessory
+            if (pig.accessory) {
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                const accessoryEmoji = {
+                    'bow': '🎀',
+                    'hat': '🎩',
+                    'glasses': '👓',
+                    'necklace': '💎'
+                }[pig.accessory];
+                ctx.fillText(accessoryEmoji, -25, -30);
+            }
+            
+            // Name
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(pig.name, 0, -50);
+            
+            // Mission progress
+            if (pig.missionProgress < pig.missionTarget) {
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                const missionEmoji = this.getMissionEmoji(pig.missionItem);
+                ctx.fillText(`${missionEmoji} ${pig.missionProgress}/${pig.missionTarget}`, 0, 50);
+            }
+            
+            ctx.restore();
+        });
+        
         // Draw items
         this.items.forEach(item => {
             if (!item.consumed) {
@@ -128,21 +210,13 @@ export class HomeInventory {
                 // Check if this item is being dragged
                 const isDragging = this.draggedItem === item;
                 
-                // Check if dragged item is over a guinea pig
-                let isOverGuineaPig = false;
+                // Apply scale if dragging
                 if (isDragging) {
-                    isOverGuineaPig = this.otherGuineaPigs.some(pig => {
-                        const distance = Math.sqrt(Math.pow(item.x - pig.x, 2) + Math.pow(item.y - pig.y, 2));
-                        return distance < 60;
-                    });
-                }
-                
-                // Apply scale if dragging or over guinea pig
-                if (isDragging) {
-                    const scale = isOverGuineaPig ? 1.3 : 1.1;
+                    const scale = 1.1;
                     ctx.translate(item.x, item.y);
                     ctx.scale(scale, scale);
                     ctx.translate(-item.x, -item.y);
+                    ctx.globalAlpha = 0.8; // Make slightly transparent when dragging
                 }
                 
                 if (item.id === 'wheel') {
@@ -225,85 +299,6 @@ export class HomeInventory {
                 ctx.restore();
             }
         });
-        
-        // Draw other guinea pigs
-        this.otherGuineaPigs.forEach(pig => {
-            ctx.save();
-            ctx.translate(pig.x, pig.y);
-            
-            // Draw guinea pig body
-            ctx.fillStyle = pig.color;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 40, 30, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Head
-            ctx.beginPath();
-            ctx.arc(-25, -10, 20, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Eyes
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(-30, -15, 3, 0, Math.PI * 2);
-            ctx.arc(-20, -15, 3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Nose
-            ctx.fillStyle = '#FFB6C1';
-            ctx.beginPath();
-            ctx.arc(-25, -5, 4, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Accessory
-            if (pig.accessory) {
-                ctx.font = '20px Arial';
-                ctx.textAlign = 'center';
-                const accessoryEmoji = {
-                    'bow': '🎀',
-                    'hat': '🎩',
-                    'glasses': '👓',
-                    'necklace': '💎'
-                }[pig.accessory];
-                ctx.fillText(accessoryEmoji, -25, -30);
-            }
-            
-            // Name
-            ctx.fillStyle = '#333';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(pig.name, 0, -50);
-            
-            // Mission progress
-            if (pig.missionProgress < pig.missionTarget) {
-                ctx.fillStyle = '#666';
-                ctx.font = '14px Arial';
-                ctx.fillText(`${pig.missionProgress}/${pig.missionTarget}`, 0, -35);
-            }
-            
-            // Heart effect when happy
-            if (pig.showHeart) {
-                ctx.save();
-                // Animate the heart floating up
-                const heartY = -70 - (Date.now() % 3000) / 30; // Float up over 3 seconds
-                ctx.font = '30px Arial';
-                ctx.fillText('💖', 0, heartY);
-                ctx.restore();
-            }
-            
-            // Eating animation
-            if (pig.isEating) {
-                ctx.save();
-                // Show munching effect
-                const munchScale = 1 + Math.sin(Date.now() * 0.01) * 0.1;
-                ctx.scale(munchScale, munchScale);
-                ctx.font = '20px Arial';
-                ctx.fillText('😋', -25, -35);
-                ctx.restore();
-            }
-            
-            ctx.restore();
-        });
     }
     
     handleClick(x, y) {
@@ -364,11 +359,11 @@ export class HomeInventory {
         console.log('Drag ended at:', x, y);
         console.log('Dragged item:', this.draggedItem);
         
-        // Check if dropped on another guinea pig
+        // Check if dropped on another guinea pig (increased detection radius)
         const targetPig = this.otherGuineaPigs.find(pig => {
             const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
             console.log(`Distance to ${pig.name}: ${distance}`);
-            return distance < 50;
+            return distance < 80; // Increased from 50 to 80
         });
         
         console.log('Target pig:', targetPig);
@@ -403,6 +398,10 @@ export class HomeInventory {
                     }
                 } else {
                     console.log(`Item mismatch: dragged ${this.draggedItem.id}, pig wants ${targetPig.missionItem}`);
+                    // Still show eating animation even if it's not the mission item
+                    if (this.game.ui && this.game.ui.showNotification) {
+                        this.game.ui.showNotification(`${targetPig.name} eet ${this.draggedItem.name}! 😊`);
+                    }
                 }
             } else if (this.isAccessory(this.draggedItem.id)) {
                 // Put accessory on guinea pig
@@ -412,6 +411,14 @@ export class HomeInventory {
                 // Check mission progress
                 if (targetPig.missionItem === this.draggedItem.id) {
                     this.completeMission(targetPig);
+                }
+                
+                // Save progress
+                this.saveProgress();
+                
+                // Show feedback
+                if (this.game.ui && this.game.ui.showNotification) {
+                    this.game.ui.showNotification(`${targetPig.name} draagt nu een ${this.draggedItem.name}! 🎀`);
                 }
             }
         }
@@ -427,6 +434,24 @@ export class HomeInventory {
     isAccessory(itemId) {
         const accessories = ['bow', 'hat', 'glasses', 'necklace'];
         return accessories.includes(itemId);
+    }
+    
+    getMissionEmoji(itemId) {
+        const emojis = {
+            'carrot': '🥕',
+            'lettuce': '🥬',
+            'cucumber': '🥒',
+            'corn': '🌽',
+            'hay_small': '🌾',
+            'hay_medium': '🌾',
+            'hay_large': '🌾',
+            'hay_premium': '🌾',
+            'bow': '🎀',
+            'hat': '🎩',
+            'glasses': '👓',
+            'necklace': '💎'
+        };
+        return emojis[itemId] || '❓';
     }
     
     showEatingAnimation(item, pig = null) {

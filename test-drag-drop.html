@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop Test - Cavia Avonturen</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border-left: 4px solid #4ECDC4;
+        }
+        .done {
+            color: green;
+            font-weight: bold;
+        }
+        .test-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4ECDC4;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .test-link:hover {
+            background: #3db5ad;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>🐹 Cavia Drag & Drop Test</h1>
+        <h2>Wijzigingen die zijn doorgevoerd:</h2>
+        <ul class="feature-list">
+            <li><span class="done">✅</span> <strong>Drag & Drop verbeterd:</strong> De detectieradius is vergroot van 50 naar 80 pixels voor betere herkenning</li>
+            <li><span class="done">✅</span> <strong>Cavia wordt groter:</strong> Als je een item over een cavia sleept, wordt de cavia 20% groter (schaal 1.2)</li>
+            <li><span class="done">✅</span> <strong>Item transparantie:</strong> Items worden licht transparant tijdens het slepen (80% opacity)</li>
+            <li><span class="done">✅</span> <strong>Missie voortgang:</strong> De voortgang wordt correct bijgehouden en opgeslagen</li>
+            <li><span class="done">✅</span> <strong>Feedback berichten:</strong> Er worden nu altijd berichten getoond, ook als het item niet voor de missie is</li>
+            <li><span class="done">✅</span> <strong>Wortel tekst kleur:</strong> Alle wortel teksten in de winkels zijn nu zwart (#000000)</li>
+        </ul>
+        
+        <h2>Hoe te testen:</h2>
+        <ol>
+            <li>Open het spel via de onderstaande link</li>
+            <li>Ga naar je huis (Home icoon)</li>
+            <li>Sleep een item naar een cavia</li>
+            <li>Let op: de cavia wordt groter als je er overheen sleept</li>
+            <li>Laat het item los om het aan de cavia te geven</li>
+            <li>Check de missie voortgang onder de cavia naam</li>
+            <li>Open een winkel om te zien dat de wortel tekst nu zwart is</li>
+        </ol>
+        
+        <a href="/index.html" class="test-link">Open Cavia Avonturen →</a>
+    </div>
+</body>
+</html>
