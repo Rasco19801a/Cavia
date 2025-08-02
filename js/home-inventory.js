@@ -79,12 +79,14 @@ export class HomeInventory {
         // Event listener for close button
         document.getElementById('closeMission').addEventListener('click', () => {
             this.missionModal.classList.add('hidden');
+            this.currentMissionPig = null;
         });
         
         // Close on escape key
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !this.missionModal.classList.contains('hidden')) {
                 this.missionModal.classList.add('hidden');
+                this.currentMissionPig = null;
             }
         });
     }
@@ -210,13 +212,21 @@ export class HomeInventory {
                 // Check if this item is being dragged
                 const isDragging = this.draggedItem === item;
                 
-                // Apply scale if dragging
+                // Apply scale if dragging or animating
                 if (isDragging) {
                     const scale = 1.1;
                     ctx.translate(item.x, item.y);
                     ctx.scale(scale, scale);
                     ctx.translate(-item.x, -item.y);
                     ctx.globalAlpha = 0.8; // Make slightly transparent when dragging
+                } else if (item.scale || item.opacity) {
+                    // Apply animation properties
+                    const scale = item.scale || 1;
+                    const opacity = item.opacity !== undefined ? item.opacity : 1;
+                    ctx.translate(item.x, item.y);
+                    ctx.scale(scale, scale);
+                    ctx.translate(-item.x, -item.y);
+                    ctx.globalAlpha = opacity;
                 }
                 
                 if (item.id === 'wheel') {
@@ -383,6 +393,9 @@ export class HomeInventory {
                     targetPig.missionProgress++;
                     console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
                     
+                    // Update mission modal if open
+                    this.updateMissionModal();
+                    
                     // Save progress
                     this.saveProgress();
                     
@@ -461,6 +474,10 @@ export class HomeInventory {
         // Show eating animation on the guinea pig
         if (pig) {
             pig.isEating = true;
+            
+            // Create disappearing animation for the item
+            this.createItemDisappearAnimation(item);
+            
             setTimeout(() => {
                 pig.isEating = false;
             }, 1000);
@@ -480,13 +497,70 @@ export class HomeInventory {
         
         // Update progress bar
         const progressPercentage = (pig.missionProgress / pig.missionTarget) * 100;
-        document.getElementById('progressFill').style.width = progressPercentage + '%';
+        const progressFill = document.getElementById('progressFill');
+        progressFill.style.width = progressPercentage + '%';
+        progressFill.style.backgroundColor = ''; // Reset to default color
         
         // Show modal
         this.missionModal.classList.remove('hidden');
+        
+        // Store reference to current mission pig
+        this.currentMissionPig = pig;
+    }
+    
+    updateMissionModal() {
+        if (this.currentMissionPig && !this.missionModal.classList.contains('hidden')) {
+            // Update progress text
+            document.getElementById('progressText').textContent = `Voortgang: ${this.currentMissionPig.missionProgress}/${this.currentMissionPig.missionTarget}`;
+            
+            // Update progress bar with animation
+            const progressPercentage = (this.currentMissionPig.missionProgress / this.currentMissionPig.missionTarget) * 100;
+            const progressFill = document.getElementById('progressFill');
+            
+            // Add transition for smooth animation
+            progressFill.style.transition = 'width 0.5s ease-in-out';
+            progressFill.style.width = progressPercentage + '%';
+            
+            // Check if mission is complete
+            if (this.currentMissionPig.missionProgress >= this.currentMissionPig.missionTarget) {
+                setTimeout(() => {
+                    progressFill.style.backgroundColor = '#4CAF50';
+                }, 500);
+            }
+        }
+    }
+    
+    createItemDisappearAnimation(item) {
+        // Create a visual effect for item disappearing
+        const animationDuration = 500; // milliseconds
+        const startTime = Date.now();
+        
+        // Store original position
+        const originalX = item.x;
+        const originalY = item.y;
+        
+        // Animation function
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / animationDuration, 1);
+            
+            // Move item towards pig's mouth with a curve
+            item.y = originalY - (progress * 30); // Move up
+            item.scale = 1 - (progress * 0.5); // Shrink
+            item.opacity = 1 - progress; // Fade out
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        animate();
     }
     
     completeMission(pig) {
+        // Update mission modal to show completion
+        this.updateMissionModal();
+        
         // Show heart emoticon and happy message
         if (this.game.ui && this.game.ui.showNotification) {
             this.game.ui.showNotification(`💖 ${pig.name} is heel blij! 💖`);
@@ -500,18 +574,26 @@ export class HomeInventory {
         
         this.game.player.carrots += 50; // Reward
         
-        // Give new mission
-        const newMissions = [
-            { mission: 'Ik wil graag 2 komkommers!', item: 'cucumber', target: 2 },
-            { mission: 'Breng me een hoed!', item: 'hat', target: 1 },
-            { mission: 'Ik heb 3 mais nodig!', item: 'corn', target: 3 }
-        ];
-        
-        const newMission = newMissions[Math.floor(Math.random() * newMissions.length)];
-        pig.mission = newMission.mission;
-        pig.missionItem = newMission.item;
-        pig.missionTarget = newMission.target;
-        pig.missionProgress = 0;
+        // Wait a bit before giving new mission
+        setTimeout(() => {
+            // Give new mission
+            const newMissions = [
+                { mission: 'Ik wil graag 2 komkommers!', item: 'cucumber', target: 2 },
+                { mission: 'Breng me een hoed!', item: 'hat', target: 1 },
+                { mission: 'Ik heb 3 mais nodig!', item: 'corn', target: 3 }
+            ];
+            
+            const newMission = newMissions[Math.floor(Math.random() * newMissions.length)];
+            pig.mission = newMission.mission;
+            pig.missionItem = newMission.item;
+            pig.missionTarget = newMission.target;
+            pig.missionProgress = 0;
+            
+            // Update modal if still open
+            if (this.currentMissionPig === pig && !this.missionModal.classList.contains('hidden')) {
+                this.showMission(pig);
+            }
+        }, 2000);
     }
     
     startMazeGame() {
