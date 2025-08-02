@@ -146,6 +146,9 @@ export class Shop {
             
             // Update shop carrots display immediately
             document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
+            
+            // Don't start minigame automatically for bath treatment
+            // The minigame should only start when clicking on the water bath
         } else {
             this.showMessage('Niet genoeg wortels!', 'error');
         }
