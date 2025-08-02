@@ -4,7 +4,7 @@ import { Player } from './player.js';
 import { Camera } from './camera.js';
 import { UI } from './ui.js';
 import { drawWorld } from './worlds.js';
-import { createDierenstadBuildings, drawInterior } from './buildings.js';
+import { createDierenstadBuildings, createZwembadBuildings, drawInterior } from './buildings.js';
 import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 import { Shop } from './shop.js';
 import { HomeInventory } from './home-inventory.js';
@@ -261,6 +261,14 @@ export class Game {
     }
     
     enterBuilding(building) {
+        // Check if this is the water pool in the swimming pool world
+        if (building.isWaterPool) {
+            // Enter underwater mini-game instead of building
+            this.underwaterWorld.enter();
+            this.ui.showNotification('Duik in het water! Verzamel alle wortels!');
+            return;
+        }
+        
         // Always enter the building first
         this.isInside = true;
         this.currentBuilding = building;
@@ -390,6 +398,9 @@ export class Game {
         switch (this.currentWorld) {
             case 'dierenstad':
                 this.buildings = createDierenstadBuildings();
+                break;
+            case 'zwembad':
+                this.buildings = createZwembadBuildings();
                 break;
         }
     }
