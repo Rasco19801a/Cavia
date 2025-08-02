@@ -33,16 +33,17 @@ export const AVAILABLE_COLORS = [
 export const COLOR_PARTS = ['body', 'ears', 'belly', 'feet', 'nose'];
 
 // World types
-export const WORLDS = {
-    STAD: 'stad',
-    NATUUR: 'natuur',
-    STRAND: 'strand',
-    WINTER: 'winter',
-    WOESTIJN: 'woestijn',
-    JUNGLE: 'jungle',
-    ZWEMBAD: 'zwembad',
-    DIERENSTAD: 'dierenstad'
-};
+export const WORLDS = [
+    'stad', 
+    'natuur', 
+    'strand', 
+    'winter', 
+    'woestijn', 
+    'jungle', 
+    'zwembad',
+    'dierenstad',
+    'thuis'
+];
 
 // Default world
-export const DEFAULT_WORLD = WORLDS.DIERENSTAD;
+export const DEFAULT_WORLD = 'dierenstad';

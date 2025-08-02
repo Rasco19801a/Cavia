@@ -7,6 +7,8 @@ import { drawWorld } from './worlds.js';
 import { createDierenstadBuildings, drawInterior } from './buildings.js';
 import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 import { Shop } from './shop.js';
+import { HomeInventory } from './home-inventory.js';
+import { UnderwaterWorld } from './underwater-world.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
@@ -23,6 +25,8 @@ export class Game {
         this.ui = new UI(this.player);
         this.animalChallenge = new AnimalChallenge(this);
         this.shop = new Shop(this);
+        this.homeInventory = new HomeInventory(this);
+        this.underwaterWorld = new UnderwaterWorld(this);
         
         // Game state
         this.currentWorld = DEFAULT_WORLD;
@@ -30,6 +34,11 @@ export class Game {
         this.isInside = false;
         this.currentBuilding = null;
         this.keys = {};
+        
+        // Drag state
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
         
         // Setup world
         this.setupWorld();
@@ -73,22 +82,40 @@ export class Game {
             this.keys[e.key] = false;
         });
         
-        // Mouse/touch controls
+        // Mouse/Touch controls
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
         
-        // Touch events for mobile
+        // Drag and drop events
+        this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+        
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
-            this.handleClick({
+            const rect = this.canvas.getBoundingClientRect();
+            const mouseEvent = new MouseEvent('mousedown', {
                 clientX: touch.clientX,
                 clientY: touch.clientY
             });
+            this.handleMouseDown(mouseEvent);
         });
         
-        // Also handle touchend for better mobile experience
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            this.handleMouseMove(mouseEvent);
+        });
+        
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            this.handleMouseUp(mouseEvent);
         });
         
         // World change event
@@ -103,13 +130,26 @@ export class Game {
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
         
+        // Handle underwater world clicks
+        if (this.underwaterWorld.active) {
+            this.underwaterWorld.handleClick(screenX, screenY);
+            return;
+        }
+        
         if (!this.isInside) {
             const worldCoords = this.camera.screenToWorld(screenX, screenY);
+            
+            // Check if in home world and clicked on home inventory items
+            if (this.currentWorld === 'thuis') {
+                if (this.homeInventory.handleClick(worldCoords.x, worldCoords.y)) {
+                    return; // Click was handled by home inventory
+                }
+            }
             
             // Check if clicked on a building
             let clickedBuilding = false;
             
-            if (this.currentWorld === WORLDS.DIERENSTAD) {
+            if (this.currentWorld === 'dierenstad') {
                 for (const building of this.buildings) {
                     if (building.contains && building.contains(worldCoords.x, worldCoords.y)) {
                         // Enter building
@@ -154,7 +194,45 @@ export class Game {
             }
         }
     }
-
+    
+    handleMouseDown(e) {
+        if (this.currentWorld !== 'thuis' || this.isInside) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const worldCoords = this.camera.screenToWorld(screenX, screenY);
+        
+        if (this.homeInventory.handleDragStart(worldCoords.x, worldCoords.y)) {
+            this.isDragging = true;
+            this.dragStartX = worldCoords.x;
+            this.dragStartY = worldCoords.y;
+        }
+    }
+    
+    handleMouseMove(e) {
+        if (!this.isDragging) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const worldCoords = this.camera.screenToWorld(screenX, screenY);
+        
+        this.homeInventory.handleDragMove(worldCoords.x, worldCoords.y);
+    }
+    
+    handleMouseUp(e) {
+        if (!this.isDragging) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const worldCoords = this.camera.screenToWorld(screenX, screenY);
+        
+        this.homeInventory.handleDragEnd(worldCoords.x, worldCoords.y);
+        this.isDragging = false;
+    }
+    
     enterBuilding(building) {
         // Always enter the building first
         this.isInside = true;
@@ -231,9 +309,8 @@ export class Game {
         console.log(`Current world before change: ${this.currentWorld}`);
         
         // Validate world parameter
-        const validWorlds = Object.values(WORLDS);
-        if (!validWorlds.includes(world)) {
-            console.error(`Invalid world: ${world}. Valid worlds are:`, validWorlds);
+        if (!WORLDS.includes(world)) {
+            console.error(`Invalid world: ${world}. Valid worlds are:`, WORLDS);
             return;
         }
         
@@ -274,7 +351,8 @@ export class Game {
             'woestijn': 'de Woestijn',
             'jungle': 'de Jungle',
             'zwembad': 'het Zwembad',
-            'dierenstad': 'de Dierenstad'
+            'dierenstad': 'de Dierenstad',
+            'thuis': 'Thuis'
         };
         return names[world] || world;
     }
@@ -283,13 +361,19 @@ export class Game {
         this.buildings = [];
         
         switch (this.currentWorld) {
-            case WORLDS.DIERENSTAD:
+            case 'dierenstad':
                 this.buildings = createDierenstadBuildings();
                 break;
         }
     }
 
     update() {
+        // Update underwater world if active
+        if (this.underwaterWorld.active) {
+            this.underwaterWorld.update();
+            return;
+        }
+        
         // Player movement
         this.player.moveToTarget();
         this.player.moveWithKeys(this.keys);
@@ -309,12 +393,23 @@ export class Game {
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
+        // Draw underwater world if active
+        if (this.underwaterWorld.active) {
+            this.underwaterWorld.draw(this.ctx);
+            return;
+        }
+        
         if (!this.isInside) {
             // Draw world
             this.ctx.save();
             this.camera.applyTransform(this.ctx);
             
             drawWorld(this.ctx, this.currentWorld, this.buildings);
+            
+            // Draw home inventory items in home world
+            if (this.currentWorld === 'thuis') {
+                this.homeInventory.draw(this.ctx);
+            }
             
             // Draw animals
             drawAnimals(this.ctx, this.currentWorld, this.camera.x, this.camera.y);

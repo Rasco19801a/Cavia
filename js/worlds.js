@@ -27,6 +27,9 @@ export function drawWorld(ctx, worldType, buildings) {
         case 'dierenstad':
             drawDierenstad(ctx, buildings);
             break;
+        case 'thuis':
+            drawThuis(ctx);
+            break;
     }
 }
 
@@ -563,4 +566,76 @@ function drawDierenstad(ctx, buildings) {
         ctx.arc(x + 10, 540, 30, 0, Math.PI * 2);
         ctx.fill();
     }
+}
+
+function drawThuis(ctx) {
+    // Cozy home interior background
+    // Walls
+    ctx.fillStyle = '#FFF8DC'; // Cream color
+    ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    
+    // Wooden floor
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(0, 600, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 600);
+    
+    // Floor boards detail
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    for (let x = 0; x < CONFIG.WORLD_WIDTH; x += 100) {
+        ctx.beginPath();
+        ctx.moveTo(x, 600);
+        ctx.lineTo(x, CONFIG.WORLD_HEIGHT);
+        ctx.stroke();
+    }
+    
+    // Windows
+    for (let i = 0; i < 3; i++) {
+        const x = 200 + i * 400;
+        
+        // Window frame
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(x, 100, 150, 200);
+        
+        // Window glass
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(x + 10, 110, 130, 180);
+        
+        // Window cross
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(x + 75, 110);
+        ctx.lineTo(x + 75, 290);
+        ctx.moveTo(x + 10, 200);
+        ctx.lineTo(x + 140, 200);
+        ctx.stroke();
+    }
+    
+    // Rug
+    ctx.fillStyle = '#DC143C';
+    ctx.fillRect(500, 450, 300, 200);
+    ctx.fillStyle = '#8B0000';
+    ctx.fillRect(520, 470, 260, 160);
+    
+    // Cozy corner with cushions
+    ctx.fillStyle = '#FFB6C1';
+    ctx.beginPath();
+    ctx.arc(150, 550, 80, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = '#FFA07A';
+    ctx.beginPath();
+    ctx.arc(250, 560, 70, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Title
+    ctx.fillStyle = '#4B0082';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏠 Thuis 🏠', CONFIG.WORLD_WIDTH / 2, 60);
+    
+    // Instructions
+    ctx.fillStyle = '#333';
+    ctx.font = '20px Arial';
+    ctx.fillText('Klik op eetbare items om ze te voeren - Sleep items naar andere cavia\'s', CONFIG.WORLD_WIDTH / 2, 90);
 }
