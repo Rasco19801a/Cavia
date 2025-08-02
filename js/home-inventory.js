@@ -199,6 +199,27 @@ export class HomeInventory {
             ctx.textAlign = 'center';
             ctx.fillText(pig.name, 0, -50);
             
+            // Heart effect when happy
+            if (pig.showHeart) {
+                ctx.save();
+                // Animate the heart floating up
+                const heartY = -70 - (Date.now() % 3000) / 30; // Float up over 3 seconds
+                ctx.font = '30px Arial';
+                ctx.fillText('💖', 0, heartY);
+                ctx.restore();
+            }
+            
+            // Eating animation
+            if (pig.isEating) {
+                ctx.save();
+                // Show munching effect
+                const munchScale = 1 + Math.sin(Date.now() * 0.01) * 0.1;
+                ctx.scale(munchScale, munchScale);
+                ctx.font = '20px Arial';
+                ctx.fillText('😋', -25, -35);
+                ctx.restore();
+            }
+            
             ctx.restore();
         });
     }
@@ -288,6 +309,14 @@ export class HomeInventory {
                 // Check mission progress
                 if (targetPig.missionItem === this.draggedItem.id) {
                     targetPig.missionProgress++;
+                    
+                    // Show progress feedback
+                    if (this.game.ui && this.game.ui.showNotification) {
+                        if (targetPig.missionProgress < targetPig.missionTarget) {
+                            this.game.ui.showNotification(`${targetPig.name}: Nog ${targetPig.missionTarget - targetPig.missionProgress} ${this.draggedItem.name} te gaan! 🐹`);
+                        }
+                    }
+                    
                     if (targetPig.missionProgress >= targetPig.missionTarget) {
                         this.completeMission(targetPig);
                     }
@@ -320,7 +349,19 @@ export class HomeInventory {
     showEatingAnimation(item, pig = null) {
         // Simple eating animation feedback
         const target = pig || this.game.player;
-        console.log(`${target.name || 'Player'} ate ${item.name}!`);
+        
+        // Show eating animation on the guinea pig
+        if (pig) {
+            pig.isEating = true;
+            setTimeout(() => {
+                pig.isEating = false;
+            }, 1000);
+            
+            // Show notification about eating
+            if (this.game.ui && this.game.ui.showNotification) {
+                this.game.ui.showNotification(`${pig.name} eet ${item.name}! 😊`);
+            }
+        }
     }
     
     showMission(pig) {
@@ -329,7 +370,17 @@ export class HomeInventory {
     }
     
     completeMission(pig) {
-        alert(`Missie voltooid! ${pig.name} is heel blij!`);
+        // Show heart emoticon and happy message
+        if (this.game.ui && this.game.ui.showNotification) {
+            this.game.ui.showNotification(`💖 ${pig.name} is heel blij! 💖`);
+        }
+        
+        // Add heart effect to the guinea pig
+        pig.showHeart = true;
+        setTimeout(() => {
+            pig.showHeart = false;
+        }, 3000); // Show heart for 3 seconds
+        
         this.game.player.carrots += 50; // Reward
         
         // Give new mission
