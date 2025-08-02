@@ -205,109 +205,107 @@ export class HomeInventory {
         });
         
         // Draw items
-        this.items.forEach(item => {
-            if (!item.consumed) {
-                ctx.save();
-                
-                // Check if this item is being dragged
-                const isDragging = this.draggedItem === item;
-                
-                // Apply scale if dragging or animating
-                if (isDragging) {
-                    const scale = 1.1;
-                    ctx.translate(item.x, item.y);
-                    ctx.scale(scale, scale);
-                    ctx.translate(-item.x, -item.y);
-                    ctx.globalAlpha = 0.8; // Make slightly transparent when dragging
-                } else if (item.scale || item.opacity) {
-                    // Apply animation properties
-                    const scale = item.scale || 1;
-                    const opacity = item.opacity !== undefined ? item.opacity : 1;
-                    ctx.translate(item.x, item.y);
-                    ctx.scale(scale, scale);
-                    ctx.translate(-item.x, -item.y);
-                    ctx.globalAlpha = opacity;
-                }
-                
-                if (item.id === 'wheel') {
-                    // Draw giant wheel
-                    ctx.translate(item.x + 100, item.y + 100);
-                    ctx.rotate(item.rotation);
-                    
-                    // Wheel structure
-                    ctx.strokeStyle = '#8B4513';
-                    ctx.lineWidth = 8;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 100, 0, Math.PI * 2);
-                    ctx.stroke();
-                    
-                    // Spokes
-                    for (let i = 0; i < 8; i++) {
-                        ctx.beginPath();
-                        ctx.moveTo(0, 0);
-                        ctx.lineTo(Math.cos(i * Math.PI / 4) * 100, Math.sin(i * Math.PI / 4) * 100);
-                        ctx.stroke();
-                    }
-                    
-                    // Running surface
-                    ctx.fillStyle = '#DEB887';
-                    for (let i = 0; i < 8; i++) {
-                        ctx.fillRect(Math.cos(i * Math.PI / 4) * 80 - 10, Math.sin(i * Math.PI / 4) * 80 - 5, 20, 10);
-                    }
-                    
-                    item.rotation += 0.02; // Rotate the wheel
-                } else if (item.id === 'tunnel') {
-                    // Draw tunnel/maze house
-                    ctx.translate(item.x, item.y);
-                    
-                    // House structure
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(0, 0, 200, 150);
-                    
-                    // Roof
-                    ctx.fillStyle = '#DC143C';
-                    ctx.beginPath();
-                    ctx.moveTo(-20, 0);
-                    ctx.lineTo(100, -50);
-                    ctx.lineTo(220, 0);
-                    ctx.closePath();
-                    ctx.fill();
-                    
-                    // Entrance
-                    ctx.fillStyle = '#000';
-                    ctx.beginPath();
-                    ctx.arc(100, 100, 30, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Maze hint
-                    ctx.fillStyle = '#FFF';
-                    ctx.font = '16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Doolhof', 100, 75);
-                } else {
-                    // Draw regular items
-                    ctx.translate(item.x, item.y);
-                    
-                    // Add shadow if dragging
-                    if (isDragging) {
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-                        ctx.shadowBlur = 10;
-                        ctx.shadowOffsetX = 5;
-                        ctx.shadowOffsetY = 5;
-                    }
-                    
-                    ctx.font = '40px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(item.emoji, 0, 0);
-                    
-                    // Item name
-                    ctx.font = '14px Arial';
-                    ctx.fillStyle = '#333';
-                    ctx.fillText(item.name, 0, 20);
-                }
-                
-                ctx.restore();
+        this.items.filter(item => !item.consumed).forEach(item => {
+            ctx.save();
+            
+            // Check if this item is being dragged
+            const isDragging = this.draggedItem === item;
+            
+            // Apply scale if dragging or animating
+            if (isDragging) {
+                const scale = 1.1;
+                ctx.translate(item.x, item.y);
+                ctx.scale(scale, scale);
+                ctx.translate(-item.x, -item.y);
+                ctx.globalAlpha = 0.8; // Make slightly transparent when dragging
+            } else if (item.scale || item.opacity) {
+                // Apply animation properties
+                const scale = item.scale || 1;
+                const opacity = item.opacity !== undefined ? item.opacity : 1;
+                ctx.translate(item.x, item.y);
+                ctx.scale(scale, scale);
+                ctx.translate(-item.x, -item.y);
+                ctx.globalAlpha = opacity;
             }
+            
+            if (item.id === 'wheel') {
+                // Draw giant wheel
+                ctx.translate(item.x + 100, item.y + 100);
+                ctx.rotate(item.rotation);
+                
+                // Wheel structure
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.arc(0, 0, 100, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Spokes
+                for (let i = 0; i < 8; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(i * Math.PI / 4) * 100, Math.sin(i * Math.PI / 4) * 100);
+                    ctx.stroke();
+                }
+                
+                // Running surface
+                ctx.fillStyle = '#DEB887';
+                for (let i = 0; i < 8; i++) {
+                    ctx.fillRect(Math.cos(i * Math.PI / 4) * 80 - 10, Math.sin(i * Math.PI / 4) * 80 - 5, 20, 10);
+                }
+                
+                item.rotation += 0.02; // Rotate the wheel
+            } else if (item.id === 'tunnel') {
+                // Draw tunnel/maze house
+                ctx.translate(item.x, item.y);
+                
+                // House structure
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(0, 0, 200, 150);
+                
+                // Roof
+                ctx.fillStyle = '#DC143C';
+                ctx.beginPath();
+                ctx.moveTo(-20, 0);
+                ctx.lineTo(100, -50);
+                ctx.lineTo(220, 0);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Entrance
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(100, 100, 30, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Maze hint
+                ctx.fillStyle = '#FFF';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Doolhof', 100, 75);
+            } else {
+                // Draw regular items
+                ctx.translate(item.x, item.y);
+                
+                // Add shadow if dragging
+                if (isDragging) {
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetX = 5;
+                    ctx.shadowOffsetY = 5;
+                }
+                
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.emoji, 0, 0);
+                
+                // Item name
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#333';
+                ctx.fillText(item.name, 0, 20);
+            }
+            
+            ctx.restore();
         });
     }
     
@@ -393,11 +391,13 @@ export class HomeInventory {
                     targetPig.missionProgress++;
                     console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
                     
-                    // Update mission modal if open
-                    this.updateMissionModal();
-                    
-                    // Save progress
+                    // Save progress immediately
                     this.saveProgress();
+                    
+                    // Update mission modal if open with immediate visual feedback
+                    if (this.currentMissionPig && this.currentMissionPig.id === targetPig.id) {
+                        this.updateMissionModal();
+                    }
                     
                     // Show progress feedback
                     if (this.game.ui && this.game.ui.showNotification) {
@@ -487,7 +487,9 @@ export class HomeInventory {
             
             setTimeout(() => {
                 pig.isEating = false;
-            }, 1000);
+                // Remove the item from the items array after animation completes
+                this.items = this.items.filter(i => i !== item);
+            }, 500);
             
             // Show notification about eating
             if (this.game.ui && this.game.ui.showNotification) {
@@ -505,6 +507,16 @@ export class HomeInventory {
         // Update progress bar
         const progressPercentage = (pig.missionProgress / pig.missionTarget) * 100;
         const progressFill = document.getElementById('progressFill');
+        
+        // Reset transition and width first
+        progressFill.style.transition = 'none';
+        progressFill.style.width = '0%';
+        
+        // Force reflow
+        progressFill.offsetHeight;
+        
+        // Now animate to the correct width
+        progressFill.style.transition = 'width 0.5s ease-in-out';
         progressFill.style.width = progressPercentage + '%';
         progressFill.style.backgroundColor = ''; // Reset to default color
         

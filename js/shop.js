@@ -147,22 +147,16 @@ export class Shop {
             // Update shop carrots display immediately
             document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
             
+            // Handle immediate use items
+            if (this.currentShop === 'Accessoires' && ['bow', 'hat', 'glasses'].includes(item.id)) {
+                this.game.player.accessory = item.id;
+                this.showMessage(`${item.name} is nu opgezet!`, 'success');
+            }
+            
             // Don't start minigame automatically for bath treatment
-            // The minigame should only start when clicking on the water bath
+            // The minigame should only start when entering the water pool in the swimming pool world
         } else {
             this.showMessage('Niet genoeg wortels!', 'error');
-        }
-        
-        // Handle immediate use items
-        if (this.currentShop === 'Accessoires' && ['bow', 'hat', 'glasses'].includes(item.id)) {
-            this.game.player.accessory = item.id;
-            this.showMessage(`${item.name} is nu opgezet!`, 'success');
-        }
-        
-        // Handle bath treatment - enter underwater world
-        if (item.id === 'bath') {
-            this.closeShop();
-            this.game.underwaterWorld.enter();
         }
     }
 
