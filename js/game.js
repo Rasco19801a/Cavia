@@ -15,6 +15,10 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
+        // Make canvas focusable and give it initial focus
+        this.canvas.tabIndex = 1;
+        this.canvas.focus();
+        
         // Set canvas size
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
@@ -85,11 +89,26 @@ export class Game {
         // Mouse/Touch controls
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
         
+        // Touch controls - handle touchend as click for better mobile support
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (e.changedTouches.length > 0) {
+                const touch = e.changedTouches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                const clickEvent = new MouseEvent('click', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                this.handleClick(clickEvent);
+            }
+        });
+        
         // Drag and drop events
         this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
         
+        // Touch drag events
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
@@ -129,6 +148,14 @@ export class Game {
         const rect = this.canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
+        
+        // Debug logging
+        console.log('Click detected at:', screenX, screenY);
+        console.log('Is inside building:', this.isInside);
+        console.log('Current world:', this.currentWorld);
+        
+        // Ensure canvas has focus
+        this.canvas.focus();
         
         // Handle underwater world clicks
         if (this.underwaterWorld.active) {

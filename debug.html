@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cavia Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 10000;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="debug-info">
+        <h3>Debug Controls</h3>
+        <button onclick="clearLocalStorage()">Clear Local Storage</button>
+        <button onclick="skipCustomization()">Skip Customization</button>
+        <button onclick="checkGameState()">Check Game State</button>
+        <button onclick="window.location.href='index.html'">Go to Game</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function clearLocalStorage() {
+            localStorage.clear();
+            document.getElementById('status').innerHTML = 'Local storage cleared!';
+        }
+
+        function skipCustomization() {
+            localStorage.setItem('caviaCustomization', JSON.stringify({
+                bodyColor: '#D2691E',
+                bellyColor: '#F5DEB3',
+                accessory: 'none'
+            }));
+            document.getElementById('status').innerHTML = 'Customization saved! Redirecting...';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        function checkGameState() {
+            const customization = localStorage.getItem('caviaCustomization');
+            const status = document.getElementById('status');
+            if (customization) {
+                status.innerHTML = 'Customization found: ' + customization;
+            } else {
+                status.innerHTML = 'No customization data found';
+            }
+        }
+    </script>
+</body>
+</html>

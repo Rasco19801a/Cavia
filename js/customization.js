@@ -1,13 +1,30 @@
 // Customization module - handles guinea pig customization
 export class Customization {
     constructor() {
+        // Check if customization was already done
+        const savedCustomization = Customization.loadCustomization();
+        if (savedCustomization && savedCustomization.skipCustomization) {
+            // Skip customization screen and start game directly
+            setTimeout(() => {
+                const customizationScreen = document.getElementById('customizationScreen');
+                if (customizationScreen) {
+                    customizationScreen.style.display = 'none';
+                    customizationScreen.remove();
+                }
+                
+                window.dispatchEvent(new CustomEvent('startGame', {
+                    detail: savedCustomization
+                }));
+            }, 100);
+            return;
+        }
+        
+        this.bodyColor = savedCustomization.bodyColor || '#D2691E';
+        this.bellyColor = savedCustomization.bellyColor || '#F5DEB3';
+        this.accessory = savedCustomization.accessory || 'none';
+        
         this.canvas = document.getElementById('previewCanvas');
         this.ctx = this.canvas.getContext('2d');
-        
-        // Default colors and settings
-        this.bodyColor = '#D2691E';
-        this.bellyColor = '#F5DEB3';
-        this.accessory = 'none';
         
         // Available colors
         this.bodyColors = [
@@ -96,9 +113,16 @@ export class Customization {
         // Setup start game button
         document.getElementById('startGameBtn').addEventListener('click', () => {
             this.saveCustomization();
-            document.getElementById('customizationScreen').classList.add('hidden');
+            const customizationScreen = document.getElementById('customizationScreen');
+            // Remove the screen entirely instead of just hiding it
+            if (customizationScreen) {
+                customizationScreen.style.display = 'none';
+                // Also remove it from DOM after a short delay to ensure smooth transition
+                setTimeout(() => {
+                    customizationScreen.remove();
+                }, 100);
+            }
             
-            // Dispatch event to start game
             window.dispatchEvent(new CustomEvent('startGame', {
                 detail: {
                     bodyColor: this.bodyColor,
