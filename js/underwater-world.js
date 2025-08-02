@@ -276,19 +276,24 @@ export class UnderwaterWorld {
         ctx.textAlign = 'center';
         ctx.fillText('Klik om te zwemmen! Verzamel alle wortels!', CONFIG.WORLD_WIDTH / 2, 40);
         
-        // Exit button
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
-        ctx.fillRect(CONFIG.WORLD_WIDTH - 120, 20, 100, 40);
-        ctx.fillStyle = '#FFF';
-        ctx.font = '20px Arial';
-        ctx.fillText('Verlaat', CONFIG.WORLD_WIDTH - 70, 45);
+        // Draw exit button - make it more visible as a close button
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.fillRect(CONFIG.WORLD_WIDTH - 60, 20, 40, 40);
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(CONFIG.WORLD_WIDTH - 50, 30);
+        ctx.lineTo(CONFIG.WORLD_WIDTH - 30, 50);
+        ctx.moveTo(CONFIG.WORLD_WIDTH - 30, 30);
+        ctx.lineTo(CONFIG.WORLD_WIDTH - 50, 50);
+        ctx.stroke();
     }
     
     handleClick(x, y) {
         if (!this.active) return;
         
         // Check exit button
-        if (x >= CONFIG.WORLD_WIDTH - 120 && x <= CONFIG.WORLD_WIDTH - 20 && y >= 20 && y <= 60) {
+        if (x >= CONFIG.WORLD_WIDTH - 60 && x <= CONFIG.WORLD_WIDTH - 20 && y >= 20 && y <= 60) {
             this.exit();
             return true;
         }

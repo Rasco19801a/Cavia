@@ -416,6 +416,9 @@ export class HomeInventory {
                         this.game.ui.showNotification(`${targetPig.name} eet ${this.draggedItem.name}! 😊`);
                     }
                 }
+                
+                // Remove consumed item from array immediately
+                this.items = this.items.filter(item => item !== this.draggedItem);
             } else if (this.isAccessory(this.draggedItem.id)) {
                 // Put accessory on guinea pig
                 targetPig.accessory = this.draggedItem.id;
@@ -433,9 +436,13 @@ export class HomeInventory {
                 if (this.game.ui && this.game.ui.showNotification) {
                     this.game.ui.showNotification(`${targetPig.name} draagt nu een ${this.draggedItem.name}! 🎀`);
                 }
+                
+                // Remove consumed item from array immediately
+                this.items = this.items.filter(item => item !== this.draggedItem);
             }
         }
         
+        // Always clear the dragged item reference
         this.draggedItem = null;
     }
     
@@ -574,6 +581,9 @@ export class HomeInventory {
         
         this.game.player.carrots += 50; // Reward
         
+        // Update UI immediately
+        this.game.ui.updateDisplay();
+        
         // Wait a bit before giving new mission
         setTimeout(() => {
             // Give new mission
@@ -589,11 +599,15 @@ export class HomeInventory {
             pig.missionTarget = newMission.target;
             pig.missionProgress = 0;
             
-            // Update modal if still open
+            // Update the mission modal if it's still open
             if (this.currentMissionPig === pig && !this.missionModal.classList.contains('hidden')) {
-                this.showMission(pig);
+                document.getElementById('missionText').textContent = pig.mission;
+                this.updateMissionModal();
             }
-        }, 2000);
+            
+            // Show notification about new mission
+            this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
+        }, 2000); // Give new mission after 2 seconds
     }
     
     startMazeGame() {
