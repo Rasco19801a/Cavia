@@ -7,7 +7,9 @@ export class HomeInventory {
         this.items = [];
         this.otherGuineaPigs = [];
         this.draggedItem = null;
+        this.missionModal = null;
         this.setupOtherGuineaPigs();
+        this.setupMissionModal();
         this.loadProgress();
     }
     
@@ -16,7 +18,7 @@ export class HomeInventory {
         this.otherGuineaPigs = [
             {
                 id: 1,
-                name: 'Fluffy',
+                name: 'Ginger',
                 x: 300,
                 y: 500,
                 color: '#8B4513',
@@ -28,7 +30,7 @@ export class HomeInventory {
             },
             {
                 id: 2,
-                name: 'Snowy',
+                name: 'Chinto',
                 x: 700,
                 y: 520,
                 color: '#FFFFFF',
@@ -40,7 +42,7 @@ export class HomeInventory {
             },
             {
                 id: 3,
-                name: 'Pepper',
+                name: 'Luxy',
                 x: 1100,
                 y: 510,
                 color: '#696969',
@@ -51,6 +53,40 @@ export class HomeInventory {
                 accessory: null
             }
         ];
+    }
+    
+    setupMissionModal() {
+        // Create mission modal
+        this.missionModal = document.createElement('div');
+        this.missionModal.id = 'missionModal';
+        this.missionModal.className = 'mission-modal hidden';
+        this.missionModal.innerHTML = `
+            <div class="mission-content">
+                <h2 id="missionPigName">Missie</h2>
+                <div class="mission-pig-icon">🐹</div>
+                <p id="missionText"></p>
+                <div class="mission-progress">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText"></p>
+                </div>
+                <button class="close-btn" id="closeMission">✖</button>
+            </div>
+        `;
+        document.body.appendChild(this.missionModal);
+        
+        // Event listener for close button
+        document.getElementById('closeMission').addEventListener('click', () => {
+            this.missionModal.classList.add('hidden');
+        });
+        
+        // Close on escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.missionModal.classList.contains('hidden')) {
+                this.missionModal.classList.add('hidden');
+            }
+        });
     }
     
     addItem(itemData) {
@@ -88,6 +124,26 @@ export class HomeInventory {
         this.items.forEach(item => {
             if (!item.consumed) {
                 ctx.save();
+                
+                // Check if this item is being dragged
+                const isDragging = this.draggedItem === item;
+                
+                // Check if dragged item is over a guinea pig
+                let isOverGuineaPig = false;
+                if (isDragging) {
+                    isOverGuineaPig = this.otherGuineaPigs.some(pig => {
+                        const distance = Math.sqrt(Math.pow(item.x - pig.x, 2) + Math.pow(item.y - pig.y, 2));
+                        return distance < 60;
+                    });
+                }
+                
+                // Apply scale if dragging or over guinea pig
+                if (isDragging) {
+                    const scale = isOverGuineaPig ? 1.3 : 1.1;
+                    ctx.translate(item.x, item.y);
+                    ctx.scale(scale, scale);
+                    ctx.translate(-item.x, -item.y);
+                }
                 
                 if (item.id === 'wheel') {
                     // Draw giant wheel
@@ -147,6 +203,15 @@ export class HomeInventory {
                 } else {
                     // Draw regular items
                     ctx.translate(item.x, item.y);
+                    
+                    // Add shadow if dragging
+                    if (isDragging) {
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                        ctx.shadowBlur = 10;
+                        ctx.shadowOffsetX = 5;
+                        ctx.shadowOffsetY = 5;
+                    }
+                    
                     ctx.font = '40px Arial';
                     ctx.textAlign = 'center';
                     ctx.fillText(item.emoji, 0, 0);
@@ -384,7 +449,16 @@ export class HomeInventory {
     
     showMission(pig) {
         // Show mission dialog
-        alert(`${pig.name}: "${pig.mission}"\n\nVoortgang: ${pig.missionProgress}/${pig.missionTarget}`);
+        document.getElementById('missionPigName').textContent = pig.name;
+        document.getElementById('missionText').textContent = pig.mission;
+        document.getElementById('progressText').textContent = `Voortgang: ${pig.missionProgress}/${pig.missionTarget}`;
+        
+        // Update progress bar
+        const progressPercentage = (pig.missionProgress / pig.missionTarget) * 100;
+        document.getElementById('progressFill').style.width = progressPercentage + '%';
+        
+        // Show modal
+        this.missionModal.classList.remove('hidden');
     }
     
     completeMission(pig) {

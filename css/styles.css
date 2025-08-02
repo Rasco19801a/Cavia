@@ -182,7 +182,7 @@ body {
 /* World selector */
 .world-selector {
     position: absolute;
-    top: 10px;
+    bottom: 10px;
     left: 10px;
     right: 10px;
     display: flex;
@@ -648,7 +648,7 @@ body {
 }
 
 #carrotsAmount {
-    color: #FFD700;
+    color: #000000;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -863,3 +863,71 @@ body {
 .shop-button-inside:active {
     transform: translate(-50%, -50%) scale(0.95);
 }
+
+/* Mission Modal Styles */
+.mission-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.mission-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    text-align: center;
+}
+
+.mission-pig-icon {
+    font-size: 60px;
+    margin: 10px 0;
+}
+
+#missionPigName {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+#missionText {
+    font-size: 18px;
+    margin: 20px 0;
+    color: #333;
+}
+
+.mission-progress {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+#progressText {
+    font-size: 14px;
+    color: #666;
+}
+
+.challenge-choice {

@@ -50,7 +50,6 @@ export class Game {
         // Show UI panels with a small delay to ensure DOM is ready
         setTimeout(() => {
             const worldSelector = document.getElementById('worldSelector');
-            const controls = document.querySelector('.controls');
             const designPanel = document.querySelector('.design-panel');
             
             if (worldSelector) {
@@ -60,7 +59,6 @@ export class Game {
                 console.error('World selector element not found!');
             }
             
-            if (controls) controls.classList.remove('hidden');
             if (designPanel) designPanel.classList.remove('hidden');
         }, 50);
         
@@ -263,6 +261,7 @@ export class Game {
     enterBuilding(building) {
         // Check if this is the water pool in the swimming pool world
         if (building.isWaterPool) {
+            console.log('Entering water pool - starting underwater mini-game');
             // Enter underwater mini-game instead of building
             this.underwaterWorld.enter();
             this.ui.showNotification('Duik in het water! Verzamel alle wortels!');
