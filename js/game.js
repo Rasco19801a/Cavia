@@ -425,6 +425,11 @@ export class Game {
         
         // Update camera
         this.camera.update(this.player, this.isInside);
+        
+        // Update home inventory if in home world
+        if (this.currentWorld === 'thuis') {
+            this.homeInventory.update();
+        }
     }
 
     draw() {

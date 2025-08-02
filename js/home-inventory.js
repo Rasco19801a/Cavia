@@ -225,22 +225,6 @@ export class HomeInventory {
     }
     
     handleClick(x, y) {
-        // Check if clicking on edible items
-        const clickedItem = this.items.find(item => {
-            if (item.consumed) return false;
-            
-            const distance = Math.sqrt(Math.pow(x - item.x, 2) + Math.pow(y - item.y, 2));
-            return distance < 40 && this.isEdible(item.id);
-        });
-        
-        if (clickedItem) {
-            // Guinea pig eats the item
-            clickedItem.consumed = true;
-            this.game.player.health = Math.min(100, this.game.player.health + 10);
-            this.showEatingAnimation(clickedItem);
-            return true;
-        }
-        
         // Check if clicking on tunnel
         const tunnel = this.items.find(item => 
             item.id === 'tunnel' && 
@@ -268,16 +252,17 @@ export class HomeInventory {
     }
     
     handleDragStart(x, y) {
-        // Check if starting drag on an item
-        const draggedItem = this.items.find(item => {
-            if (item.consumed || item.id === 'wheel' || item.id === 'tunnel') return false;
+        // Check if clicking on an item to drag it
+        const clickedItem = this.items.find(item => {
+            if (item.consumed) return false;
             
             const distance = Math.sqrt(Math.pow(x - item.x, 2) + Math.pow(y - item.y, 2));
             return distance < 40;
         });
         
-        if (draggedItem) {
-            this.draggedItem = draggedItem;
+        if (clickedItem && !clickedItem.consumed) {
+            this.draggedItem = clickedItem;
+            console.log('Started dragging item:', clickedItem.id, clickedItem.name);
             return true;
         }
         
@@ -309,6 +294,7 @@ export class HomeInventory {
                 // Check mission progress
                 if (targetPig.missionItem === this.draggedItem.id) {
                     targetPig.missionProgress++;
+                    console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
                     
                     // Show progress feedback
                     if (this.game.ui && this.game.ui.showNotification) {
@@ -320,6 +306,8 @@ export class HomeInventory {
                     if (targetPig.missionProgress >= targetPig.missionTarget) {
                         this.completeMission(targetPig);
                     }
+                } else {
+                    console.log(`Item mismatch: dragged ${this.draggedItem.id}, pig wants ${targetPig.missionItem}`);
                 }
             } else if (this.isAccessory(this.draggedItem.id)) {
                 // Put accessory on guinea pig
@@ -412,5 +400,16 @@ export class HomeInventory {
         );
         
         return distance < 80; // Player is in the wheel
+    }
+    
+    update() {
+        // Remove consumed items from the items array
+        this.items = this.items.filter(item => !item.consumed);
+        
+        // Update wheel rotation if it exists
+        const wheel = this.items.find(item => item.id === 'wheel');
+        if (wheel && this.checkPlayerInWheel()) {
+            wheel.rotation += 0.05;
+        }
     }
 }

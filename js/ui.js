@@ -164,4 +164,20 @@ export class UI {
             setTimeout(() => carrotsAmount.classList.remove('carrot-bounce'), 500);
         }
     }
+    
+    updateDisplay() {
+        // Update the main carrots display
+        this.updateCarrotsDisplay(this.player.carrots);
+        
+        // Update shop modal if it's open
+        const shopCarrotsAmount = document.getElementById('shopCarrotsAmount');
+        if (shopCarrotsAmount) {
+            shopCarrotsAmount.textContent = this.player.carrots;
+        }
+        
+        // Dispatch event for other components
+        window.dispatchEvent(new CustomEvent('carrotsUpdated', { 
+            detail: { carrots: this.player.carrots } 
+        }));
+    }
 }

@@ -138,6 +138,9 @@ export class Shop {
             
             // Update UI
             this.game.ui.updateDisplay();
+            
+            // Update shop carrots display immediately
+            document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
         } else {
             this.showMessage('Niet genoeg wortels!', 'error');
         }
