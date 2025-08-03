@@ -24,7 +24,7 @@ export class HomeInventory {
                 id: 1,
                 name: 'Ginger',
                 x: 600,
-                y: 500,
+                y: 480,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#F5DEB3'  // Beige belly
@@ -39,7 +39,7 @@ export class HomeInventory {
                 id: 2,
                 name: 'Chinto',
                 x: 900,
-                y: 500,
+                y: 480,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#000000'  // Black belly
@@ -54,7 +54,7 @@ export class HomeInventory {
                 id: 3,
                 name: 'Luxy',
                 x: 1200,
-                y: 500,
+                y: 480,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#8B4513'  // Brown belly
@@ -120,7 +120,7 @@ export class HomeInventory {
         const gridColumns = 8; // Number of columns in the grid
         const gridSpacing = 150; // Space between items
         const startX = 200; // Starting X position
-        const startY = 350; // Starting Y position
+        const startY = 480; // Starting Y position - now on the ground
         
         // Find the next available position
         const existingPositions = this.items.map(item => ({ x: item.x, y: item.y }));
