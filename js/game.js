@@ -9,6 +9,8 @@ import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 import { Shop } from './shop.js';
 import { HomeInventory } from './home-inventory.js';
 import { UnderwaterWorld } from './underwater-world.js';
+import { Inventory } from './inventory.js';
+import { Minigames } from './minigames.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
@@ -31,6 +33,8 @@ export class Game {
         this.shop = new Shop(this);
         this.homeInventory = new HomeInventory(this);
         this.underwaterWorld = new UnderwaterWorld(this);
+        this.inventory = new Inventory(this);
+        this.minigames = new Minigames(this);
         
         // Game state
         this.currentWorld = DEFAULT_WORLD;
@@ -437,6 +441,18 @@ export class Game {
         }
     }
 
+    startPuzzleMinigame() {
+        this.minigames.startPuzzleMinigame();
+    }
+    
+    startCatchMinigame() {
+        this.minigames.startCatchMinigame();
+    }
+    
+    startStackMinigame() {
+        this.minigames.startStackMinigame();
+    }
+    
     draw() {
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

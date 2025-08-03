@@ -75,6 +75,7 @@ export class HomeInventory {
                     </div>
                     <p id="progressText"></p>
                 </div>
+                <button class="inventory-select-btn" id="selectFromInventory">Selecteer uit Rugzak 🎒</button>
                 <button class="close-btn" id="closeMission">✖</button>
             </div>
         `;
@@ -84,6 +85,16 @@ export class HomeInventory {
         document.getElementById('closeMission').addEventListener('click', () => {
             this.missionModal.classList.add('hidden');
             this.currentMissionPig = null;
+        });
+        
+        // Event listener for inventory select button
+        document.getElementById('selectFromInventory').addEventListener('click', () => {
+            // Store current mission pig in game object for inventory to access
+            this.game.currentMissionPig = this.currentMissionPig;
+            // Open inventory
+            this.game.inventory.openInventory();
+            // Close mission modal
+            this.missionModal.classList.add('hidden');
         });
         
         // Close on escape key
