@@ -598,64 +598,237 @@ function drawDierenstad(ctx, buildings) {
 }
 
 function drawThuis(ctx) {
-    // Cozy home interior background
-    // Walls
-    ctx.fillStyle = '#FFF8DC'; // Cream color
+    // Modern home interior background
+    // Walls - warm gray
+    ctx.fillStyle = '#E8E0D5';
     ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
     
     // Wooden floor
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(0, 600, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 600);
+    ctx.fillStyle = '#8B6F47';
+    ctx.fillRect(0, 550, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 550);
     
     // Floor boards detail
-    ctx.strokeStyle = '#654321';
+    ctx.strokeStyle = '#6B5637';
     ctx.lineWidth = 2;
-    for (let x = 0; x < CONFIG.WORLD_WIDTH; x += 100) {
+    for (let x = 0; x < CONFIG.WORLD_WIDTH; x += 80) {
         ctx.beginPath();
-        ctx.moveTo(x, 600);
+        ctx.moveTo(x, 550);
         ctx.lineTo(x, CONFIG.WORLD_HEIGHT);
         ctx.stroke();
     }
     
-    // Windows
+    // Fireplace (left side)
+    // Fireplace base
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(50, 350, 200, 200);
+    
+    // Fireplace opening
+    ctx.fillStyle = '#2F2F2F';
+    ctx.fillRect(80, 400, 140, 120);
+    
+    // Fire
+    ctx.fillStyle = '#FF6B35';
+    ctx.beginPath();
+    ctx.moveTo(100, 500);
+    ctx.quadraticCurveTo(120, 450, 100, 420);
+    ctx.quadraticCurveTo(150, 440, 130, 480);
+    ctx.quadraticCurveTo(170, 430, 160, 470);
+    ctx.quadraticCurveTo(200, 440, 180, 500);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Fire glow
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.moveTo(120, 480);
+    ctx.quadraticCurveTo(140, 450, 130, 440);
+    ctx.quadraticCurveTo(160, 455, 150, 480);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Mantel
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(40, 340, 220, 20);
+    
+    // Windows (3 large modern windows)
     for (let i = 0; i < 3; i++) {
-        const x = 200 + i * 400;
+        const x = 350 + i * 300;
         
         // Window frame
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(x, 100, 150, 200);
+        ctx.fillStyle = '#4A4A4A';
+        ctx.fillRect(x, 100, 180, 250);
         
-        // Window glass
+        // Window glass with sky view
         ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(x + 10, 110, 130, 180);
+        ctx.fillRect(x + 10, 110, 160, 230);
         
-        // Window cross
-        ctx.strokeStyle = '#8B4513';
-        ctx.lineWidth = 5;
+        // Window dividers
+        ctx.strokeStyle = '#4A4A4A';
+        ctx.lineWidth = 8;
         ctx.beginPath();
-        ctx.moveTo(x + 75, 110);
-        ctx.lineTo(x + 75, 290);
-        ctx.moveTo(x + 10, 200);
-        ctx.lineTo(x + 140, 200);
+        ctx.moveTo(x + 90, 110);
+        ctx.lineTo(x + 90, 340);
+        ctx.moveTo(x + 10, 225);
+        ctx.lineTo(x + 170, 225);
         ctx.stroke();
+        
+        // Curtains
+        ctx.fillStyle = 'rgba(139, 69, 19, 0.3)';
+        ctx.fillRect(x, 100, 30, 250);
+        ctx.fillRect(x + 150, 100, 30, 250);
     }
     
-    // Rug
-    ctx.fillStyle = '#DC143C';
-    ctx.fillRect(500, 450, 300, 200);
-    ctx.fillStyle = '#8B0000';
-    ctx.fillRect(520, 470, 260, 160);
+    // Large L-shaped couch (center-right)
+    // Main couch body
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(600, 420, 300, 100);
+    ctx.fillRect(800, 320, 100, 200);
     
-    // Cozy corner with cushions
+    // Couch cushions
+    ctx.fillStyle = '#A0522D';
+    // Seat cushions
+    ctx.fillRect(610, 440, 90, 70);
+    ctx.fillRect(710, 440, 90, 70);
+    ctx.fillRect(810, 440, 80, 70);
+    // Back cushions
+    ctx.fillRect(610, 425, 85, 40);
+    ctx.fillRect(705, 425, 85, 40);
+    ctx.fillRect(810, 330, 80, 85);
+    
+    // Throw pillows
     ctx.fillStyle = '#FFB6C1';
     ctx.beginPath();
-    ctx.arc(150, 550, 80, 0, Math.PI * 2);
+    ctx.arc(650, 430, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#98D8C8';
+    ctx.beginPath();
+    ctx.arc(750, 430, 20, 0, Math.PI * 2);
     ctx.fill();
     
-    ctx.fillStyle = '#FFA07A';
+    // Coffee table
+    ctx.fillStyle = '#4A4A4A';
+    ctx.fillRect(650, 540, 180, 8);
+    // Table legs
+    ctx.fillRect(660, 548, 8, 30);
+    ctx.fillRect(812, 548, 8, 30);
+    
+    // TV Stand (right side)
+    ctx.fillStyle = '#2F2F2F';
+    ctx.fillRect(1000, 450, 250, 100);
+    
+    // Television
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(1025, 300, 200, 120);
+    // TV Screen
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(1035, 310, 180, 100);
+    // TV reflection
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(1035, 310, 180, 50);
+    
+    // Game console
+    ctx.fillStyle = '#4169E1';
+    ctx.fillRect(1060, 460, 60, 40);
+    // Console details
+    ctx.fillStyle = '#000080';
+    ctx.fillRect(1065, 465, 50, 5);
+    ctx.fillRect(1065, 475, 50, 5);
+    
+    // Controllers
+    ctx.fillStyle = '#FF0000';
+    ctx.fillRect(1130, 470, 30, 20);
+    ctx.fillStyle = '#0000FF';
+    ctx.fillRect(1165, 470, 30, 20);
+    
+    // Chairs (2 modern chairs)
+    // Chair 1
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(400, 440, 80, 80);
+    ctx.fillRect(400, 420, 80, 40);
+    // Chair legs
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(405, 520, 8, 30);
+    ctx.fillRect(467, 520, 8, 30);
+    
+    // Chair 2
+    ctx.fillStyle = '#4682B4';
+    ctx.fillRect(1100, 440, 80, 80);
+    ctx.fillRect(1100, 420, 80, 40);
+    // Chair legs
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(1105, 520, 8, 30);
+    ctx.fillRect(1167, 520, 8, 30);
+    
+    // Plants
+    // Large floor plant (left)
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(280, 480, 40, 70);
+    ctx.fillStyle = '#228B22';
     ctx.beginPath();
-    ctx.arc(250, 560, 70, 0, Math.PI * 2);
+    ctx.arc(300, 450, 40, 0, Math.PI * 2);
     ctx.fill();
+    ctx.beginPath();
+    ctx.arc(280, 460, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(320, 460, 30, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Small plant on coffee table
+    ctx.fillStyle = '#696969';
+    ctx.fillRect(730, 520, 20, 20);
+    ctx.fillStyle = '#32CD32';
+    ctx.beginPath();
+    ctx.arc(740, 515, 15, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Hanging plant (near window)
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(500, 100);
+    ctx.lineTo(500, 200);
+    ctx.stroke();
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(480, 200, 40, 30);
+    ctx.fillStyle = '#228B22';
+    ctx.beginPath();
+    ctx.arc(500, 210, 25, 0, Math.PI * 2);
+    ctx.fill();
+    // Hanging vines
+    ctx.strokeStyle = '#228B22';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(485, 230);
+    ctx.quadraticCurveTo(480, 250, 485, 270);
+    ctx.moveTo(500, 230);
+    ctx.quadraticCurveTo(500, 250, 505, 270);
+    ctx.moveTo(515, 230);
+    ctx.quadraticCurveTo(520, 250, 515, 270);
+    ctx.stroke();
+    
+    // Rug under coffee table
+    ctx.fillStyle = '#8B0000';
+    ctx.fillRect(600, 520, 280, 120);
+    ctx.fillStyle = '#DC143C';
+    ctx.fillRect(620, 530, 240, 100);
+    // Rug pattern
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(630, 540, 220, 80);
+    
+    // Wall art/paintings
+    // Painting 1
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(100, 150, 100, 120);
+    ctx.fillStyle = '#FFE4B5';
+    ctx.fillRect(110, 160, 80, 100);
+    
+    // Painting 2
+    ctx.fillStyle = '#4A4A4A';
+    ctx.fillRect(1050, 150, 120, 100);
+    ctx.fillStyle = '#F0F0F0';
+    ctx.fillRect(1060, 160, 100, 80);
     
     // Title
     ctx.fillStyle = '#4B0082';
