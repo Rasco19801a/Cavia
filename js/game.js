@@ -292,10 +292,10 @@ export class Game {
         if (building.name === 'Zwembad') {
             // Check if player has badbehandeling
             if (this.shop.hasPurchased('bath')) {
-                console.log('Player has badbehandeling - starting swimming pool feature');
-                // Enter underwater mini-game instead of building
-                this.underwaterWorld.enter();
-                this.ui.showNotification('Je hebt badbehandeling! Duik in het water! Verzamel alle wortels!');
+                console.log('Player has badbehandeling - starting bath minigame');
+                // Start bath minigame
+                this.startBathMinigame();
+                this.ui.showNotification('Tijd voor een ontspannend badje!');
             } else {
                 console.log('Player needs badbehandeling to use the swimming pool');
                 this.ui.showNotification('Je hebt badbehandeling nodig om te kunnen zwemmen! Koop het in de Cavia Spa.');
@@ -434,6 +434,10 @@ export class Game {
     
     startStackMinigame() {
         this.minigames.startStackMinigame();
+    }
+    
+    startBathMinigame() {
+        this.minigames.startBathMinigame();
     }
     
     draw() {

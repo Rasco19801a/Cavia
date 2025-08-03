@@ -46,7 +46,7 @@ export function createZwembadBuildings() {
     return [
         {
             x: 500, y: 400, w: 200, h: 150, 
-            color: '#00CED1', name: 'Duik in het Water!',
+            color: '#00CED1', name: 'Zwembad',
             door: {x: 580, y: 475, w: 40, h: 40},
             isWaterPool: true  // Special flag to identify this as the water pool
         }
