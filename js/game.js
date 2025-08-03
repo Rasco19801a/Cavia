@@ -153,7 +153,9 @@ export class Game {
         
         // Check if inside a shop and clicking on a shop item
         if (this.isInside && this.currentBuilding && this.shop.isShopBuilding(this.currentBuilding.name)) {
-            if (this.shop.handleClick(x, y)) {
+            // Convert screen coordinates to world coordinates for shops
+            const worldCoords = this.camera.screenToWorld(x, y);
+            if (this.shop.handleClick(worldCoords.x, worldCoords.y)) {
                 return; // Click was handled by shop
             }
         }
@@ -400,7 +402,7 @@ export class Game {
         }
         
         // Update camera
-        this.camera.update(this.player, this.isInside);
+        this.camera.update(this.player, this.isInside, this.currentBuilding);
         
         // Update home inventory if in home world
         if (this.currentWorld === 'thuis') {
@@ -460,8 +462,19 @@ export class Game {
             this.ctx.restore();
         } else {
             // Draw interior
+            this.ctx.save();
+            
+            // Apply camera transform for shops
+            const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+            const isShop = this.currentBuilding && shopBuildings.includes(this.currentBuilding.name);
+            if (isShop) {
+                this.camera.applyTransform(this.ctx);
+            }
+            
             drawInterior(this.ctx, this.currentBuilding);
             this.player.draw(this.ctx);
+            
+            this.ctx.restore();
         }
     }
 
