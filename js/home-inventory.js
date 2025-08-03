@@ -15,6 +15,11 @@ export class HomeInventory {
         this.setupOtherGuineaPigs();
         this.setupMissionModal();
         this.loadProgress();
+        
+        // Reorganize any existing items to prevent overlapping
+        if (this.items.length > 0) {
+            this.reorganizeItems();
+        }
     }
     
     setupOtherGuineaPigs() {
@@ -124,6 +129,11 @@ export class HomeInventory {
         
         // Find the next available position
         const existingPositions = this.items.map(item => ({ x: item.x, y: item.y }));
+        
+        // Also consider guinea pig positions to avoid overlapping with them
+        const guineaPigPositions = this.otherGuineaPigs.map(pig => ({ x: pig.x, y: pig.y }));
+        const allOccupiedPositions = [...existingPositions, ...guineaPigPositions];
+        
         let gridIndex = 0;
         let x, y;
         
@@ -135,8 +145,8 @@ export class HomeInventory {
             y = startY + (row * gridSpacing);
             
             // Check if this position is already occupied
-            const isOccupied = existingPositions.some(pos => 
-                Math.abs(pos.x - x) < 50 && Math.abs(pos.y - y) < 50
+            const isOccupied = allOccupiedPositions.some(pos => 
+                Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 100
             );
             
             if (!isOccupied || gridIndex > 50) { // Safety limit
@@ -172,6 +182,70 @@ export class HomeInventory {
         this.items.forEach((item, index) => {
             console.log(`${index}: ${item.id} - ${item.name} at (${Math.round(item.x)}, ${Math.round(item.y)}) - consumed: ${item.consumed}`);
         });
+    }
+    
+    reorganizeItems() {
+        // Reorganize all items to prevent overlapping
+        const gridColumns = 8; // Number of columns in the grid
+        const gridSpacing = 150; // Space between items
+        const startX = 200; // Starting X position
+        const startY = 480; // Starting Y position - on the ground
+        
+        // Get guinea pig positions to avoid
+        const guineaPigPositions = this.otherGuineaPigs.map(pig => ({ x: pig.x, y: pig.y }));
+        
+        // Sort items by their current position to maintain some order
+        this.items.sort((a, b) => {
+            if (Math.abs(a.y - b.y) < 50) {
+                return a.x - b.x;
+            }
+            return a.y - b.y;
+        });
+        
+        // Reassign positions
+        this.items.forEach((item, index) => {
+            // Skip special items that have fixed positions
+            if (item.id === 'wheel' || item.id === 'tunnel') {
+                return;
+            }
+            
+            let gridIndex = index;
+            let x, y;
+            let attempts = 0;
+            
+            // Find an empty grid position
+            while (attempts < 100) {
+                const col = gridIndex % gridColumns;
+                const row = Math.floor(gridIndex / gridColumns);
+                x = startX + (col * gridSpacing);
+                y = startY + (row * gridSpacing);
+                
+                // Check if this position conflicts with guinea pigs
+                const conflictsWithPig = guineaPigPositions.some(pos => 
+                    Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 100
+                );
+                
+                // Check if this position conflicts with other already placed items
+                const conflictsWithItem = this.items.slice(0, index).some(otherItem => 
+                    otherItem.id !== 'wheel' && otherItem.id !== 'tunnel' &&
+                    Math.abs(otherItem.x - x) < 100 && Math.abs(otherItem.y - y) < 100
+                );
+                
+                if (!conflictsWithPig && !conflictsWithItem) {
+                    break;
+                }
+                
+                gridIndex++;
+                attempts++;
+            }
+            
+            // Update item position
+            item.x = x;
+            item.y = y;
+        });
+        
+        console.log('Items reorganized to prevent overlapping');
+        this.logInventory();
     }
     
     draw(ctx) {

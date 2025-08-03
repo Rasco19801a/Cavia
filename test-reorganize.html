@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Reorganize Items - Cavia Wereld</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .test-button {
+            background: #48bb78;
+        }
+        .test-button:hover {
+            background: #38a169;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐹 Test Item Reorganisatie</h1>
+        
+        <div class="instructions">
+            <h2>Nieuwe functionaliteit:</h2>
+            <p>De objecten in de thuis wereld worden nu automatisch georganiseerd om overlapping te voorkomen:</p>
+            <ul>
+                <li>Items worden in een raster geplaatst met voldoende ruimte ertussen</li>
+                <li>Bij het wisselen naar de thuis wereld worden items automatisch georganiseerd</li>
+                <li>Druk op de <code>R</code> toets in de thuis wereld om items handmatig te reorganiseren</li>
+                <li>Items kunnen vanuit de rugzak in het huis geplaatst worden met de nieuwe "Plaats in Huis" knop</li>
+                <li>De positie van cavia's wordt ook in acht genomen bij het plaatsen van items</li>
+            </ul>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="window.location.href='index.html'">Start het Spel</button>
+            <button class="test-button" onclick="testReorganize()">Test Reorganisatie Code</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>Hoe te testen:</h3>
+            <ol>
+                <li>Start het spel en ga naar de thuis wereld (🏠 knop)</li>
+                <li>Open je rugzak (🎒 knop)</li>
+                <li>Als je items hebt, selecteer er een en klik op "Plaats in Huis"</li>
+                <li>Items worden automatisch netjes geplaatst zonder overlap</li>
+                <li>Druk op <code>R</code> om items opnieuw te organiseren</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        function testReorganize() {
+            alert('De reorganisatie functie is geïntegreerd in het hoofdspel. Start het spel om het te testen!');
+        }
+    </script>
+</body>
+</html>
