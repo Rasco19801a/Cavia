@@ -134,8 +134,8 @@ export class Shop {
             this.inventory.push(item);
             this.purchasedItems.add(item.id); // Track purchased item
             
-            // Add item to home inventory
-            this.game.homeInventory.addItem(item);
+            // Add item to player inventory
+            this.game.inventory.addItem(item);
             
             this.showMessage(`${item.name} gekocht!`, 'success');
             this.updateBuyButtons();

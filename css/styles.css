@@ -931,3 +931,265 @@ body {
 }
 
 .challenge-choice {
+}
+
+/* Inventory System Styles */
+.inventory-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #667eea;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.inventory-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.inventory-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.inventory-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.inventory-content h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 2em;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+.inventory-item {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.inventory-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.inventory-item.selected {
+    border-color: #667eea;
+    background: #f0f4ff;
+    transform: scale(1.05);
+}
+
+.inventory-item.empty {
+    background: #f9f9f9;
+    border-style: dashed;
+    cursor: default;
+}
+
+.inventory-item.empty:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #ddd;
+}
+
+.item-emoji {
+    font-size: 2.5em;
+    margin-bottom: 5px;
+}
+
+.item-name {
+    font-size: 0.9em;
+    color: #333;
+    font-weight: 600;
+}
+
+.item-quantity {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.inventory-info {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 150px;
+}
+
+.selected-item-info h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.selected-item-info p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.use-item-btn,
+.play-minigame-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.use-item-btn:hover,
+.play-minigame-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+}
+
+.play-minigame-btn {
+    background: #48bb78;
+}
+
+.play-minigame-btn:hover {
+    background: #38a169;
+}
+
+/* Mission Modal Update */
+.mission-modal .inventory-select-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.mission-modal .inventory-select-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+}
+
+/* Minigame Styles */
+.minigame-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
+
+.minigame-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.minigame-content h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 2em;
+}
+
+.minigame-area {
+    min-height: 300px;
+    margin: 20px 0;
+}
+
+.minigame-score {
+    text-align: center;
+    font-size: 1.5em;
+    color: #667eea;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.puzzle-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.puzzle-tile:hover:not(.empty) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-tile.empty {
+    background: transparent !important;
+    cursor: default;
+    border: 2px dashed #ddd;
+}
