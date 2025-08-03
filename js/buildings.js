@@ -64,12 +64,12 @@ function drawShopInterior(ctx, name) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Welkom in de ' + name + '!', CONFIG.WORLD_WIDTH / 2, 50);
+    ctx.fillText('Welkom in de ' + name + '!', 400, 50);
     
-    // Draw items in a grid - now 4 columns instead of 2
+    // Draw items in a grid - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Item background
         ctx.fillStyle = '#FFE4E1';
@@ -301,12 +301,12 @@ function drawGroenteMarkt(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Verse Groenten voor je Cavia!', CONFIG.WORLD_WIDTH / 2, 50);
+    ctx.fillText('Verse Groenten voor je Cavia!', 400, 50);
     
-    // Draw items in a grid - now 4 columns instead of 2
+    // Draw items in a grid - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Item background
         ctx.fillStyle = '#8FBC8F';
@@ -364,12 +364,12 @@ function drawHooiWinkel(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '25px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Het Beste Hooi!', CONFIG.WORLD_WIDTH / 2, 50);
+    ctx.fillText('Het Beste Hooi!', 400, 50);
     
-    // Draw items - now 4 columns instead of 2
+    // Draw items - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Hay bale background
         ctx.fillStyle = '#F0E68C';
@@ -436,12 +436,12 @@ function drawSpeeltjesShop(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Speeltjes voor Blije Cavia\'s!', CONFIG.WORLD_WIDTH / 2, 50);
+    ctx.fillText('Speeltjes voor Blije Cavia\'s!', 400, 50);
     
-    // Draw items - now 4 columns instead of 2
+    // Draw items - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Item background
         ctx.fillStyle = '#FFE4B5';
@@ -499,12 +499,12 @@ function drawCaviaSpa(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '50px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Spa', CONFIG.WORLD_WIDTH / 2, 80);
+    ctx.fillText('Spa', 400, 80);
     
-    // Draw items - now 4 columns instead of 2
+    // Draw items - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Spa background
         ctx.fillStyle = '#87CEEB';
@@ -566,12 +566,12 @@ function drawAccessoiresShop(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Pimp je Cavia!', CONFIG.WORLD_WIDTH / 2, 50);
+    ctx.fillText('Pimp je Cavia!', 400, 50);
     
-    // Draw items - now 4 columns instead of 2
+    // Draw items - 2 columns to fit in 800px width
     items.forEach((item, index) => {
-        const x = 200 + (index % 4) * 400;
-        const y = 120 + Math.floor(index / 4) * 200;
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
         // Item background
         ctx.fillStyle = '#E6E6FA';
