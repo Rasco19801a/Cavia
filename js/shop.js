@@ -2,8 +2,6 @@
 export class Shop {
     constructor(game) {
         this.game = game;
-        this.shopModal = null;
-        this.currentShop = null;
         this.shopItems = {
             'Speelgoedwinkel': [
                 { id: 'ball', name: 'Bal', price: 10, emoji: '⚽', description: 'Een leuke bal om mee te spelen' },
@@ -44,86 +42,7 @@ export class Shop {
         };
         this.inventory = [];
         this.purchasedItems = new Set(); // Track purchased item IDs
-        this.setupModal();
-    }
-
-    setupModal() {
-        // Create shop modal
-        this.shopModal = document.createElement('div');
-        this.shopModal.id = 'shopModal';
-        this.shopModal.className = 'shop-modal hidden';
-        this.shopModal.innerHTML = `
-            <div class="shop-content">
-                <h2 id="shopTitle">Winkel</h2>
-                            <div class="shop-carrots">
-                <span class="carrot-icon">🥕</span>
-                <span id="shopCarrotsAmount">0</span>
-            </div>
-                <div id="shopItems" class="shop-items-grid"></div>
-                <button class="close-btn" id="closeShop">✖</button>
-                <div id="shopMessage" class="shop-message hidden"></div>
-            </div>
-        `;
-        document.body.appendChild(this.shopModal);
-
-        // Event listeners
-        document.getElementById('closeShop').addEventListener('click', () => this.closeShop());
-        
-        // ESC key to close
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !this.shopModal.classList.contains('hidden')) {
-                this.closeShop();
-            }
-        });
-    }
-
-    openShop(shopName) {
-        this.currentShop = shopName;
-        const items = this.shopItems[shopName];
-        
-        if (!items) {
-            console.log('No items for shop:', shopName);
-            return;
-        }
-
-        // Update shop title
-        document.getElementById('shopTitle').textContent = shopName;
-        
-        // Update carrots display
-        document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
-        
-        // Clear and populate items
-        const itemsContainer = document.getElementById('shopItems');
-        itemsContainer.innerHTML = '';
-        
-        items.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'shop-item';
-            itemDiv.innerHTML = `
-                <div class="item-emoji">${item.emoji}</div>
-                <div class="item-name">${item.name}</div>
-                <div class="item-description">${item.description}</div>
-                <div class="item-price">
-                    <span class="carrot-icon">🥕</span>
-                    <span>${item.price}</span>
-                </div>
-                <button class="buy-btn" data-item-id="${item.id}">Kopen</button>
-            `;
-            
-            const buyBtn = itemDiv.querySelector('.buy-btn');
-            buyBtn.addEventListener('click', () => this.buyItem(item));
-            
-            // Disable button if not enough carrots
-            if (this.game.player.carrots < item.price) {
-                buyBtn.disabled = true;
-                buyBtn.textContent = 'Te duur';
-            }
-            
-            itemsContainer.appendChild(itemDiv);
-        });
-        
-        // Show modal
-        this.shopModal.classList.remove('hidden');
+        this.clickAreas = []; // Store clickable areas for items
     }
 
     buyItem(item) {
@@ -137,72 +56,51 @@ export class Shop {
             // Add item to player inventory
             this.game.inventory.addItem(item);
             
-            this.showMessage(`${item.name} gekocht!`, 'success');
-            this.updateBuyButtons();
+            this.game.ui.showNotification(`${item.name} gekocht!`);
             
             // Update UI
             this.game.ui.updateDisplay();
             console.log('UI updateDisplay called');
             
-            // Update shop carrots display immediately
-            document.getElementById('shopCarrotsAmount').textContent = this.game.player.carrots;
-            
             // Handle immediate use items
-            if (this.currentShop === 'Accessoires' && ['bow', 'hat', 'glasses'].includes(item.id)) {
+            if (this.game.currentBuilding && this.game.currentBuilding.name === 'Accessoires' && ['bow', 'hat', 'glasses'].includes(item.id)) {
                 this.game.player.accessory = item.id;
-                this.showMessage(`${item.name} is nu opgezet!`, 'success');
+                this.game.ui.showNotification(`${item.name} is nu opgezet!`);
             }
             
             // Don't start minigame automatically for bath treatment
             // The minigame should only start when entering the water pool in the swimming pool world
         } else {
-            this.showMessage('Niet genoeg wortels!', 'error');
-        }
-    }
-
-    updateBuyButtons() {
-        const items = this.shopItems[this.currentShop];
-        const buyButtons = document.querySelectorAll('.buy-btn');
-        
-        buyButtons.forEach((btn, index) => {
-            const item = items[index];
-            if (this.game.player.carrots < item.price) {
-                btn.disabled = true;
-                btn.textContent = 'Te duur';
-            } else {
-                btn.disabled = false;
-                btn.textContent = 'Kopen';
-            }
-        });
-    }
-
-    showMessage(message, type) {
-        const messageDiv = document.getElementById('shopMessage');
-        messageDiv.textContent = message;
-        messageDiv.className = `shop-message ${type}`;
-        messageDiv.classList.remove('hidden');
-        
-        setTimeout(() => {
-            messageDiv.classList.add('hidden');
-        }, 2000);
-    }
-
-    closeShop() {
-        this.shopModal.classList.add('hidden');
-        this.currentShop = null;
-        
-        // Show the shop button again if we're still inside a shop building
-        if (this.game.isInside && this.game.currentBuilding) {
-            const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 
-                                 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
-            
-            if (shopBuildings.includes(this.game.currentBuilding.name)) {
-                this.game.showShopButton(this.game.currentBuilding.name);
-            }
+            this.game.ui.showNotification('Niet genoeg wortels!');
         }
     }
 
     hasPurchased(itemId) {
         return this.purchasedItems.has(itemId);
+    }
+
+    isShopBuilding(buildingName) {
+        return this.shopItems.hasOwnProperty(buildingName);
+    }
+
+    getShopItems(shopName) {
+        return this.shopItems[shopName] || [];
+    }
+
+    // Check if a click is on a shop item
+    handleClick(x, y) {
+        for (const area of this.clickAreas) {
+            if (x >= area.x && x <= area.x + area.width &&
+                y >= area.y && y <= area.y + area.height) {
+                this.buyItem(area.item);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Clear click areas when leaving shop
+    clearClickAreas() {
+        this.clickAreas = [];
     }
 }

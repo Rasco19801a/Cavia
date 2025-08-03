@@ -146,13 +146,28 @@ export class Game {
         });
     }
 
-    handleClick(e) {
+    handleClick(event) {
         const rect = this.canvas.getBoundingClientRect();
-        const screenX = e.clientX - rect.left;
-        const screenY = e.clientY - rect.top;
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        // Check if inside a shop and clicking on a shop item
+        if (this.isInside && this.currentBuilding && this.shop.isShopBuilding(this.currentBuilding.name)) {
+            if (this.shop.handleClick(x, y)) {
+                return; // Click was handled by shop
+            }
+        }
+        
+        // Check if clicking on exit
+        if (this.isInside) {
+            if (x >= 350 && x <= 450 && y >= 520 && y <= 570) {
+                this.exitBuilding();
+                return;
+            }
+        }
         
         // Debug logging
-        console.log('Click detected at:', screenX, screenY);
+        console.log('Click detected at:', x, y);
         console.log('Is inside building:', this.isInside);
         console.log('Current world:', this.currentWorld);
         
@@ -161,12 +176,12 @@ export class Game {
         
         // Handle underwater world clicks
         if (this.underwaterWorld.active) {
-            this.underwaterWorld.handleClick(screenX, screenY);
+            this.underwaterWorld.handleClick(x, y);
             return;
         }
         
         if (!this.isInside) {
-            const worldCoords = this.camera.screenToWorld(screenX, screenY);
+            const worldCoords = this.camera.screenToWorld(x, y);
             
             // Check if in home world and clicked on home inventory items
             if (this.currentWorld === 'thuis') {
@@ -214,12 +229,12 @@ export class Game {
             }
         } else {
             // Inside building
-            if (screenY > 500) {
+            if (y > 500) {
                 // Exit building
                 this.exitBuilding();
             } else {
                 // Move inside building
-                this.player.setTarget(screenX, screenY);
+                this.player.setTarget(x, y);
             }
         }
     }
@@ -263,9 +278,9 @@ export class Game {
     }
     
     enterBuilding(building) {
-        // Check if this is the water pool in the swimming pool world
-        if (building.isWaterPool) {
-            // Check if player has purchased badbehandeling
+        // Special handling for swimming pool
+        if (building.name === 'Zwembad') {
+            // Check if player has badbehandeling
             if (this.shop.hasPurchased('bath')) {
                 console.log('Player has badbehandeling - starting swimming pool feature');
                 // Enter underwater mini-game instead of building
@@ -286,66 +301,19 @@ export class Game {
         this.player.clearTarget();
         this.ui.showNotification(`Je bent nu in ${building.name}`);
         
-        // Check if building is a shop and show shop button inside
-        const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 
-                             'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
-        
-        if (shopBuildings.includes(building.name)) {
-            // Show a shop button inside the building
-            this.showShopButton(building.name);
-        }
+        // Clear shop click areas when entering a building
+        this.shop.clearClickAreas();
     }
     
-    showShopButton(shopName) {
-        // Create shop button if it doesn't exist
-        if (!this.shopButton) {
-            this.shopButton = document.createElement('button');
-            this.shopButton.className = 'shop-button-inside';
-            this.shopButton.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                padding: 20px 40px;
-                font-size: 24px;
-                background: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 10px;
-                cursor: pointer;
-                z-index: 1000;
-                font-family: 'Nunito', sans-serif;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            `;
-            document.body.appendChild(this.shopButton);
-        }
-        
-        this.shopButton.textContent = `🛒 Open ${shopName}`;
-        this.shopButton.style.display = 'block';
-        
-        // Remove any existing click listeners
-        this.shopButton.replaceWith(this.shopButton.cloneNode(true));
-        this.shopButton = document.querySelector('.shop-button-inside');
-        
-        this.shopButton.addEventListener('click', () => {
-            this.shop.openShop(shopName);
-            this.shopButton.style.display = 'none';
-        });
-    }
-    
-    hideShopButton() {
-        if (this.shopButton) {
-            this.shopButton.style.display = 'none';
-        }
-    }
-
     exitBuilding() {
         this.isInside = false;
         this.player.x = this.currentBuilding.x + this.currentBuilding.w / 2;
         this.player.y = this.currentBuilding.y + this.currentBuilding.h + 50;
         this.currentBuilding = null;
         this.player.clearTarget();
-        this.hideShopButton(); // Hide shop button when exiting
+        
+        // Clear shop click areas when exiting
+        this.shop.clearClickAreas();
     }
 
     changeWorld(world) {
@@ -372,7 +340,6 @@ export class Game {
         this.camera.y = 0;
         this.isInside = false;
         this.currentBuilding = null;
-        this.hideShopButton(); // Hide shop button when changing worlds
         this.setupWorld();
         console.log(`World changed successfully to: ${this.currentWorld}`);
         

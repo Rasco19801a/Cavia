@@ -38,42 +38,67 @@ export function createZwembadBuildings() {
 }
 
 function drawShopInterior(ctx, name) {
-    // Draw shop name
+    // Get shop items from the game's shop system
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems(name);
+    game.shop.clearClickAreas();
+    
     ctx.fillStyle = 'black';
-    ctx.font = '16px Nunito, sans-serif';
+    ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(name, 400, 50);
+    ctx.fillText('Welkom in de ' + name + '!', 400, 50);
     
-    // Draw shelves
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(100, 150, 200, 20);
-    ctx.fillRect(100, 250, 200, 20);
-    ctx.fillRect(500, 150, 200, 20);
-    ctx.fillRect(500, 250, 200, 20);
-    
-    // Draw counter
-    ctx.fillStyle = '#654321';
-    ctx.fillRect(300, 400, 200, 80);
-    
-    // Draw items on shelves based on shop type
-    if (name === 'Speelgoedwinkel') {
-        // Toys
-        ctx.fillStyle = '#FF0000';
-        ctx.fillRect(120, 130, 20, 20);
-        ctx.fillStyle = '#00FF00';
-        ctx.fillRect(160, 130, 20, 20);
-        ctx.fillStyle = '#0000FF';
-        ctx.fillRect(200, 130, 20, 20);
-    } else if (name === 'Cavia Café') {
-        // Food items
-        ctx.fillStyle = '#FFA500';
-        ctx.beginPath();
-        ctx.arc(150, 140, 10, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(200, 140, 10, 0, Math.PI * 2);
-        ctx.fill();
-    }
+    // Draw items in a grid
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
+        
+        // Item background
+        ctx.fillStyle = '#FFE4E1';
+        ctx.fillRect(x, y, 200, 150);
+        
+        // Item emoji
+        ctx.font = '50px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
 }
 
 function drawCafeInterior(ctx) {
@@ -244,102 +269,330 @@ export function drawInterior(ctx, building) {
 }
 
 function drawGroenteMarkt(ctx) {
+    // Get shop items from the game's shop system
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems('Groente Markt');
+    game.shop.clearClickAreas(); // Clear previous click areas
+    
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Verse Groenten voor je Cavia!', 400, 50);
     
-    // Vegetable stands
-    const veggies = ['🥕', '🥬', '🥒', '🌽', '🥦'];
-    for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = '#8FBC8F';
-        ctx.fillRect(100 + i * 120, 200, 100, 150);
+    // Draw items in a grid
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
+        // Item background
+        ctx.fillStyle = '#8FBC8F';
+        ctx.fillRect(x, y, 200, 150);
+        
+        // Item emoji
         ctx.font = '50px sans-serif';
-        ctx.fillText(veggies[i], 150 + i * 120, 280);
-    }
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
 }
 
 function drawHooiWinkel(ctx) {
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems('Hooi Winkel');
+    game.shop.clearClickAreas();
+    
     ctx.fillStyle = 'black';
     ctx.font = '25px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Het Beste Hooi!', 400, 50);
     
-    // Hay bales
-    for (let i = 0; i < 6; i++) {
+    // Draw items
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
+        
+        // Hay bale background
         ctx.fillStyle = '#F0E68C';
-        ctx.fillRect(150 + (i % 3) * 200, 200 + Math.floor(i / 3) * 150, 150, 100);
+        ctx.fillRect(x, y, 200, 150);
         
         // Hay texture
         ctx.strokeStyle = '#DAA520';
         for (let j = 0; j < 5; j++) {
             ctx.beginPath();
-            ctx.moveTo(150 + (i % 3) * 200, 210 + j * 20 + Math.floor(i / 3) * 150);
-            ctx.lineTo(300 + (i % 3) * 200, 210 + j * 20 + Math.floor(i / 3) * 150);
+            ctx.moveTo(x, y + 10 + j * 20);
+            ctx.lineTo(x + 200, y + 10 + j * 20);
             ctx.stroke();
         }
-    }
+        
+        // Item emoji
+        ctx.font = '50px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
 }
 
 function drawSpeeltjesShop(ctx) {
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems('Speeltjes & Meer');
+    game.shop.clearClickAreas();
+    
     ctx.fillStyle = 'black';
     ctx.font = '16px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Speeltjes voor Blije Cavia\'s!', 400, 50);
     
-    // Toy displays
-    const toys = ['⚽', '🎾', '🎲', '🧸', '🎪'];
-    for (let i = 0; i < toys.length; i++) {
-        ctx.fillStyle = '#FFE4B5';
-        ctx.fillRect(100 + i * 120, 250, 80, 80);
+    // Draw items
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
-        ctx.font = '40px sans-serif';
-        ctx.fillText(toys[i], 140 + i * 120, 300);
-    }
+        // Item background
+        ctx.fillStyle = '#FFE4B5';
+        ctx.fillRect(x, y, 200, 150);
+        
+        // Item emoji
+        ctx.font = '50px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
 }
 
 function drawCaviaSpa(ctx) {
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems('Cavia Spa');
+    game.shop.clearClickAreas();
+    
     ctx.fillStyle = 'black';
     ctx.font = '50px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Spa', 400, 100);
+    ctx.fillText('Spa', 400, 80);
     
-    // Spa baths
-    for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(200 + i * 150, 250, 100, 80);
+    // Draw items
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
-        ctx.fillStyle = '#4682B4';
-        ctx.font = '30px Nunito, sans-serif';
-        ctx.fillText('🛁', 250 + i * 150, 300);
-    }
+        // Spa background
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(x, y, 200, 150);
+        
+        // Item emoji
+        ctx.font = '50px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
     
     ctx.fillStyle = 'black';
     ctx.font = '16px Nunito, sans-serif';
-    ctx.fillText('Ontspan en geniet!', 400, 400);
+    ctx.fillText('Ontspan en geniet!', 400, 480);
 }
 
 function drawAccessoiresShop(ctx) {
+    const game = window.game;
+    if (!game || !game.shop) return;
+    
+    const items = game.shop.getShopItems('Accessoires');
+    game.shop.clearClickAreas();
+    
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Pimp je Cavia!', 400, 50);
     
-    // Accessory displays
-    const accessories = ['🎀', '👒', '🎩', '👓', '💎'];
-    for (let i = 0; i < accessories.length; i++) {
-        ctx.fillStyle = '#E6E6FA';
-        ctx.fillRect(100 + i * 120, 200, 100, 100);
+    // Draw items
+    items.forEach((item, index) => {
+        const x = 150 + (index % 2) * 250;
+        const y = 120 + Math.floor(index / 2) * 200;
         
-        ctx.font = '40px sans-serif';
-        ctx.fillText(accessories[i], 150 + i * 120, 260);
-    }
-    
-    // Price tags
-    ctx.fillStyle = 'black';
-    ctx.font = '12px Nunito, sans-serif';
-    for (let i = 0; i < accessories.length; i++) {
-        ctx.fillText('🥕 ' + (5 + i * 2), 150 + i * 120, 320);
-    }
+        // Item background
+        ctx.fillStyle = '#E6E6FA';
+        ctx.fillRect(x, y, 200, 150);
+        
+        // Item emoji
+        ctx.font = '50px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.emoji, x + 100, y + 60);
+        
+        // Item name
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(item.name, x + 100, y + 90);
+        
+        // Item price
+        ctx.font = '16px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        
+        // Buy button
+        const buttonY = y + 120;
+        const buttonWidth = 80;
+        const buttonHeight = 25;
+        const buttonX = x + 60;
+        
+        if (game.player.carrots >= item.price) {
+            ctx.fillStyle = '#4CAF50';
+        } else {
+            ctx.fillStyle = '#999999';
+        }
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        
+        // Store click area
+        game.shop.clickAreas.push({
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            item: item
+        });
+    });
 }
