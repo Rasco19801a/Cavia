@@ -167,7 +167,7 @@ export class Inventory {
             itemDiv.innerHTML = `
                 <div class="item-emoji">${item.emoji}</div>
                 <div class="item-name">${item.name}</div>
-                <div class="item-quantity">${item.quantity > 1 ? item.quantity : ''}</div>
+                <div class="item-quantity">${item.quantity}</div>
             `;
             
             itemDiv.addEventListener('click', () => this.selectItem(item));
