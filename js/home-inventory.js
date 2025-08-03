@@ -25,7 +25,10 @@ export class HomeInventory {
                 name: 'Ginger',
                 x: 300,
                 y: 500,
-                color: '#8B4513',
+                color: {
+                    body: '#FFFFFF',  // White body
+                    belly: '#F5DEB3'  // Beige belly
+                },
                 mission: 'Ik heb zo\'n honger! Breng me 3 wortels!',
                 missionProgress: 0,
                 missionTarget: 3,
@@ -37,7 +40,10 @@ export class HomeInventory {
                 name: 'Chinto',
                 x: 700,
                 y: 520,
-                color: '#FFFFFF',
+                color: {
+                    body: '#FFFFFF',  // White body
+                    belly: '#000000'  // Black belly
+                },
                 mission: 'Ik wil graag een mooie strik!',
                 missionProgress: 0,
                 missionTarget: 1,
@@ -49,7 +55,10 @@ export class HomeInventory {
                 name: 'Luxy',
                 x: 1100,
                 y: 510,
-                color: '#696969',
+                color: {
+                    body: '#FFFFFF',  // White body
+                    belly: '#8B4513'  // Brown belly
+                },
                 mission: 'Help me 2 stukken sla te vinden!',
                 missionProgress: 0,
                 missionTarget: 2,
@@ -201,12 +210,19 @@ export class HomeInventory {
             ctx.scale(scale, scale);
             
             // Draw guinea pig body
-            ctx.fillStyle = pig.color;
+            ctx.fillStyle = pig.color.body;
             ctx.beginPath();
             ctx.ellipse(0, 0, 40, 30, 0, 0, Math.PI * 2);
             ctx.fill();
             
+            // Draw belly
+            ctx.fillStyle = pig.color.belly;
+            ctx.beginPath();
+            ctx.ellipse(0, 10, 25, 15, 0, 0, Math.PI);
+            ctx.fill();
+            
             // Head
+            ctx.fillStyle = pig.color.body;
             ctx.beginPath();
             ctx.arc(-25, -10, 20, 0, Math.PI * 2);
             ctx.fill();
@@ -535,7 +551,7 @@ export class HomeInventory {
     }
     
     isEdible(itemId) {
-        const edibleItems = ['carrot', 'lettuce', 'cucumber', 'corn', 'hay_small', 'hay_medium', 'hay_large', 'hay_premium'];
+        const edibleItems = ['carrot', 'lettuce', 'cucumber', 'corn', 'hay_small', 'hay_medium', 'hay_large', 'hay_premium', 'endive', 'celery', 'spinach'];
         return edibleItems.includes(itemId);
     }
     

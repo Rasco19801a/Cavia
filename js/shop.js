@@ -13,7 +13,10 @@ export class Shop {
                 { id: 'carrot', name: 'Wortel', price: 5, emoji: '🥕', description: 'Verse wortels voor je cavia' },
                 { id: 'lettuce', name: 'Sla', price: 3, emoji: '🥬', description: 'Knapperige sla' },
                 { id: 'cucumber', name: 'Komkommer', price: 4, emoji: '🥒', description: 'Sappige komkommer' },
-                { id: 'corn', name: 'Mais', price: 6, emoji: '🌽', description: 'Zoete mais' }
+                { id: 'corn', name: 'Mais', price: 6, emoji: '🌽', description: 'Zoete mais' },
+                { id: 'endive', name: 'Andijvie', price: 4, emoji: '🥬', description: 'Verse andijvie, rijk aan vitamines' },
+                { id: 'celery', name: 'Bleekselderij', price: 3, emoji: '🥬', description: 'Knapperige bleekselderij' },
+                { id: 'spinach', name: 'Spinazie', price: 5, emoji: '🥬', description: 'Gezonde spinazie vol ijzer' }
             ],
             'Hooi Winkel': [
                 { id: 'hay_small', name: 'Klein Hooi Pakket', price: 8, emoji: '🌾', description: 'Vers hooi voor een week' },
