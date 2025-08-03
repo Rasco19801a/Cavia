@@ -878,14 +878,7 @@ function drawThuis(ctx) {
         bookY += 50;
     }
     
-    // Title
-    ctx.fillStyle = '#4B0082';
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('🏠 Thuis 🏠', CONFIG.WORLD_WIDTH / 2, 60);
+    // Title removed
     
-    // Instructions
-    ctx.fillStyle = '#333';
-    ctx.font = '20px Arial';
-    ctx.fillText('Klik op eetbare items om ze te voeren - Sleep items naar andere cavia\'s', CONFIG.WORLD_WIDTH / 2, 90);
+    // Instructions removed
 }
