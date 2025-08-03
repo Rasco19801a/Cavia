@@ -146,13 +146,8 @@ export class HomeInventory {
     }
     
     draw(ctx) {
-        // Draw floor
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(0, CONFIG.WORLD_HEIGHT - 100, CONFIG.WORLD_WIDTH, 100);
-        
-        // Draw walls
-        ctx.fillStyle = '#D2691E';
-        ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 100);
+        // Don't draw floor and walls here - the living room interior is already drawn in drawThuis()
+        // The home world has its own detailed interior design
         
         // Draw other guinea pigs first (before items so they appear behind)
         this.otherGuineaPigs.forEach(pig => {
