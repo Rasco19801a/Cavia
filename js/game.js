@@ -82,6 +82,14 @@ export class Game {
         // Keyboard controls
         window.addEventListener('keydown', (e) => {
             this.keys[e.key] = true;
+            
+            // R key to reorganize items in home world
+            if (e.key === 'r' || e.key === 'R') {
+                if (this.currentWorld === 'thuis' && this.homeInventory) {
+                    this.homeInventory.reorganizeItems();
+                    this.ui.showNotification('Items georganiseerd!');
+                }
+            }
         });
         
         window.addEventListener('keyup', (e) => {
@@ -379,6 +387,12 @@ export class Game {
                 break;
             case 'zwembad':
                 this.buildings = createZwembadBuildings();
+                break;
+            case 'thuis':
+                // Reorganize items when entering home world to prevent overlapping
+                if (this.homeInventory) {
+                    this.homeInventory.reorganizeItems();
+                }
                 break;
         }
     }

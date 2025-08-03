@@ -69,6 +69,7 @@ export class Inventory {
                         <p id="selectedItemDescription"></p>
                         <button id="useItemBtn" class="use-item-btn hidden">Gebruiken</button>
                         <button id="playMinigameBtn" class="play-minigame-btn hidden">Speel Minigame</button>
+                        <button id="placeInHomeBtn" class="place-home-btn hidden">Plaats in Huis</button>
                     </div>
                 </div>
                 <button class="close-btn" id="closeInventory">✖</button>
@@ -81,6 +82,7 @@ export class Inventory {
         document.getElementById('closeInventory').addEventListener('click', () => this.closeInventory());
         document.getElementById('useItemBtn').addEventListener('click', () => this.useSelectedItem());
         document.getElementById('playMinigameBtn').addEventListener('click', () => this.playItemMinigame());
+        document.getElementById('placeInHomeBtn').addEventListener('click', () => this.placeItemInHome());
         
         // ESC key to close
         window.addEventListener('keydown', (e) => {
@@ -196,6 +198,7 @@ export class Inventory {
         const descEl = document.getElementById('selectedItemDescription');
         const useBtn = document.getElementById('useItemBtn');
         const minigameBtn = document.getElementById('playMinigameBtn');
+        const placeHomeBtn = document.getElementById('placeInHomeBtn');
         
         if (this.selectedItem) {
             infoDiv.classList.remove('hidden');
@@ -213,6 +216,13 @@ export class Inventory {
                 minigameBtn.classList.remove('hidden');
             } else {
                 minigameBtn.classList.add('hidden');
+            }
+
+            // Show "Place in Home" button if in home world
+            if (this.game.currentWorld === 'thuis') {
+                placeHomeBtn.classList.remove('hidden');
+            } else {
+                placeHomeBtn.classList.add('hidden');
             }
         } else {
             infoDiv.classList.add('hidden');
@@ -248,6 +258,20 @@ export class Inventory {
         if (this.selectedItem.quantity <= 1) {
             this.selectedItem = null;
         }
+        this.updateInventoryDisplay();
+        this.updateSelectedItemInfo();
+    }
+
+    placeItemInHome() {
+        if (!this.selectedItem) return;
+
+        // Add item to home inventory
+        this.game.homeInventory.addItem(this.selectedItem);
+
+        // Remove from player's inventory
+        this.removeItem(this.selectedItem.id, 1);
+
+        this.game.ui.showNotification(`${this.selectedItem.name} geplaatst in je huis!`);
         this.updateInventoryDisplay();
         this.updateSelectedItemInfo();
     }

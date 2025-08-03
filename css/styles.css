@@ -882,7 +882,8 @@ body {
 }
 
 .use-item-btn,
-.play-minigame-btn {
+.play-minigame-btn,
+.place-home-btn {
     background: #667eea;
     color: white;
     border: none;
@@ -895,7 +896,8 @@ body {
 }
 
 .use-item-btn:hover,
-.play-minigame-btn:hover {
+.play-minigame-btn:hover,
+.place-home-btn:hover {
     background: #5a67d8;
     transform: translateY(-2px);
 }
@@ -906,6 +908,14 @@ body {
 
 .play-minigame-btn:hover {
     background: #38a169;
+}
+
+.place-home-btn {
+    background: #ed8936;
+}
+
+.place-home-btn:hover {
+    background: #dd6b20;
 }
 
 /* Mission Modal Update */
