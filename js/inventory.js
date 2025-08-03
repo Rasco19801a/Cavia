@@ -29,7 +29,7 @@ export class Inventory {
             height: 60px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.9);
-            border: 3px solid #667eea;
+            border: none;
             font-size: 30px;
             cursor: pointer;
             z-index: 100;
