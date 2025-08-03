@@ -1,6 +1,22 @@
 // Buildings module - handles building creation and interiors
 import { CONFIG } from './config.js';
 
+// Utility function to draw rounded rectangle
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+}
+
 export function createStadBuildings() {
     return [
         {
@@ -84,7 +100,7 @@ function drawShopInterior(ctx, name) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
@@ -315,7 +331,7 @@ function drawGroenteMarkt(ctx) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
@@ -387,7 +403,7 @@ function drawHooiWinkel(ctx) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
@@ -450,7 +466,7 @@ function drawSpeeltjesShop(ctx) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
@@ -513,7 +529,7 @@ function drawCaviaSpa(ctx) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
@@ -580,7 +596,7 @@ function drawAccessoiresShop(ctx) {
         } else {
             ctx.fillStyle = '#999999';
         }
-        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
         ctx.font = '14px Nunito, sans-serif';
