@@ -878,11 +878,7 @@ function drawThuis(ctx) {
         bookY += 50;
     }
     
-    // Title
-    ctx.fillStyle = '#4B0082';
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('🏠 🏠', CONFIG.WORLD_WIDTH / 2, 60);
+    // Title removed
     
     // Instructions removed
 }
