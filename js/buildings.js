@@ -64,12 +64,12 @@ function drawShopInterior(ctx, name) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Welkom in de ' + name + '!', 400, 50);
+    ctx.fillText('Welkom in de ' + name + '!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Draw items in a grid
+    // Draw items in a grid - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Item background
         ctx.fillStyle = '#FFE4E1';
@@ -118,38 +118,44 @@ function drawShopInterior(ctx, name) {
 }
 
 function drawCafeInterior(ctx) {
-    // Draw café name
+    // Draw cafe name
     ctx.fillStyle = 'black';
-    ctx.font = '16px Nunito, sans-serif';
+    ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Cavia Café - Gezelligheid!', 400, 50);
+    ctx.fillText('Cavia Café - Gezellig samen zijn!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Tables
-    for (let i = 0; i < 3; i++) {
+    // Tables spread out more
+    for (let i = 0; i < 5; i++) {
         ctx.fillStyle = '#8B4513';
-        ctx.fillRect(150 + i * 200, 200, 80, 80);
+        ctx.beginPath();
+        ctx.arc(300 + i * 350, 250, 60, 0, Math.PI * 2);
+        ctx.fill();
         
         // Chairs
-        ctx.fillStyle = '#654321';
-        ctx.fillRect(160 + i * 200, 180, 20, 20);
-        ctx.fillRect(200 + i * 200, 180, 20, 20);
-        ctx.fillRect(160 + i * 200, 280, 20, 20);
-        ctx.fillRect(200 + i * 200, 280, 20, 20);
+        for (let j = 0; j < 4; j++) {
+            const angle = j * Math.PI / 2;
+            const chairX = 300 + i * 350 + Math.cos(angle) * 80;
+            const chairY = 250 + Math.sin(angle) * 80;
+            ctx.fillStyle = '#A0522D';
+            ctx.beginPath();
+            ctx.arc(chairX, chairY, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
     
     // Counter
     ctx.fillStyle = '#4682B4';
-    ctx.fillRect(250, 400, 300, 100);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 300, 400, 600, 100);
     
     // Coffee machine
     ctx.fillStyle = '#2F4F4F';
-    ctx.fillRect(350, 350, 100, 50);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 50, 350, 100, 50);
     
     // Menu board
     ctx.fillStyle = '#228B22';
-    ctx.fillRect(300, 80, 200, 100);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 100, 80, 200, 100);
     ctx.fillStyle = 'white';
-    ctx.fillRect(310, 90, 180, 80);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 90, 90, 180, 80);
 }
 
 function drawVetInterior(ctx) {
@@ -157,50 +163,50 @@ function drawVetInterior(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Dierenarts - Dr. Fluffington', 400, 50);
+    ctx.fillText('Dierenarts - Dr. Fluffington', CONFIG.WORLD_WIDTH / 2, 50);
     
     // Examination table
     ctx.fillStyle = '#E0E0E0';
-    ctx.fillRect(300, 250, 200, 100);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 150, 250, 300, 100);
     
     // Medical cabinets
     ctx.fillStyle = '#F0F0F0';
-    ctx.fillRect(100, 150, 100, 200);
-    ctx.fillRect(600, 150, 100, 200);
+    ctx.fillRect(200, 150, 150, 200);
+    ctx.fillRect(CONFIG.WORLD_WIDTH - 350, 150, 150, 200);
     
     // Posters
     ctx.fillStyle = '#ADD8E6';
-    ctx.fillRect(250, 100, 80, 100);
-    ctx.fillRect(470, 100, 80, 100);
+    ctx.fillRect(400, 100, 120, 150);
+    ctx.fillRect(CONFIG.WORLD_WIDTH - 520, 100, 120, 150);
     
     // Waiting chairs
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 8; i++) {
         ctx.fillStyle = '#4169E1';
-        ctx.fillRect(150 + i * 120, 450, 60, 60);
+        ctx.fillRect(300 + i * 200, 450, 80, 80);
     }
 }
 
 function drawSalonInterior(ctx) {
     // Draw salon name
     ctx.fillStyle = 'black';
-    ctx.font = '12px Nunito, sans-serif';
+    ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Kapsalon Fluffy - Voor de mooiste cavia kapsels!', 400, 50);
+    ctx.fillText('Kapsalon Fluffy - Voor de mooiste cavia kapsels!', CONFIG.WORLD_WIDTH / 2, 50);
     
     // Salon chairs
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
         ctx.fillStyle = '#FF69B4';
-        ctx.fillRect(200 + i * 150, 300, 80, 100);
+        ctx.fillRect(200 + i * 280, 300, 120, 150);
         
         // Mirrors
         ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(210 + i * 150, 200, 60, 80);
+        ctx.fillRect(220 + i * 280, 180, 80, 100);
     }
     
     // Product shelves
     ctx.fillStyle = '#DDA0DD';
     ctx.fillRect(100, 150, 80, 250);
-    ctx.fillRect(620, 150, 80, 250);
+    ctx.fillRect(CONFIG.WORLD_WIDTH - 180, 150, 80, 250);
 }
 
 export function createDierenstadBuildings() {
@@ -236,19 +242,19 @@ export function createDierenstadBuildings() {
 export function drawInterior(ctx, building) {
     // Background
     ctx.fillStyle = '#FFF8DC';
-    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
     
     // Floor
     ctx.fillStyle = '#DEB887';
-    ctx.fillRect(0, 500, 800, 100);
+    ctx.fillRect(0, 500, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 500);
     
     // Exit sign
     ctx.fillStyle = '#FF0000';
-    ctx.fillRect(350, 520, 100, 50);
+    ctx.fillRect(CONFIG.WORLD_WIDTH / 2 - 50, 520, 100, 50);
     ctx.fillStyle = 'white';
     ctx.font = '30px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('EXIT', 400, 555);
+    ctx.fillText('EXIT', CONFIG.WORLD_WIDTH / 2, 555);
     
     // Draw specific interior based on building
     switch(building.name) {
@@ -295,12 +301,12 @@ function drawGroenteMarkt(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Verse Groenten voor je Cavia!', 400, 50);
+    ctx.fillText('Verse Groenten voor je Cavia!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Draw items in a grid
+    // Draw items in a grid - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Item background
         ctx.fillStyle = '#8FBC8F';
@@ -358,12 +364,12 @@ function drawHooiWinkel(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '25px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Het Beste Hooi!', 400, 50);
+    ctx.fillText('Het Beste Hooi!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Draw items
+    // Draw items - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Hay bale background
         ctx.fillStyle = '#F0E68C';
@@ -428,14 +434,14 @@ function drawSpeeltjesShop(ctx) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '16px Nunito, sans-serif';
+    ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Speeltjes voor Blije Cavia\'s!', 400, 50);
+    ctx.fillText('Speeltjes voor Blije Cavia\'s!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Draw items
+    // Draw items - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Item background
         ctx.fillStyle = '#FFE4B5';
@@ -493,12 +499,12 @@ function drawCaviaSpa(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '50px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Spa', 400, 80);
+    ctx.fillText('Spa', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items
+    // Draw items - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Spa background
         ctx.fillStyle = '#87CEEB';
@@ -560,12 +566,12 @@ function drawAccessoiresShop(ctx) {
     ctx.fillStyle = 'black';
     ctx.font = '20px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Pimp je Cavia!', 400, 50);
+    ctx.fillText('Pimp je Cavia!', CONFIG.WORLD_WIDTH / 2, 50);
     
-    // Draw items
+    // Draw items - now 4 columns instead of 2
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = 200 + (index % 4) * 400;
+        const y = 120 + Math.floor(index / 4) * 200;
         
         // Item background
         ctx.fillStyle = '#E6E6FA';
