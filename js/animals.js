@@ -149,7 +149,7 @@ export class AnimalChallenge {
         document.getElementById('challengeChoice').classList.add('hidden');
         document.getElementById('challengeTask').classList.remove('hidden');
         document.getElementById('taskDescription').textContent = 'Luister goed en typ het woord dat je hoort:';
-        document.getElementById('taskInput').innerHTML = '<input type="text" id="answerInput" placeholder="Typ hier het woord...">';
+        document.getElementById('taskInput').innerHTML = '<input type="text" id="answerInput" placeholder="Typ hier het woord..." autocorrect="off" autocomplete="off" spellcheck="false">';
         document.getElementById('repeatWord').classList.remove('hidden');
         
         // Pronounce the word
