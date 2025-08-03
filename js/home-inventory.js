@@ -18,12 +18,12 @@ export class HomeInventory {
     }
     
     setupOtherGuineaPigs() {
-        // Create 3 other guinea pigs in the home
+        // Create 3 other guinea pigs in the home - spaced out evenly
         this.otherGuineaPigs = [
             {
                 id: 1,
                 name: 'Ginger',
-                x: 1050,
+                x: 800,
                 y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
@@ -38,8 +38,8 @@ export class HomeInventory {
             {
                 id: 2,
                 name: 'Chinto',
-                x: 900,
-                y: 480,
+                x: 1000,
+                y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#000000'  // Black belly
@@ -53,8 +53,8 @@ export class HomeInventory {
             {
                 id: 3,
                 name: 'Luxy',
-                x: 1180,
-                y: 470,
+                x: 1200,
+                y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#8B4513'  // Brown belly
@@ -116,21 +116,50 @@ export class HomeInventory {
     }
     
     addItem(itemData) {
+        // Calculate grid position to prevent overlapping
+        const gridColumns = 8; // Number of columns in the grid
+        const gridSpacing = 150; // Space between items
+        const startX = 200; // Starting X position
+        const startY = 350; // Starting Y position
+        
+        // Find the next available position
+        const existingPositions = this.items.map(item => ({ x: item.x, y: item.y }));
+        let gridIndex = 0;
+        let x, y;
+        
+        // Find an empty grid position
+        while (true) {
+            const col = gridIndex % gridColumns;
+            const row = Math.floor(gridIndex / gridColumns);
+            x = startX + (col * gridSpacing);
+            y = startY + (row * gridSpacing);
+            
+            // Check if this position is already occupied
+            const isOccupied = existingPositions.some(pos => 
+                Math.abs(pos.x - x) < 50 && Math.abs(pos.y - y) < 50
+            );
+            
+            if (!isOccupied || gridIndex > 50) { // Safety limit
+                break;
+            }
+            
+            gridIndex++;
+        }
+        
         const item = {
             ...itemData,
-            x: 100 + Math.random() * (CONFIG.WORLD_WIDTH - 200),
-            y: 400 + Math.random() * 200,
+            x: x,
+            y: y,
             consumed: false
         };
         
-        // Special handling for interactive items
+        // Special handling for interactive items - place them at specific positions
         if (item.id === 'wheel') {
             item.x = CONFIG.WORLD_WIDTH / 2 - 100;
-            item.y = 350;
-            item.rotation = 0;
+            item.y = 250; // Move up to avoid overlap
         } else if (item.id === 'tunnel') {
-            item.x = 900;
-            item.y = 450;
+            item.x = 1100;
+            item.y = 350;
         }
         
         this.items.push(item);

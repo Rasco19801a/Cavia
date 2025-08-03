@@ -515,7 +515,7 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 15px;
+    border-radius: 50px;
     padding: 20px 30px;
     font-size: 18px;
     cursor: pointer;
@@ -562,12 +562,11 @@ body {
 }
 
 .submit-btn, .repeat-btn {
-    background: #4CAF50;
+    background: #2196F3;
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 12px 30px;
-    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 50px;
     cursor: pointer;
     transition: background 0.2s;
     margin: 5px;
@@ -888,7 +887,7 @@ body {
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
     font-size: 16px;
     margin-right: 10px;
@@ -915,7 +914,7 @@ body {
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
     font-size: 16px;
     margin-top: 15px;
