@@ -23,7 +23,7 @@ export class HomeInventory {
             {
                 id: 1,
                 name: 'Ginger',
-                x: 800,
+                x: 600,
                 y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
@@ -38,7 +38,7 @@ export class HomeInventory {
             {
                 id: 2,
                 name: 'Chinto',
-                x: 1000,
+                x: 900,
                 y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
@@ -249,6 +249,28 @@ export class HomeInventory {
             ctx.fillStyle = pig.color.body;
             ctx.beginPath();
             ctx.arc(-25, -10, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ears
+            ctx.fillStyle = pig.color.body;
+            // Left ear
+            ctx.beginPath();
+            ctx.ellipse(-35, -25, 8, 12, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            // Right ear
+            ctx.beginPath();
+            ctx.ellipse(-15, -25, 8, 12, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner ears
+            ctx.fillStyle = '#FFB6C1';
+            // Left inner ear
+            ctx.beginPath();
+            ctx.ellipse(-35, -25, 4, 6, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            // Right inner ear
+            ctx.beginPath();
+            ctx.ellipse(-15, -25, 4, 6, 0.3, 0, Math.PI * 2);
             ctx.fill();
             
             // Eyes
