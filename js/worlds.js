@@ -678,39 +678,47 @@ function drawThuis(ctx) {
         ctx.fillRect(x + 150, 100, 30, 250);
     }
     
-    // Large L-shaped couch (center-right)
-    // Main couch body
+    // Regular front-facing sofa (center)
+    // Main sofa body
     ctx.fillStyle = '#8B4513';
-    ctx.fillRect(600, 420, 300, 100);
-    ctx.fillRect(800, 320, 100, 200);
+    ctx.fillRect(550, 420, 350, 100);
     
-    // Couch cushions
+    // Sofa back
+    ctx.fillStyle = '#A0522D';
+    ctx.fillRect(550, 380, 350, 60);
+    
+    // Sofa cushions
     ctx.fillStyle = '#A0522D';
     // Seat cushions
-    ctx.fillRect(610, 440, 90, 70);
-    ctx.fillRect(710, 440, 90, 70);
-    ctx.fillRect(810, 440, 80, 70);
+    ctx.fillRect(560, 440, 105, 70);
+    ctx.fillRect(675, 440, 105, 70);
+    ctx.fillRect(790, 440, 100, 70);
     // Back cushions
-    ctx.fillRect(610, 425, 85, 40);
-    ctx.fillRect(705, 425, 85, 40);
-    ctx.fillRect(810, 330, 80, 85);
+    ctx.fillRect(560, 385, 105, 50);
+    ctx.fillRect(675, 385, 105, 50);
+    ctx.fillRect(790, 385, 100, 50);
+    
+    // Sofa arms
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(540, 380, 20, 130);
+    ctx.fillRect(890, 380, 20, 130);
     
     // Throw pillows
     ctx.fillStyle = '#FFB6C1';
     ctx.beginPath();
-    ctx.arc(650, 430, 20, 0, Math.PI * 2);
+    ctx.arc(620, 430, 20, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#98D8C8';
     ctx.beginPath();
-    ctx.arc(750, 430, 20, 0, Math.PI * 2);
+    ctx.arc(830, 430, 20, 0, Math.PI * 2);
     ctx.fill();
     
     // Coffee table
     ctx.fillStyle = '#4A4A4A';
-    ctx.fillRect(650, 540, 180, 8);
+    ctx.fillRect(600, 540, 250, 8);
     // Table legs
-    ctx.fillRect(660, 548, 8, 30);
-    ctx.fillRect(812, 548, 8, 30);
+    ctx.fillRect(610, 548, 8, 30);
+    ctx.fillRect(832, 548, 8, 30);
     
     // TV Stand (right side)
     ctx.fillStyle = '#2F2F2F';
@@ -740,82 +748,165 @@ function drawThuis(ctx) {
     ctx.fillStyle = '#0000FF';
     ctx.fillRect(1165, 470, 30, 20);
     
-    // Chairs (2 modern chairs)
-    // Chair 1
-    ctx.fillStyle = '#228B22';
-    ctx.fillRect(400, 440, 80, 80);
-    ctx.fillRect(400, 420, 80, 40);
-    // Chair legs
+    // Bed (left corner near fireplace)
+    // Bed frame
     ctx.fillStyle = '#654321';
-    ctx.fillRect(405, 520, 8, 30);
-    ctx.fillRect(467, 520, 8, 30);
+    ctx.fillRect(300, 200, 180, 220);
     
-    // Chair 2
+    // Mattress
+    ctx.fillStyle = '#F0E68C';
+    ctx.fillRect(310, 210, 160, 200);
+    
+    // Pillow
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(320, 220, 140, 40);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(320, 220, 140, 40);
+    
+    // Blanket
     ctx.fillStyle = '#4682B4';
-    ctx.fillRect(1100, 440, 80, 80);
-    ctx.fillRect(1100, 420, 80, 40);
+    ctx.fillRect(310, 260, 160, 150);
+    // Blanket pattern
+    ctx.strokeStyle = '#5A9FCF';
+    ctx.lineWidth = 3;
+    for (let y = 280; y < 410; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(310, y);
+        ctx.lineTo(470, y);
+        ctx.stroke();
+    }
+    
+    // Bedside table
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(490, 350, 50, 70);
+    // Drawer
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(495, 360, 40, 25);
+    ctx.strokeRect(495, 390, 40, 25);
+    // Drawer handles
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.arc(515, 372, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(515, 402, 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Lamp on bedside table
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(505, 330, 20, 20);
+    ctx.fillStyle = '#FFF8DC';
+    ctx.beginPath();
+    ctx.moveTo(495, 330);
+    ctx.lineTo(535, 330);
+    ctx.lineTo(525, 310);
+    ctx.lineTo(505, 310);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Guinea pig cage area (near windows, more visible)
+    // Cage base
+    ctx.fillStyle = '#696969';
+    ctx.fillRect(950, 380, 200, 150);
+    ctx.strokeStyle = '#4A4A4A';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(950, 380, 200, 150);
+    
+    // Cage bars
+    ctx.strokeStyle = '#4A4A4A';
+    ctx.lineWidth = 2;
+    for (let x = 960; x < 1150; x += 15) {
+        ctx.beginPath();
+        ctx.moveTo(x, 380);
+        ctx.lineTo(x, 530);
+        ctx.stroke();
+    }
+    
+    // Bedding in cage
+    ctx.fillStyle = '#F4A460';
+    ctx.fillRect(955, 480, 190, 45);
+    
+    // Water bottle
+    ctx.fillStyle = '#4169E1';
+    ctx.fillRect(1130, 400, 15, 40);
+    ctx.fillStyle = '#C0C0C0';
+    ctx.fillRect(1132, 440, 11, 5);
+    
+    // Food bowl
+    ctx.fillStyle = '#8B0000';
+    ctx.beginPath();
+    ctx.arc(980, 500, 15, 0, Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Chair (near bed)
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(350, 440, 80, 80);
+    ctx.fillRect(350, 420, 80, 40);
     // Chair legs
     ctx.fillStyle = '#654321';
-    ctx.fillRect(1105, 520, 8, 30);
-    ctx.fillRect(1167, 520, 8, 30);
+    ctx.fillRect(355, 520, 8, 30);
+    ctx.fillRect(417, 520, 8, 30);
     
     // Plants
     // Large floor plant (left)
     ctx.fillStyle = '#8B4513';
-    ctx.fillRect(280, 480, 40, 70);
+    ctx.fillRect(50, 480, 40, 70);
     ctx.fillStyle = '#228B22';
     ctx.beginPath();
-    ctx.arc(300, 450, 40, 0, Math.PI * 2);
+    ctx.arc(70, 450, 40, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(280, 460, 30, 0, Math.PI * 2);
+    ctx.arc(50, 460, 30, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(320, 460, 30, 0, Math.PI * 2);
+    ctx.arc(90, 460, 30, 0, Math.PI * 2);
     ctx.fill();
     
     // Small plant on coffee table
     ctx.fillStyle = '#696969';
-    ctx.fillRect(730, 520, 20, 20);
+    ctx.fillRect(720, 520, 20, 20);
     ctx.fillStyle = '#32CD32';
     ctx.beginPath();
-    ctx.arc(740, 515, 15, 0, Math.PI * 2);
+    ctx.arc(730, 515, 15, 0, Math.PI * 2);
     ctx.fill();
     
     // Hanging plant (near window)
     ctx.strokeStyle = '#8B4513';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(500, 100);
-    ctx.lineTo(500, 200);
+    ctx.moveTo(800, 100);
+    ctx.lineTo(800, 200);
     ctx.stroke();
     ctx.fillStyle = '#8B4513';
-    ctx.fillRect(480, 200, 40, 30);
+    ctx.fillRect(780, 200, 40, 30);
     ctx.fillStyle = '#228B22';
     ctx.beginPath();
-    ctx.arc(500, 210, 25, 0, Math.PI * 2);
+    ctx.arc(800, 210, 25, 0, Math.PI * 2);
     ctx.fill();
     // Hanging vines
     ctx.strokeStyle = '#228B22';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(485, 230);
-    ctx.quadraticCurveTo(480, 250, 485, 270);
-    ctx.moveTo(500, 230);
-    ctx.quadraticCurveTo(500, 250, 505, 270);
-    ctx.moveTo(515, 230);
-    ctx.quadraticCurveTo(520, 250, 515, 270);
+    ctx.moveTo(785, 230);
+    ctx.quadraticCurveTo(780, 250, 785, 270);
+    ctx.moveTo(800, 230);
+    ctx.quadraticCurveTo(800, 250, 805, 270);
+    ctx.moveTo(815, 230);
+    ctx.quadraticCurveTo(820, 250, 815, 270);
     ctx.stroke();
     
     // Rug under coffee table
     ctx.fillStyle = '#8B0000';
-    ctx.fillRect(600, 520, 280, 120);
+    ctx.fillRect(550, 520, 350, 120);
     ctx.fillStyle = '#DC143C';
-    ctx.fillRect(620, 530, 240, 100);
+    ctx.fillRect(570, 530, 310, 100);
     // Rug pattern
     ctx.strokeStyle = '#FFD700';
     ctx.lineWidth = 2;
-    ctx.strokeRect(630, 540, 220, 80);
+    ctx.strokeRect(580, 540, 290, 80);
     
     // Wall art/paintings
     // Painting 1
@@ -826,9 +917,9 @@ function drawThuis(ctx) {
     
     // Painting 2
     ctx.fillStyle = '#4A4A4A';
-    ctx.fillRect(1050, 150, 120, 100);
+    ctx.fillRect(1200, 150, 120, 100);
     ctx.fillStyle = '#F0F0F0';
-    ctx.fillRect(1060, 160, 100, 80);
+    ctx.fillRect(1210, 160, 100, 80);
     
     // Title
     ctx.fillStyle = '#4B0082';

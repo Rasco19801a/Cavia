@@ -23,7 +23,7 @@ export class HomeInventory {
             {
                 id: 1,
                 name: 'Ginger',
-                x: 300,
+                x: 1050,
                 y: 500,
                 color: {
                     body: '#FFFFFF',  // White body
@@ -38,8 +38,8 @@ export class HomeInventory {
             {
                 id: 2,
                 name: 'Chinto',
-                x: 700,
-                y: 520,
+                x: 900,
+                y: 480,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#000000'  // Black belly
@@ -53,8 +53,8 @@ export class HomeInventory {
             {
                 id: 3,
                 name: 'Luxy',
-                x: 1100,
-                y: 510,
+                x: 1180,
+                y: 470,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#8B4513'  // Brown belly
