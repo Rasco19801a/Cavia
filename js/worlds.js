@@ -617,309 +617,266 @@ function drawThuis(ctx) {
         ctx.stroke();
     }
     
-    // Fireplace (left side)
+    // 1. BANK (SOFA) - Left side, front-facing view
+    // Main sofa body
+    ctx.fillStyle = '#4169E1'; // Royal blue sofa
+    ctx.fillRect(50, 420, 250, 100);
+    
+    // Sofa back
+    ctx.fillStyle = '#1E90FF';
+    ctx.fillRect(50, 350, 250, 80);
+    
+    // Sofa cushions
+    ctx.fillStyle = '#6495ED';
+    // Seat cushions
+    ctx.fillRect(60, 440, 70, 70);
+    ctx.fillRect(140, 440, 70, 70);
+    ctx.fillRect(220, 440, 70, 70);
+    // Back cushions
+    ctx.fillRect(60, 360, 70, 60);
+    ctx.fillRect(140, 360, 70, 60);
+    ctx.fillRect(220, 360, 70, 60);
+    
+    // Sofa arms
+    ctx.fillStyle = '#4169E1';
+    ctx.fillRect(40, 350, 20, 170);
+    ctx.fillRect(290, 350, 20, 170);
+    
+    // Decorative pillows
+    ctx.fillStyle = '#FFB6C1';
+    ctx.beginPath();
+    ctx.arc(100, 400, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#98D8C8';
+    ctx.beginPath();
+    ctx.arc(250, 400, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 2. OPENHAARD (FIREPLACE) - Center-left
     // Fireplace base
     ctx.fillStyle = '#8B7355';
-    ctx.fillRect(50, 350, 200, 200);
+    ctx.fillRect(400, 350, 200, 200);
     
     // Fireplace opening
     ctx.fillStyle = '#2F2F2F';
-    ctx.fillRect(80, 400, 140, 120);
+    ctx.fillRect(430, 400, 140, 120);
     
     // Fire
     ctx.fillStyle = '#FF6B35';
     ctx.beginPath();
-    ctx.moveTo(100, 500);
-    ctx.quadraticCurveTo(120, 450, 100, 420);
-    ctx.quadraticCurveTo(150, 440, 130, 480);
-    ctx.quadraticCurveTo(170, 430, 160, 470);
-    ctx.quadraticCurveTo(200, 440, 180, 500);
+    ctx.moveTo(450, 500);
+    ctx.quadraticCurveTo(470, 450, 450, 420);
+    ctx.quadraticCurveTo(500, 440, 480, 480);
+    ctx.quadraticCurveTo(520, 430, 510, 470);
+    ctx.quadraticCurveTo(550, 440, 530, 500);
     ctx.closePath();
     ctx.fill();
     
     // Fire glow
     ctx.fillStyle = '#FFD700';
     ctx.beginPath();
-    ctx.moveTo(120, 480);
-    ctx.quadraticCurveTo(140, 450, 130, 440);
-    ctx.quadraticCurveTo(160, 455, 150, 480);
+    ctx.moveTo(470, 480);
+    ctx.quadraticCurveTo(490, 450, 480, 440);
+    ctx.quadraticCurveTo(510, 455, 500, 480);
     ctx.closePath();
     ctx.fill();
     
     // Mantel
     ctx.fillStyle = '#654321';
-    ctx.fillRect(40, 340, 220, 20);
+    ctx.fillRect(390, 340, 220, 20);
     
-    // Windows (3 large modern windows)
+    // 3. BED - Center
+    // Bed frame
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(700, 300, 200, 250);
+    
+    // Mattress
+    ctx.fillStyle = '#F0E68C';
+    ctx.fillRect(710, 310, 180, 230);
+    
+    // Pillow
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(720, 320, 160, 50);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(720, 320, 160, 50);
+    
+    // Blanket
+    ctx.fillStyle = '#9370DB';
+    ctx.fillRect(710, 370, 180, 170);
+    // Blanket pattern
+    ctx.strokeStyle = '#8A2BE2';
+    ctx.lineWidth = 3;
+    for (let y = 390; y < 540; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(710, y);
+        ctx.lineTo(890, y);
+        ctx.stroke();
+    }
+    
+    // Headboard
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(700, 250, 200, 60);
+    
+    // 4. TV - Center-right
+    // TV Stand
+    ctx.fillStyle = '#2F2F2F';
+    ctx.fillRect(1000, 450, 200, 100);
+    
+    // Television
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(1025, 320, 150, 100);
+    // TV Screen
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(1035, 330, 130, 80);
+    // TV reflection
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(1035, 330, 130, 40);
+    
+    // TV stand shelves
+    ctx.strokeStyle = '#4A4A4A';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(1000, 500);
+    ctx.lineTo(1200, 500);
+    ctx.stroke();
+    
+    // 5. STOEL (CHAIR) - Right side
+    // Chair seat
+    ctx.fillStyle = '#FF6347';
+    ctx.fillRect(1300, 440, 80, 80);
+    
+    // Chair back
+    ctx.fillStyle = '#DC143C';
+    ctx.fillRect(1300, 380, 80, 70);
+    
+    // Chair legs
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(1305, 520, 10, 30);
+    ctx.fillRect(1365, 520, 10, 30);
+    ctx.fillRect(1305, 380, 10, 60);
+    ctx.fillRect(1365, 380, 10, 60);
+    
+    // Chair cushion
+    ctx.fillStyle = '#FFE4E1';
+    ctx.fillRect(1310, 450, 60, 60);
+    
+    // DECORATIVE ELEMENTS
+    
+    // Windows (3 windows across the back wall)
     for (let i = 0; i < 3; i++) {
-        const x = 350 + i * 300;
+        const x = 150 + i * 400;
         
         // Window frame
         ctx.fillStyle = '#4A4A4A';
-        ctx.fillRect(x, 100, 180, 250);
+        ctx.fillRect(x, 100, 180, 200);
         
         // Window glass with sky view
         ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(x + 10, 110, 160, 230);
+        ctx.fillRect(x + 10, 110, 160, 180);
         
         // Window dividers
         ctx.strokeStyle = '#4A4A4A';
         ctx.lineWidth = 8;
         ctx.beginPath();
         ctx.moveTo(x + 90, 110);
-        ctx.lineTo(x + 90, 340);
-        ctx.moveTo(x + 10, 225);
-        ctx.lineTo(x + 170, 225);
+        ctx.lineTo(x + 90, 290);
+        ctx.moveTo(x + 10, 200);
+        ctx.lineTo(x + 170, 200);
         ctx.stroke();
         
-        // Curtains
+        // Simple curtains
         ctx.fillStyle = 'rgba(139, 69, 19, 0.3)';
-        ctx.fillRect(x, 100, 30, 250);
-        ctx.fillRect(x + 150, 100, 30, 250);
+        ctx.fillRect(x, 100, 30, 200);
+        ctx.fillRect(x + 150, 100, 30, 200);
     }
     
-    // Regular front-facing sofa (center)
-    // Main sofa body
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(550, 420, 350, 100);
-    
-    // Sofa back
-    ctx.fillStyle = '#A0522D';
-    ctx.fillRect(550, 380, 350, 60);
-    
-    // Sofa cushions
-    ctx.fillStyle = '#A0522D';
-    // Seat cushions
-    ctx.fillRect(560, 440, 105, 70);
-    ctx.fillRect(675, 440, 105, 70);
-    ctx.fillRect(790, 440, 100, 70);
-    // Back cushions
-    ctx.fillRect(560, 385, 105, 50);
-    ctx.fillRect(675, 385, 105, 50);
-    ctx.fillRect(790, 385, 100, 50);
-    
-    // Sofa arms
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(540, 380, 20, 130);
-    ctx.fillRect(890, 380, 20, 130);
-    
-    // Throw pillows
-    ctx.fillStyle = '#FFB6C1';
-    ctx.beginPath();
-    ctx.arc(620, 430, 20, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#98D8C8';
-    ctx.beginPath();
-    ctx.arc(830, 430, 20, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Coffee table
-    ctx.fillStyle = '#4A4A4A';
-    ctx.fillRect(600, 540, 250, 8);
-    // Table legs
-    ctx.fillRect(610, 548, 8, 30);
-    ctx.fillRect(832, 548, 8, 30);
-    
-    // TV Stand (right side)
-    ctx.fillStyle = '#2F2F2F';
-    ctx.fillRect(1000, 450, 250, 100);
-    
-    // Television
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(1025, 300, 200, 120);
-    // TV Screen
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(1035, 310, 180, 100);
-    // TV reflection
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fillRect(1035, 310, 180, 50);
-    
-    // Game console
-    ctx.fillStyle = '#4169E1';
-    ctx.fillRect(1060, 460, 60, 40);
-    // Console details
-    ctx.fillStyle = '#000080';
-    ctx.fillRect(1065, 465, 50, 5);
-    ctx.fillRect(1065, 475, 50, 5);
-    
-    // Controllers
-    ctx.fillStyle = '#FF0000';
-    ctx.fillRect(1130, 470, 30, 20);
-    ctx.fillStyle = '#0000FF';
-    ctx.fillRect(1165, 470, 30, 20);
-    
-    // Bed (left corner near fireplace)
-    // Bed frame
-    ctx.fillStyle = '#654321';
-    ctx.fillRect(300, 200, 180, 220);
-    
-    // Mattress
-    ctx.fillStyle = '#F0E68C';
-    ctx.fillRect(310, 210, 160, 200);
-    
-    // Pillow
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(320, 220, 140, 40);
-    ctx.strokeStyle = '#CCCCCC';
+    // Rug under sofa
+    ctx.fillStyle = '#8B0000';
+    ctx.fillRect(30, 520, 300, 100);
+    // Rug pattern
+    ctx.strokeStyle = '#A52A2A';
     ctx.lineWidth = 2;
-    ctx.strokeRect(320, 220, 140, 40);
+    ctx.strokeRect(40, 530, 280, 80);
+    ctx.strokeRect(50, 540, 260, 60);
     
-    // Blanket
-    ctx.fillStyle = '#4682B4';
-    ctx.fillRect(310, 260, 160, 150);
-    // Blanket pattern
-    ctx.strokeStyle = '#5A9FCF';
-    ctx.lineWidth = 3;
-    for (let y = 280; y < 410; y += 30) {
-        ctx.beginPath();
-        ctx.moveTo(310, y);
-        ctx.lineTo(470, y);
-        ctx.stroke();
-    }
-    
-    // Bedside table
+    // Small side table next to sofa
     ctx.fillStyle = '#8B4513';
-    ctx.fillRect(490, 350, 50, 70);
-    // Drawer
-    ctx.strokeStyle = '#654321';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(495, 360, 40, 25);
-    ctx.strokeRect(495, 390, 40, 25);
-    // Drawer handles
-    ctx.fillStyle = '#FFD700';
-    ctx.beginPath();
-    ctx.arc(515, 372, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(515, 402, 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(320, 460, 40, 60);
+    // Table top
+    ctx.fillStyle = '#A0522D';
+    ctx.fillRect(315, 455, 50, 5);
     
-    // Lamp on bedside table
+    // Lamp on side table
     ctx.fillStyle = '#FFD700';
-    ctx.fillRect(505, 330, 20, 20);
+    ctx.fillRect(330, 435, 20, 20);
     ctx.fillStyle = '#FFF8DC';
     ctx.beginPath();
-    ctx.moveTo(495, 330);
-    ctx.lineTo(535, 330);
-    ctx.lineTo(525, 310);
-    ctx.lineTo(505, 310);
+    ctx.moveTo(320, 435);
+    ctx.lineTo(360, 435);
+    ctx.lineTo(350, 415);
+    ctx.lineTo(330, 415);
     ctx.closePath();
     ctx.fill();
     
-    // Guinea pig cage area (near windows, more visible)
-    // Cage base
-    ctx.fillStyle = '#696969';
-    ctx.fillRect(950, 380, 200, 150);
-    ctx.strokeStyle = '#4A4A4A';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(950, 380, 200, 150);
+    // Coffee table in front of TV
+    ctx.fillStyle = '#4A4A4A';
+    ctx.fillRect(1050, 540, 100, 8);
+    // Table legs
+    ctx.fillRect(1060, 548, 8, 25);
+    ctx.fillRect(1132, 548, 8, 25);
     
-    // Cage bars
-    ctx.strokeStyle = '#4A4A4A';
-    ctx.lineWidth = 2;
-    for (let x = 960; x < 1150; x += 15) {
+    // Plant near window
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(620, 480, 40, 70);
+    ctx.fillStyle = '#228B22';
+    ctx.beginPath();
+    ctx.arc(640, 450, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(620, 460, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(660, 460, 30, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Picture frames on wall
+    // Above fireplace
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(470, 200, 60, 80);
+    ctx.fillStyle = '#F0E68C';
+    ctx.fillRect(475, 205, 50, 70);
+    
+    // Above bed
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(770, 150, 60, 80);
+    ctx.fillStyle = '#E6E6FA';
+    ctx.fillRect(775, 155, 50, 70);
+    
+    // Bookshelf next to TV
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(920, 300, 60, 250);
+    // Shelves
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 4;
+    for (let y = 350; y < 550; y += 50) {
         ctx.beginPath();
-        ctx.moveTo(x, 380);
-        ctx.lineTo(x, 530);
+        ctx.moveTo(920, y);
+        ctx.lineTo(980, y);
         ctx.stroke();
     }
-    
-    // Bedding in cage
-    ctx.fillStyle = '#F4A460';
-    ctx.fillRect(955, 480, 190, 45);
-    
-    // Water bottle
-    ctx.fillStyle = '#4169E1';
-    ctx.fillRect(1130, 400, 15, 40);
-    ctx.fillStyle = '#C0C0C0';
-    ctx.fillRect(1132, 440, 11, 5);
-    
-    // Food bowl
-    ctx.fillStyle = '#8B0000';
-    ctx.beginPath();
-    ctx.arc(980, 500, 15, 0, Math.PI);
-    ctx.closePath();
-    ctx.fill();
-    
-    // Chair (near bed)
-    ctx.fillStyle = '#228B22';
-    ctx.fillRect(350, 440, 80, 80);
-    ctx.fillRect(350, 420, 80, 40);
-    // Chair legs
-    ctx.fillStyle = '#654321';
-    ctx.fillRect(355, 520, 8, 30);
-    ctx.fillRect(417, 520, 8, 30);
-    
-    // Plants
-    // Large floor plant (left)
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(50, 480, 40, 70);
-    ctx.fillStyle = '#228B22';
-    ctx.beginPath();
-    ctx.arc(70, 450, 40, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(50, 460, 30, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(90, 460, 30, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Small plant on coffee table
-    ctx.fillStyle = '#696969';
-    ctx.fillRect(720, 520, 20, 20);
-    ctx.fillStyle = '#32CD32';
-    ctx.beginPath();
-    ctx.arc(730, 515, 15, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Hanging plant (near window)
-    ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(800, 100);
-    ctx.lineTo(800, 200);
-    ctx.stroke();
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(780, 200, 40, 30);
-    ctx.fillStyle = '#228B22';
-    ctx.beginPath();
-    ctx.arc(800, 210, 25, 0, Math.PI * 2);
-    ctx.fill();
-    // Hanging vines
-    ctx.strokeStyle = '#228B22';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(785, 230);
-    ctx.quadraticCurveTo(780, 250, 785, 270);
-    ctx.moveTo(800, 230);
-    ctx.quadraticCurveTo(800, 250, 805, 270);
-    ctx.moveTo(815, 230);
-    ctx.quadraticCurveTo(820, 250, 815, 270);
-    ctx.stroke();
-    
-    // Rug under coffee table
-    ctx.fillStyle = '#8B0000';
-    ctx.fillRect(550, 520, 350, 120);
-    ctx.fillStyle = '#DC143C';
-    ctx.fillRect(570, 530, 310, 100);
-    // Rug pattern
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(580, 540, 290, 80);
-    
-    // Wall art/paintings
-    // Painting 1
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(100, 150, 100, 120);
-    ctx.fillStyle = '#FFE4B5';
-    ctx.fillRect(110, 160, 80, 100);
-    
-    // Painting 2
-    ctx.fillStyle = '#4A4A4A';
-    ctx.fillRect(1200, 150, 120, 100);
-    ctx.fillStyle = '#F0F0F0';
-    ctx.fillRect(1210, 160, 100, 80);
+    // Books
+    const bookColors = ['#FF0000', '#0000FF', '#008000', '#FFD700', '#800080'];
+    let bookY = 355;
+    for (let shelf = 0; shelf < 4; shelf++) {
+        let bookX = 925;
+        for (let book = 0; book < 5; book++) {
+            ctx.fillStyle = bookColors[book];
+            ctx.fillRect(bookX, bookY, 8, 40);
+            bookX += 10;
+        }
+        bookY += 50;
+    }
     
     // Title
     ctx.fillStyle = '#4B0082';
