@@ -11,8 +11,108 @@
 </head>
 <body>
     <div class="game-container">
+        <!-- Multiplication Tables Selection Screen -->
+        <div id="tablesScreen" class="selection-screen">
+            <div class="selection-content">
+                <h1>🧮 Welke tafels wil je oefenen?</h1>
+                <p class="screen-description">Kies één of meer tafels om te oefenen tijdens het spel</p>
+                
+                <div class="tables-grid">
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="1" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 1</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="2" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 2</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="3" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 3</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="4" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 4</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="5" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 5</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="6" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 6</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="7" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 7</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="8" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 8</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="9" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 9</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="10" class="table-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Tafel van 10</span>
+                    </label>
+                </div>
+                
+                <button id="tablesNextBtn" class="next-btn" disabled>Volgende →</button>
+            </div>
+        </div>
+
+        <!-- Spelling Difficulty Selection Screen -->
+        <div id="difficultyScreen" class="selection-screen hidden">
+            <div class="selection-content">
+                <h1>📝 Kies de moeilijkheid van de woorden</h1>
+                <p class="screen-description">Selecteer één of meer groepen voor de spellingsopdrachten</p>
+                
+                <div class="difficulty-options">
+                    <label class="checkbox-label difficulty-label">
+                        <input type="checkbox" value="6" class="difficulty-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">
+                            <strong>Groep 6</strong>
+                            <small>Basis woordenschat</small>
+                        </span>
+                    </label>
+                    <label class="checkbox-label difficulty-label">
+                        <input type="checkbox" value="7" class="difficulty-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">
+                            <strong>Groep 7</strong>
+                            <small>Gemiddelde moeilijkheid</small>
+                        </span>
+                    </label>
+                    <label class="checkbox-label difficulty-label">
+                        <input type="checkbox" value="8" class="difficulty-checkbox">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">
+                            <strong>Groep 8</strong>
+                            <small>Gevorderde woorden</small>
+                        </span>
+                    </label>
+                </div>
+                
+                <button id="difficultyNextBtn" class="next-btn" disabled>Volgende →</button>
+            </div>
+        </div>
+        
         <!-- Customization Screen -->
-        <div id="customizationScreen" class="customization-screen">
+        <div id="customizationScreen" class="customization-screen hidden">
             <div class="customization-content">
                 <h1>🐹 Customize je Cavia!</h1>
                 

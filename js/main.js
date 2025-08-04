@@ -1,6 +1,7 @@
 // Main entry point - initializes the game
 import { Game } from './game.js';
 import { Customization } from './customization.js';
+import { ScreenManager } from './screen-manager.js';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,17 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    // Initialize customization screen
-    const customization = new Customization();
-    
-    // Wait for customization to complete
-    window.addEventListener('startGame', (e) => {
-        // Initialize the game with customization data
-        const game = new Game(canvas, e.detail);
+    // Check if we should skip the initial screens
+    if (ScreenManager.hasSettings() && Customization.loadCustomization().skipCustomization) {
+        // Skip all screens and start game directly
+        document.getElementById('tablesScreen').classList.add('hidden');
+        document.getElementById('difficultyScreen').classList.add('hidden');
+        document.getElementById('customizationScreen').classList.add('hidden');
+        
+        const savedCustomization = Customization.loadCustomization();
+        const gameSettings = ScreenManager.getGameSettings();
+        
+        // Initialize the game with customization and settings data
+        const game = new Game(canvas, {
+            ...savedCustomization,
+            ...gameSettings
+        });
         
         // Make game instance available globally for debugging
         window.game = game;
         
         console.log('Cavia Avonturen Wereld is geladen!');
-    });
+    } else {
+        // Initialize screen manager for the selection screens
+        const screenManager = new ScreenManager();
+        
+        // Initialize customization screen
+        const customization = new Customization();
+        
+        // Wait for customization to complete
+        window.addEventListener('startGame', (e) => {
+            const gameSettings = ScreenManager.getGameSettings();
+            
+            // Initialize the game with customization and settings data
+            const game = new Game(canvas, {
+                ...e.detail,
+                ...gameSettings
+            });
+            
+            // Make game instance available globally for debugging
+            window.game = game;
+            
+            console.log('Cavia Avonturen Wereld is geladen!');
+        });
+    }
 });
