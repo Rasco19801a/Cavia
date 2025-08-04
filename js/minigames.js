@@ -44,14 +44,27 @@ export class Minigames {
         const puzzleSize = 3;
         const tiles = [];
         
+        // Determine tile size based on screen width
+        const screenWidth = window.innerWidth;
+        let tileSize = 100;
+        let gap = 5;
+        
+        if (screenWidth <= 480) {
+            tileSize = 70;
+            gap = 3;
+        } else if (screenWidth <= 768) {
+            tileSize = 85;
+            gap = 4;
+        }
+        
         // Initialize puzzle grid
         const puzzleGrid = document.createElement('div');
         puzzleGrid.className = 'puzzle-grid';
         puzzleGrid.style.cssText = `
             display: grid;
-            grid-template-columns: repeat(${puzzleSize}, 100px);
-            grid-template-rows: repeat(${puzzleSize}, 100px);
-            gap: 5px;
+            grid-template-columns: repeat(${puzzleSize}, ${tileSize}px);
+            grid-template-rows: repeat(${puzzleSize}, ${tileSize}px);
+            gap: ${gap}px;
             margin: 20px auto;
             width: fit-content;
         `;
@@ -81,14 +94,21 @@ export class Minigames {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 24px;
+                    font-size: ${screenWidth <= 480 ? '18px' : '24px'};
                     font-weight: bold;
                     cursor: pointer;
                     border-radius: 10px;
                     transition: all 0.3s ease;
+                    user-select: none;
+                    -webkit-user-select: none;
+                    -webkit-tap-highlight-color: transparent;
                 `;
                 
                 tile.addEventListener('click', () => this.moveTile(index, tiles, puzzleSize));
+                tile.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.moveTile(index, tiles, puzzleSize);
+                });
             }
             
             puzzleGrid.appendChild(tile);
@@ -100,6 +120,7 @@ export class Minigames {
         const instructions = document.createElement('p');
         instructions.textContent = 'Klik op een tegel naast de lege ruimte om te schuiven!';
         instructions.style.textAlign = 'center';
+        instructions.style.fontSize = screenWidth <= 480 ? '14px' : '16px';
         gameArea.appendChild(instructions);
         
         // Show modal
@@ -177,24 +198,31 @@ export class Minigames {
         const gameArea = document.getElementById('minigameArea');
         gameArea.innerHTML = '';
         gameArea.style.position = 'relative';
-        gameArea.style.height = '400px';
+        
+        // Responsive game area height
+        const screenWidth = window.innerWidth;
+        const gameHeight = screenWidth <= 480 ? '300px' : '400px';
+        
+        gameArea.style.height = gameHeight;
         gameArea.style.background = '#87CEEB';
         gameArea.style.borderRadius = '10px';
         gameArea.style.overflow = 'hidden';
+        gameArea.style.touchAction = 'none'; // Prevent scrolling on touch
         
-        // Create ball
+        // Create ball with responsive size
         const ball = document.createElement('div');
         ball.className = 'catch-ball';
         ball.innerHTML = '⚽';
         ball.style.cssText = `
             position: absolute;
-            font-size: 40px;
+            font-size: ${screenWidth <= 480 ? '30px' : '40px'};
             cursor: pointer;
             user-select: none;
+            -webkit-user-select: none;
             transition: none;
         `;
         
-        // Create catcher (guinea pig)
+        // Create catcher (guinea pig) with responsive size
         const catcher = document.createElement('div');
         catcher.innerHTML = '🐹';
         catcher.style.cssText = `
@@ -202,8 +230,9 @@ export class Minigames {
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 50px;
+            font-size: ${screenWidth <= 480 ? '40px' : '50px'};
             user-select: none;
+            -webkit-user-select: none;
         `;
         
         gameArea.appendChild(ball);
@@ -213,7 +242,7 @@ export class Minigames {
         let score = 0;
         let ballX = Math.random() * (gameArea.offsetWidth - 40);
         let ballY = 0;
-        let ballSpeed = 2;
+        let ballSpeed = screenWidth <= 480 ? 1.5 : 2;
         let catcherX = gameArea.offsetWidth / 2;
         
         // Update score display
@@ -222,16 +251,35 @@ export class Minigames {
         // Mouse/touch controls
         const moveCatcher = (clientX) => {
             const rect = gameArea.getBoundingClientRect();
-            catcherX = Math.max(25, Math.min(gameArea.offsetWidth - 25, clientX - rect.left));
+            const catcherSize = screenWidth <= 480 ? 20 : 25;
+            catcherX = Math.max(catcherSize, Math.min(gameArea.offsetWidth - catcherSize, clientX - rect.left));
             catcher.style.left = catcherX + 'px';
         };
         
+        // Mouse events
         gameArea.addEventListener('mousemove', (e) => moveCatcher(e.clientX));
-        gameArea.addEventListener('touchmove', (e) => {
+        
+        // Touch events with better handling
+        let touchActive = false;
+        
+        gameArea.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            touchActive = true;
             if (e.touches.length > 0) {
                 moveCatcher(e.touches[0].clientX);
             }
+        });
+        
+        gameArea.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (touchActive && e.touches.length > 0) {
+                moveCatcher(e.touches[0].clientX);
+            }
+        });
+        
+        gameArea.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            touchActive = false;
         });
         
         // Game loop
@@ -240,16 +288,20 @@ export class Minigames {
             ball.style.left = ballX + 'px';
             ball.style.top = ballY + 'px';
             
+            // Responsive catch detection
+            const catchDistance = screenWidth <= 480 ? 35 : 40;
+            const catchHeight = screenWidth <= 480 ? 80 : 100;
+            
             // Check if caught
-            if (ballY > gameArea.offsetHeight - 100 && 
-                Math.abs(ballX + 20 - catcherX) < 40) {
+            if (ballY > gameArea.offsetHeight - catchHeight && 
+                Math.abs(ballX + 20 - catcherX) < catchDistance) {
                 score++;
                 document.getElementById('minigameScore').textContent = `Score: ${score}`;
                 
                 // Reset ball
                 ballX = Math.random() * (gameArea.offsetWidth - 40);
                 ballY = 0;
-                ballSpeed = Math.min(ballSpeed + 0.2, 8);
+                ballSpeed = Math.min(ballSpeed + 0.2, screenWidth <= 480 ? 6 : 8);
                 
                 if (score >= 10) {
                     clearInterval(gameLoop);
@@ -288,15 +340,26 @@ export class Minigames {
         const gameArea = document.getElementById('minigameArea');
         gameArea.innerHTML = '';
         gameArea.style.position = 'relative';
-        gameArea.style.height = '400px';
+        
+        // Responsive game area
+        const screenWidth = window.innerWidth;
+        const gameHeight = screenWidth <= 480 ? '300px' : '400px';
+        
+        gameArea.style.height = gameHeight;
         gameArea.style.background = '#f0f0f0';
         gameArea.style.borderRadius = '10px';
+        gameArea.style.touchAction = 'none'; // Prevent scrolling
         
         // Create game elements
         const blocks = [];
         let currentBlock = null;
         let score = 0;
         let gameActive = true;
+        
+        // Responsive block dimensions
+        const blockWidth = screenWidth <= 480 ? 60 : 80;
+        const blockHeight = screenWidth <= 480 ? 25 : 30;
+        const baseWidth = screenWidth <= 480 ? 80 : 100;
         
         // Create base
         const base = document.createElement('div');
@@ -305,7 +368,7 @@ export class Minigames {
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
+            width: ${baseWidth}px;
             height: 20px;
             background: #333;
         `;
@@ -318,8 +381,8 @@ export class Minigames {
                 position: absolute;
                 top: 20px;
                 left: 0;
-                width: 80px;
-                height: 30px;
+                width: ${blockWidth}px;
+                height: ${blockHeight}px;
                 background: #667eea;
                 border: 2px solid #5a67d8;
                 border-radius: 5px;
@@ -330,7 +393,7 @@ export class Minigames {
         
         currentBlock = createBlock();
         let direction = 1;
-        let speed = 2;
+        let speed = screenWidth <= 480 ? 1.5 : 2;
         
         // Movement loop
         const moveLoop = setInterval(() => {
@@ -339,22 +402,23 @@ export class Minigames {
             const left = parseInt(currentBlock.style.left);
             const newLeft = left + (direction * speed);
             
-            if (newLeft <= 0 || newLeft >= gameArea.offsetWidth - 80) {
+            if (newLeft <= 0 || newLeft >= gameArea.offsetWidth - blockWidth) {
                 direction *= -1;
             }
             
             currentBlock.style.left = newLeft + 'px';
         }, 20);
         
-        // Click to drop
-        gameArea.addEventListener('click', () => {
+        // Click/touch to drop
+        const dropBlock = () => {
             if (!gameActive || !currentBlock) return;
             
             // Drop the block
             const blockLeft = parseInt(currentBlock.style.left);
+            const blockSpacing = blockHeight + 2;
             const blockTop = blocks.length > 0 ? 
-                gameArea.offsetHeight - 20 - (blocks.length * 32) : 
-                gameArea.offsetHeight - 52;
+                gameArea.offsetHeight - 20 - (blocks.length * blockSpacing) : 
+                gameArea.offsetHeight - 20 - blockHeight - 2;
             
             currentBlock.style.top = blockTop + 'px';
             blocks.push({ element: currentBlock, left: blockLeft });
@@ -363,12 +427,13 @@ export class Minigames {
             if (blocks.length > 1) {
                 const prevBlock = blocks[blocks.length - 2];
                 const offset = Math.abs(blockLeft - prevBlock.left);
+                const maxOffset = screenWidth <= 480 ? 45 : 60;
                 
-                if (offset > 60) {
+                if (offset > maxOffset) {
                     // Block fell off
                     gameActive = false;
                     currentBlock.style.transform = 'rotate(45deg)';
-                    currentBlock.style.top = (gameArea.offsetHeight - 30) + 'px';
+                    currentBlock.style.top = (gameArea.offsetHeight - blockHeight) + 'px';
                     
                     clearInterval(moveLoop);
                     this.completeStackGame(score);
@@ -386,8 +451,15 @@ export class Minigames {
             } else {
                 // Create new block
                 currentBlock = createBlock();
-                speed = Math.min(speed + 0.3, 6);
+                speed = Math.min(speed + 0.3, screenWidth <= 480 ? 4.5 : 6);
             }
+        };
+        
+        // Add both click and touch support
+        gameArea.addEventListener('click', dropBlock);
+        gameArea.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            dropBlock();
         });
         
         // Store game loop
@@ -431,15 +503,32 @@ export class Minigames {
         const gameArea = document.getElementById('minigameArea');
         gameArea.innerHTML = '';
         
+        // Responsive canvas dimensions
+        const screenWidth = window.innerWidth;
+        let canvasWidth = 600;
+        let canvasHeight = 400;
+        
+        if (screenWidth <= 480) {
+            canvasWidth = Math.min(screenWidth - 40, 320);
+            canvasHeight = 280;
+        } else if (screenWidth <= 768) {
+            canvasWidth = Math.min(screenWidth - 60, 500);
+            canvasHeight = 350;
+        }
+        
         // Create canvas for bath minigame
         const canvas = document.createElement('canvas');
-        canvas.width = 600;
-        canvas.height = 400;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
         canvas.style.cssText = `
             border: 2px solid #87CEEB;
             border-radius: 10px;
             cursor: pointer;
             background: linear-gradient(to bottom, #E0F6FF 0%, #B0E0E6 100%);
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+            touch-action: none;
         `;
         gameArea.appendChild(canvas);
         
@@ -449,15 +538,18 @@ export class Minigames {
         let gameActive = true;
         let tapEffects = []; // Array to store tap visual effects
         
-        // Create dirt spots
+        // Scale factors for responsive design
+        const scaleFactor = canvasWidth / 600;
+        
+        // Create dirt spots with responsive sizing
         const dirtSpots = [];
-        const numSpots = 12; // More spots for more challenge
+        const numSpots = screenWidth <= 480 ? 8 : 12; // Fewer spots on mobile
         
         for (let i = 0; i < numSpots; i++) {
             dirtSpots.push({
-                x: 150 + Math.random() * 300,
-                y: 100 + Math.random() * 200,
-                radius: 25 + Math.random() * 20,
+                x: (150 + Math.random() * 300) * scaleFactor,
+                y: (100 + Math.random() * 200) * scaleFactor,
+                radius: (25 + Math.random() * 20) * scaleFactor,
                 cleaned: false,
                 id: i,
                 tapCount: 0,
@@ -471,8 +563,8 @@ export class Minigames {
             bubbles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                radius: 5 + Math.random() * 15,
-                speed: 0.5 + Math.random() * 1.5,
+                radius: (5 + Math.random() * 15) * scaleFactor,
+                speed: (0.5 + Math.random() * 1.5) * scaleFactor,
                 opacity: 0.3 + Math.random() * 0.4
             });
         }
@@ -522,7 +614,7 @@ export class Minigames {
             
             // Draw bathtub edge
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2, canvas.height - 50, 250, 80, 0, 0, Math.PI);
+            ctx.ellipse(canvas.width/2, canvas.height - 50 * scaleFactor, 250 * scaleFactor, 80 * scaleFactor, 0, 0, Math.PI);
             ctx.fillStyle = '#F0F0F0';
             ctx.fill();
             ctx.strokeStyle = '#D0D0D0';
@@ -531,41 +623,41 @@ export class Minigames {
             
             // Draw guinea pig body
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2, canvas.height/2, 150, 100, 0, 0, Math.PI * 2);
+            ctx.ellipse(canvas.width/2, canvas.height/2, 150 * scaleFactor, 100 * scaleFactor, 0, 0, Math.PI * 2);
             ctx.fillStyle = '#8B4513';
             ctx.fill();
             
             // Draw guinea pig head
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2 - 100, canvas.height/2 - 20, 60, 50, -0.2, 0, Math.PI * 2);
+            ctx.ellipse(canvas.width/2 - 100 * scaleFactor, canvas.height/2 - 20 * scaleFactor, 60 * scaleFactor, 50 * scaleFactor, -0.2, 0, Math.PI * 2);
             ctx.fillStyle = '#A0522D';
             ctx.fill();
             
             // Draw eyes
             ctx.beginPath();
-            ctx.arc(canvas.width/2 - 120, canvas.height/2 - 30, 8, 0, Math.PI * 2);
+            ctx.arc(canvas.width/2 - 120 * scaleFactor, canvas.height/2 - 30 * scaleFactor, 8 * scaleFactor, 0, Math.PI * 2);
             ctx.fillStyle = '#000';
             ctx.fill();
             
             ctx.beginPath();
-            ctx.arc(canvas.width/2 - 80, canvas.height/2 - 25, 8, 0, Math.PI * 2);
+            ctx.arc(canvas.width/2 - 80 * scaleFactor, canvas.height/2 - 25 * scaleFactor, 8 * scaleFactor, 0, Math.PI * 2);
             ctx.fillStyle = '#000';
             ctx.fill();
             
             // Draw nose
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2 - 140, canvas.height/2 - 10, 8, 6, 0, 0, Math.PI * 2);
+            ctx.ellipse(canvas.width/2 - 140 * scaleFactor, canvas.height/2 - 10 * scaleFactor, 8 * scaleFactor, 6 * scaleFactor, 0, 0, Math.PI * 2);
             ctx.fillStyle = '#FF69B4';
             ctx.fill();
             
             // Draw ears
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2 - 110, canvas.height/2 - 60, 15, 20, -0.5, 0, Math.PI * 2);
+            ctx.ellipse(canvas.width/2 - 110 * scaleFactor, canvas.height/2 - 60 * scaleFactor, 15 * scaleFactor, 20 * scaleFactor, -0.5, 0, Math.PI * 2);
             ctx.fillStyle = '#8B4513';
             ctx.fill();
             
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2 - 70, canvas.height/2 - 55, 15, 20, 0.5, 0, Math.PI * 2);
+            ctx.ellipse(canvas.width/2 - 70 * scaleFactor, canvas.height/2 - 55 * scaleFactor, 15 * scaleFactor, 20 * scaleFactor, 0.5, 0, Math.PI * 2);
             ctx.fillStyle = '#8B4513';
             ctx.fill();
             
@@ -595,7 +687,7 @@ export class Minigames {
                     
                     // Show tap progress
                     if (spot.tapCount > 0) {
-                        ctx.font = 'bold 14px Arial';
+                        ctx.font = `bold ${14 * scaleFactor}px Arial`;
                         ctx.fillStyle = '#FFF';
                         ctx.textAlign = 'center';
                         ctx.fillText(`${spot.requiredTaps - spot.tapCount}`, spot.x, spot.y + 5);
@@ -622,7 +714,7 @@ export class Minigames {
                         const splashY = effect.y + Math.sin(angle) * effect.radius * 0.7;
                         
                         ctx.beginPath();
-                        ctx.arc(splashX, splashY, 5, 0, Math.PI * 2);
+                        ctx.arc(splashX, splashY, 5 * scaleFactor, 0, Math.PI * 2);
                         ctx.fillStyle = `rgba(173, 216, 230, ${effect.opacity})`;
                         ctx.fill();
                     }
@@ -633,7 +725,7 @@ export class Minigames {
             });
             
             // Draw timer
-            ctx.font = 'bold 24px Arial';
+            ctx.font = `bold ${24 * scaleFactor}px Arial`;
             ctx.fillStyle = timeLeft <= 10 ? '#FF4444' : '#333';
             ctx.textAlign = 'left';
             ctx.fillText(`⏰ ${timeLeft}s`, 20, 40);
@@ -664,13 +756,13 @@ export class Minigames {
             const rect = canvas.getBoundingClientRect();
             if (e.touches) {
                 return {
-                    x: e.touches[0].clientX - rect.left,
-                    y: e.touches[0].clientY - rect.top
+                    x: (e.touches[0].clientX - rect.left) * (canvas.width / rect.width),
+                    y: (e.touches[0].clientY - rect.top) * (canvas.height / rect.height)
                 };
             }
             return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
+                x: (e.clientX - rect.left) * (canvas.width / rect.width),
+                y: (e.clientY - rect.top) * (canvas.height / rect.height)
             };
         };
         
@@ -684,7 +776,7 @@ export class Minigames {
             tapEffects.push({
                 x: pos.x,
                 y: pos.y,
-                radius: 10,
+                radius: 10 * scaleFactor,
                 opacity: 1
             });
             
@@ -728,7 +820,7 @@ export class Minigames {
             text-align: center;
             margin-top: 10px;
             color: #333;
-            font-size: 16px;
+            font-size: ${screenWidth <= 480 ? '14px' : '16px'};
             font-weight: bold;
         `;
         instructions.textContent = 'Tap snel op de vuile plekken om ze schoon te maken! Je hebt 30 seconden!';
