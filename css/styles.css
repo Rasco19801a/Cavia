@@ -465,16 +465,15 @@ body {
 /* Challenge Modal Styles */
 .challenge-modal {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    border-radius: 12px;
 }
 
 .challenge-content {
@@ -649,16 +648,15 @@ body {
 /* Mission Modal Styles */
 .mission-modal {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    border-radius: 12px;
 }
 
 .mission-content {
@@ -742,16 +740,15 @@ body {
 
 .inventory-modal {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    border-radius: 12px;
 }
 
 .inventory-content {
@@ -926,16 +923,15 @@ body {
 /* Minigame Styles */
 .minigame-modal {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    border-radius: 12px;
 }
 
 .minigame-content {
@@ -1086,16 +1082,15 @@ body {
 /* Unified Modal Base Styles */
 .modal-base {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    border-radius: 12px;
 }
 
 .modal-content-base {
