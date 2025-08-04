@@ -548,12 +548,31 @@ body {
 
 #answerInput {
     width: 100%;
+    max-width: 100%;
     padding: 15px;
     font-size: 18px;
     border: 2px solid #ddd;
     border-radius: 10px;
     margin-bottom: 20px;
     text-align: center;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+}
+
+/* Make input field responsive */
+@media (max-width: 768px) {
+    #answerInput {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #answerInput {
+        font-size: 14px;
+        padding: 10px;
+    }
 }
 
 .math-question {
