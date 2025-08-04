@@ -90,7 +90,7 @@ export class HomeInventory {
                     <p id="progressText"></p>
                 </div>
                 <button class="inventory-select-btn" id="selectFromInventory">Selecteer uit Rugzak 🎒</button>
-                <button class="close-btn" id="closeMission">✖</button>
+                <button class="modal-close-btn" id="closeMission">✖</button>
             </div>
         `;
         document.body.appendChild(this.missionModal);
@@ -1024,27 +1024,10 @@ export class HomeInventory {
         // Create ferris wheel minigame modal
         const modal = document.createElement('div');
         modal.className = 'minigame-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        `;
         
         const gameContainer = document.createElement('div');
+        gameContainer.className = 'minigame-content';
         gameContainer.style.cssText = `
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            position: relative;
-            max-width: 600px;
-            width: 90%;
             text-align: center;
         `;
         
@@ -1065,19 +1048,7 @@ export class HomeInventory {
                 cursor: pointer;
                 margin-top: 10px;
             ">Stop het ritje</button>
-            <button id="closeFerrisWheel" style="
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                background: #E53E3E;
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-            ">✖</button>
+            <button id="closeFerrisWheel" class="modal-close-btn">✖</button>
         `;
         
         modal.appendChild(gameContainer);
@@ -1245,27 +1216,11 @@ export class HomeInventory {
         // Create a simple water bath minigame
         const modal = document.createElement('div');
         modal.className = 'minigame-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        `;
         
         const gameContainer = document.createElement('div');
+        gameContainer.className = 'minigame-content';
         gameContainer.style.cssText = `
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            position: relative;
             max-width: 500px;
-            width: 90%;
         `;
         
         gameContainer.innerHTML = `
@@ -1276,19 +1231,7 @@ export class HomeInventory {
             </div>
             <p id="bathGameInstructions" style="text-align: center; color: #666;">Klik op de bubbels om ze te laten knappen! 🫧</p>
             <p id="bathGameScore" style="text-align: center; font-size: 20px; color: #333; font-weight: bold;">Score: 0</p>
-            <button id="closeBathGame" style="
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                background: #E53E3E;
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-            ">✖</button>
+            <button id="closeBathGame" class="modal-close-btn">✖</button>
         `;
         
         modal.appendChild(gameContainer);

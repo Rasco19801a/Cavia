@@ -72,7 +72,7 @@ export class Inventory {
                         <button id="placeInHomeBtn" class="place-home-btn hidden">Plaats in Huis</button>
                     </div>
                 </div>
-                <button class="close-btn" id="closeInventory">✖</button>
+                <button class="modal-close-btn" id="closeInventory">✖</button>
             </div>
         `;
         
