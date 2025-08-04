@@ -17,6 +17,10 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
+        // Store game settings
+        this.selectedTables = customization.selectedTables || [1, 2, 3, 4, 5];
+        this.selectedDifficulties = customization.selectedDifficulties || [6, 7];
+        
         // Make canvas focusable and give it initial focus
         this.canvas.tabIndex = 1;
         this.canvas.focus();
