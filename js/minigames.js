@@ -416,11 +416,17 @@ export class Minigames {
             clearInterval(this.currentGameLoop);
             this.currentGameLoop = null;
         }
+        
+        // Call specific cleanup if exists
+        if (this.currentCleanup) {
+            this.currentCleanup();
+            this.currentCleanup = null;
+        }
     }
     
     startBathMinigame() {
         this.activeMinigame = 'bath';
-        document.getElementById('minigameTitle').textContent = '🛁 Badtijd - Maak de Cavia Schoon!';
+        document.getElementById('minigameTitle').textContent = '🛁 Badtijd - Tap snel om schoon te maken!';
         
         const gameArea = document.getElementById('minigameArea');
         gameArea.innerHTML = '';
@@ -439,20 +445,23 @@ export class Minigames {
         
         const ctx = canvas.getContext('2d');
         let score = 0;
-        let isMouseDown = false;
-        let cleanedSpots = new Set();
+        let timeLeft = 30; // 30 seconds timer
+        let gameActive = true;
+        let tapEffects = []; // Array to store tap visual effects
         
         // Create dirt spots
         const dirtSpots = [];
-        const numSpots = 8;
+        const numSpots = 12; // More spots for more challenge
         
         for (let i = 0; i < numSpots; i++) {
             dirtSpots.push({
                 x: 150 + Math.random() * 300,
                 y: 100 + Math.random() * 200,
-                radius: 20 + Math.random() * 15,
+                radius: 25 + Math.random() * 20,
                 cleaned: false,
-                id: i
+                id: i,
+                tapCount: 0,
+                requiredTaps: 3 + Math.floor(Math.random() * 3) // 3-5 taps needed per spot
             });
         }
         
@@ -468,9 +477,31 @@ export class Minigames {
             });
         }
         
-        // Sponge position
-        let spongeX = 0;
-        let spongeY = 0;
+        // Timer setup
+        const timerInterval = setInterval(() => {
+            if (!gameActive) {
+                clearInterval(timerInterval);
+                return;
+            }
+            
+            timeLeft--;
+            if (timeLeft <= 0) {
+                gameActive = false;
+                clearInterval(timerInterval);
+                
+                // Game over
+                setTimeout(() => {
+                    if (score === numSpots) {
+                        this.game.ui.showNotification('🎉 Perfect! Alles is schoon!');
+                        this.game.player.addCarrots(15);
+                    } else {
+                        this.game.ui.showNotification(`⏰ Tijd is op! Je hebt ${score}/${numSpots} plekken schoongemaakt.`);
+                        this.game.player.addCarrots(Math.floor(score * 1.5));
+                    }
+                    this.closeMinigame();
+                }, 500);
+            }
+        }, 1000);
         
         // Draw function
         const draw = () => {
@@ -541,9 +572,12 @@ export class Minigames {
             // Draw dirt spots
             dirtSpots.forEach(spot => {
                 if (!spot.cleaned) {
+                    // Calculate opacity based on remaining taps
+                    const opacity = 0.3 + (spot.tapCount / spot.requiredTaps) * 0.4;
+                    
                     ctx.beginPath();
                     ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(101, 67, 33, 0.6)';
+                    ctx.fillStyle = `rgba(101, 67, 33, ${opacity})`;
                     ctx.fill();
                     
                     // Add some texture
@@ -555,46 +589,54 @@ export class Minigames {
                             spot.radius * 0.2,
                             0, Math.PI * 2
                         );
-                        ctx.fillStyle = 'rgba(80, 52, 26, 0.4)';
+                        ctx.fillStyle = `rgba(80, 52, 26, ${opacity * 0.7})`;
                         ctx.fill();
+                    }
+                    
+                    // Show tap progress
+                    if (spot.tapCount > 0) {
+                        ctx.font = 'bold 14px Arial';
+                        ctx.fillStyle = '#FFF';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`${spot.requiredTaps - spot.tapCount}`, spot.x, spot.y + 5);
                     }
                 }
             });
             
-            // Draw sponge if mouse is down
-            if (isMouseDown) {
-                // Sponge
-                ctx.beginPath();
-                ctx.rect(spongeX - 30, spongeY - 20, 60, 40);
-                ctx.fillStyle = '#FFD700';
-                ctx.fill();
-                ctx.strokeStyle = '#FFA500';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+            // Draw tap effects
+            tapEffects = tapEffects.filter(effect => {
+                effect.radius += 3;
+                effect.opacity -= 0.05;
                 
-                // Sponge texture
-                for (let i = 0; i < 6; i++) {
-                    for (let j = 0; j < 4; j++) {
+                if (effect.opacity > 0) {
+                    ctx.beginPath();
+                    ctx.arc(effect.x, effect.y, effect.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(135, 206, 235, ${effect.opacity})`;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    
+                    // Draw water splash effect
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (Math.PI * 2 / 5) * i;
+                        const splashX = effect.x + Math.cos(angle) * effect.radius * 0.7;
+                        const splashY = effect.y + Math.sin(angle) * effect.radius * 0.7;
+                        
                         ctx.beginPath();
-                        ctx.arc(spongeX - 25 + i * 10, spongeY - 15 + j * 10, 2, 0, Math.PI * 2);
-                        ctx.fillStyle = '#FFA500';
+                        ctx.arc(splashX, splashY, 5, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(173, 216, 230, ${effect.opacity})`;
                         ctx.fill();
                     }
+                    
+                    return true;
                 }
-                
-                // Soap bubbles around sponge
-                for (let i = 0; i < 3; i++) {
-                    ctx.beginPath();
-                    ctx.arc(
-                        spongeX + (Math.random() - 0.5) * 50,
-                        spongeY + (Math.random() - 0.5) * 50,
-                        5 + Math.random() * 5,
-                        0, Math.PI * 2
-                    );
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                    ctx.fill();
-                }
-            }
+                return false;
+            });
+            
+            // Draw timer
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = timeLeft <= 10 ? '#FF4444' : '#333';
+            ctx.textAlign = 'left';
+            ctx.fillText(`⏰ ${timeLeft}s`, 20, 40);
             
             // Update score display
             document.getElementById('minigameScore').textContent = `Schoongemaakt: ${score}/${numSpots}`;
@@ -617,61 +659,68 @@ export class Minigames {
             requestAnimationFrame(animate);
         };
         
-        // Mouse events
-        const getMousePos = (e) => {
+        // Mouse/Touch events
+        const getPos = (e) => {
             const rect = canvas.getBoundingClientRect();
+            if (e.touches) {
+                return {
+                    x: e.touches[0].clientX - rect.left,
+                    y: e.touches[0].clientY - rect.top
+                };
+            }
             return {
                 x: e.clientX - rect.left,
                 y: e.clientY - rect.top
             };
         };
         
-        canvas.addEventListener('mousedown', (e) => {
-            isMouseDown = true;
-            const pos = getMousePos(e);
-            spongeX = pos.x;
-            spongeY = pos.y;
-        });
-        
-        canvas.addEventListener('mousemove', (e) => {
-            if (isMouseDown) {
-                const pos = getMousePos(e);
-                spongeX = pos.x;
-                spongeY = pos.y;
-                
-                // Check if cleaning dirt spots
-                dirtSpots.forEach(spot => {
-                    if (!spot.cleaned) {
-                        const dist = Math.sqrt(
-                            Math.pow(pos.x - spot.x, 2) + 
-                            Math.pow(pos.y - spot.y, 2)
-                        );
+        const handleTap = (e) => {
+            if (!gameActive) return;
+            
+            e.preventDefault();
+            const pos = getPos(e);
+            
+            // Add tap effect
+            tapEffects.push({
+                x: pos.x,
+                y: pos.y,
+                radius: 10,
+                opacity: 1
+            });
+            
+            // Check if tapping on dirt spots
+            dirtSpots.forEach(spot => {
+                if (!spot.cleaned) {
+                    const dist = Math.sqrt(
+                        Math.pow(pos.x - spot.x, 2) + 
+                        Math.pow(pos.y - spot.y, 2)
+                    );
+                    
+                    if (dist < spot.radius) {
+                        spot.tapCount++;
                         
-                        if (dist < spot.radius + 20) {
+                        if (spot.tapCount >= spot.requiredTaps) {
                             spot.cleaned = true;
                             score++;
                             
                             // Check if all spots are cleaned
                             if (score === numSpots) {
+                                gameActive = false;
                                 setTimeout(() => {
-                                    this.game.ui.showNotification('🎉 Perfect! De cavia is helemaal schoon!');
-                                    this.game.player.addCarrots(10);
+                                    this.game.ui.showNotification('🎉 Perfect! Alles is schoon!');
+                                    this.game.player.addCarrots(20);
                                     this.closeMinigame();
                                 }, 500);
                             }
                         }
                     }
-                });
-            }
-        });
+                }
+            });
+        };
         
-        canvas.addEventListener('mouseup', () => {
-            isMouseDown = false;
-        });
-        
-        canvas.addEventListener('mouseleave', () => {
-            isMouseDown = false;
-        });
+        // Add both mouse and touch support
+        canvas.addEventListener('mousedown', handleTap);
+        canvas.addEventListener('touchstart', handleTap);
         
         // Show instructions
         const instructions = document.createElement('div');
@@ -680,12 +729,19 @@ export class Minigames {
             margin-top: 10px;
             color: #333;
             font-size: 16px;
+            font-weight: bold;
         `;
-        instructions.textContent = 'Gebruik de spons om alle vuile plekken schoon te maken!';
+        instructions.textContent = 'Tap snel op de vuile plekken om ze schoon te maken! Je hebt 30 seconden!';
         gameArea.appendChild(instructions);
         
         this.minigameModal.classList.remove('hidden');
         animate();
+        
+        // Store cleanup function
+        this.currentCleanup = () => {
+            clearInterval(timerInterval);
+            gameActive = false;
+        };
     }
     
     shuffleArray(array) {
