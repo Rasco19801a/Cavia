@@ -1113,10 +1113,10 @@ body {
 /* Unified Close Button for Modals */
 .modal-close-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #E53E3E;
-    color: white;
+    top: 16px;
+    right: 16px;
+    background: white;
+    color: black;
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -1131,5 +1131,5 @@ body {
 
 .modal-close-btn:hover {
     transform: scale(1.1);
-    background: #C53030;
+    background: #f0f0f0;
 }
