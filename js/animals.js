@@ -108,7 +108,7 @@ export class AnimalChallenge {
                     <button id="submitAnswer" class="submit-btn">Controleer</button>
                     <button id="repeatWord" class="repeat-btn hidden">🔊 Herhaal woord</button>
                 </div>
-                <button class="close-btn" id="closeChallenge">✖</button>
+                <button class="modal-close-btn" id="closeChallenge">✖</button>
                 <div id="feedback" class="feedback hidden"></div>
             </div>
         `;

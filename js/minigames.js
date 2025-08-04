@@ -17,7 +17,7 @@ export class Minigames {
                 <h2 id="minigameTitle">Minigame</h2>
                 <div id="minigameArea" class="minigame-area"></div>
                 <div id="minigameScore" class="minigame-score">Score: 0</div>
-                <button class="close-btn" id="closeMinigame">✖</button>
+                <button class="modal-close-btn" id="closeMinigame">✖</button>
             </div>
         `;
         document.body.appendChild(this.minigameModal);
