@@ -312,6 +312,80 @@ function drawWoestijn(ctx) {
         ctx.arc(x + 7, 580, 25, 0, Math.PI * 2);
         ctx.fill();
     }
+    
+    // Cave on the right side
+    const caveX = 1700;
+    const caveY = 450;
+    const caveWidth = 150;
+    const caveHeight = 150;
+    
+    // Cave rock formation
+    ctx.fillStyle = '#8B7355';
+    ctx.beginPath();
+    ctx.moveTo(caveX - 20, caveY + caveHeight);
+    ctx.lineTo(caveX - 10, caveY - 20);
+    ctx.lineTo(caveX + caveWidth + 10, caveY - 20);
+    ctx.lineTo(caveX + caveWidth + 20, caveY + caveHeight);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Cave entrance
+    ctx.fillStyle = '#2F2F2F';
+    ctx.beginPath();
+    ctx.ellipse(caveX + caveWidth/2, caveY + caveHeight/2, caveWidth/2 - 10, caveHeight/2 - 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Cave entrance shadow
+    ctx.fillStyle = '#1A1A1A';
+    ctx.beginPath();
+    ctx.ellipse(caveX + caveWidth/2, caveY + caveHeight/2, caveWidth/2 - 20, caveHeight/2 - 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw play button if tunnel is purchased
+    if (window.game && window.game.shop && window.game.shop.hasPurchased('tunnel')) {
+        const buttonX = caveX + caveWidth/2 - 50;
+        const buttonY = caveY + caveHeight + 20;
+        const buttonWidth = 100;
+        const buttonHeight = 40;
+        
+        // Check if hovering
+        let isHovering = false;
+        if (window.game.mouseX !== undefined && window.game.mouseY !== undefined) {
+            const rect = window.game.canvas.getBoundingClientRect();
+            const mouseX = window.game.mouseX || 0;
+            const mouseY = window.game.mouseY || 0;
+            const worldCoords = window.game.camera.screenToWorld(mouseX - rect.left, mouseY - rect.top);
+            
+            isHovering = worldCoords.x >= buttonX && 
+                        worldCoords.x <= buttonX + buttonWidth &&
+                        worldCoords.y >= buttonY && 
+                        worldCoords.y <= buttonY + buttonHeight;
+        }
+        
+        // Button background with hover effect
+        ctx.fillStyle = isHovering ? '#FF8C00' : '#FF6347';
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button border
+        ctx.strokeStyle = isHovering ? '#FF4500' : '#CD5C5C';
+        ctx.lineWidth = isHovering ? 3 : 2;
+        ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button shadow when hovering
+        if (isHovering) {
+            ctx.shadowColor = 'rgba(255, 69, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+            ctx.shadowBlur = 0;
+        }
+        
+        // Button text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 16px Nunito, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌀 Doolhof', buttonX + buttonWidth/2, buttonY + buttonHeight/2);
+    }
 }
 
 function drawJungle(ctx) {

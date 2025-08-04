@@ -836,6 +836,336 @@ export class Minigames {
         };
     }
     
+    startMazeMinigame() {
+        this.activeMinigame = 'maze';
+        document.getElementById('minigameTitle').textContent = '🌀 Doolhof Spel';
+        
+        const gameArea = document.getElementById('minigameArea');
+        gameArea.innerHTML = '';
+        
+        // Create canvas for maze
+        const canvas = document.createElement('canvas');
+        const screenWidth = window.innerWidth;
+        const canvasSize = Math.min(screenWidth - 40, 500);
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+        canvas.style.cssText = `
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            touch-action: none;
+        `;
+        gameArea.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Maze configuration
+        const mazeSize = 10;
+        const cellSize = canvasSize / mazeSize;
+        let playerPos = { x: 0, y: 0 };
+        const exitPos = { x: mazeSize - 1, y: mazeSize - 1 };
+        let gameActive = true;
+        let moveCount = 0;
+        
+        // Generate maze (simple maze with random walls)
+        const maze = [];
+        for (let y = 0; y < mazeSize; y++) {
+            maze[y] = [];
+            for (let x = 0; x < mazeSize; x++) {
+                maze[y][x] = {
+                    walls: {
+                        top: true,
+                        right: true,
+                        bottom: true,
+                        left: true
+                    },
+                    visited: false
+                };
+            }
+        }
+        
+        // Generate maze using recursive backtracking
+        const generateMaze = (x, y) => {
+            maze[y][x].visited = true;
+            
+            // Get neighbors in random order
+            const neighbors = [];
+            if (y > 0 && !maze[y - 1][x].visited) neighbors.push({ x, y: y - 1, dir: 'top' });
+            if (x < mazeSize - 1 && !maze[y][x + 1].visited) neighbors.push({ x: x + 1, y, dir: 'right' });
+            if (y < mazeSize - 1 && !maze[y + 1][x].visited) neighbors.push({ x, y: y + 1, dir: 'bottom' });
+            if (x > 0 && !maze[y][x - 1].visited) neighbors.push({ x: x - 1, y, dir: 'left' });
+            
+            this.shuffleArray(neighbors);
+            
+            for (const neighbor of neighbors) {
+                if (!maze[neighbor.y][neighbor.x].visited) {
+                    // Remove walls between current and neighbor
+                    if (neighbor.dir === 'top') {
+                        maze[y][x].walls.top = false;
+                        maze[neighbor.y][neighbor.x].walls.bottom = false;
+                    } else if (neighbor.dir === 'right') {
+                        maze[y][x].walls.right = false;
+                        maze[neighbor.y][neighbor.x].walls.left = false;
+                    } else if (neighbor.dir === 'bottom') {
+                        maze[y][x].walls.bottom = false;
+                        maze[neighbor.y][neighbor.x].walls.top = false;
+                    } else if (neighbor.dir === 'left') {
+                        maze[y][x].walls.left = false;
+                        maze[neighbor.y][neighbor.x].walls.right = false;
+                    }
+                    
+                    generateMaze(neighbor.x, neighbor.y);
+                }
+            }
+        };
+        
+        generateMaze(0, 0);
+        
+        // Draw maze
+        const drawMaze = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw maze walls
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            for (let y = 0; y < mazeSize; y++) {
+                for (let x = 0; x < mazeSize; x++) {
+                    const cell = maze[y][x];
+                    const cellX = x * cellSize;
+                    const cellY = y * cellSize;
+                    
+                    ctx.beginPath();
+                    if (cell.walls.top) {
+                        ctx.moveTo(cellX, cellY);
+                        ctx.lineTo(cellX + cellSize, cellY);
+                    }
+                    if (cell.walls.right) {
+                        ctx.moveTo(cellX + cellSize, cellY);
+                        ctx.lineTo(cellX + cellSize, cellY + cellSize);
+                    }
+                    if (cell.walls.bottom) {
+                        ctx.moveTo(cellX, cellY + cellSize);
+                        ctx.lineTo(cellX + cellSize, cellY + cellSize);
+                    }
+                    if (cell.walls.left) {
+                        ctx.moveTo(cellX, cellY);
+                        ctx.lineTo(cellX, cellY + cellSize);
+                    }
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw exit
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(exitPos.x * cellSize + cellSize * 0.2, exitPos.y * cellSize + cellSize * 0.2, cellSize * 0.6, cellSize * 0.6);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${cellSize * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🏁', exitPos.x * cellSize + cellSize / 2, exitPos.y * cellSize + cellSize / 2);
+            
+            // Draw player
+            ctx.fillStyle = '#FF6B6B';
+            ctx.beginPath();
+            ctx.arc(playerPos.x * cellSize + cellSize / 2, playerPos.y * cellSize + cellSize / 2, cellSize * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw cavia face on player
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(playerPos.x * cellSize + cellSize / 2 - cellSize * 0.1, playerPos.y * cellSize + cellSize / 2 - cellSize * 0.1, cellSize * 0.05, 0, Math.PI * 2);
+            ctx.arc(playerPos.x * cellSize + cellSize / 2 + cellSize * 0.1, playerPos.y * cellSize + cellSize / 2 - cellSize * 0.1, cellSize * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+        };
+        
+        // Handle movement
+        const movePlayer = (dx, dy) => {
+            if (!gameActive) return;
+            
+            const newX = playerPos.x + dx;
+            const newY = playerPos.y + dy;
+            
+            // Check boundaries
+            if (newX < 0 || newX >= mazeSize || newY < 0 || newY >= mazeSize) return;
+            
+            // Check walls
+            const currentCell = maze[playerPos.y][playerPos.x];
+            if (dx === 1 && currentCell.walls.right) return;
+            if (dx === -1 && currentCell.walls.left) return;
+            if (dy === 1 && currentCell.walls.bottom) return;
+            if (dy === -1 && currentCell.walls.top) return;
+            
+            // Move player
+            playerPos.x = newX;
+            playerPos.y = newY;
+            moveCount++;
+            
+            // Update score
+            document.getElementById('minigameScore').textContent = `Stappen: ${moveCount}`;
+            
+            drawMaze();
+            
+            // Check win condition
+            if (playerPos.x === exitPos.x && playerPos.y === exitPos.y) {
+                gameActive = false;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = `${canvasSize / 10}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🎉 Gewonnen! 🎉', canvas.width / 2, canvas.height / 2);
+                
+                // Award carrots based on efficiency
+                const reward = Math.max(10, 30 - Math.floor(moveCount / 5));
+                this.game.ui.showNotification(`🥕 Je hebt ${reward} wortels verdiend!`);
+                this.game.player.addCarrots(reward);
+                
+                setTimeout(() => this.closeMinigame(), 2000);
+            }
+        };
+        
+        // Keyboard controls
+        const handleKeydown = (e) => {
+            if (!gameActive) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    movePlayer(1, 0);
+                    break;
+            }
+        };
+        
+        window.addEventListener('keydown', handleKeydown);
+        
+        // Touch controls
+        let touchStartX = null;
+        let touchStartY = null;
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (touchStartX === null || touchStartY === null) return;
+            
+            const touch = e.changedTouches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+            
+            const absDx = Math.abs(dx);
+            const absDy = Math.abs(dy);
+            
+            if (absDx > absDy) {
+                // Horizontal swipe
+                if (dx > 0) {
+                    movePlayer(1, 0); // Right
+                } else {
+                    movePlayer(-1, 0); // Left
+                }
+            } else {
+                // Vertical swipe
+                if (dy > 0) {
+                    movePlayer(0, 1); // Down
+                } else {
+                    movePlayer(0, -1); // Up
+                }
+            }
+            
+            touchStartX = null;
+            touchStartY = null;
+        });
+        
+        // Add control buttons for mobile
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+        `;
+        
+        const createButton = (text, gridColumn, gridRow, onClick) => {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.style.cssText = `
+                grid-column: ${gridColumn};
+                grid-row: ${gridRow};
+                font-size: 24px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                touch-action: manipulation;
+            `;
+            btn.addEventListener('click', onClick);
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                onClick();
+            });
+            return btn;
+        };
+        
+        controlsDiv.appendChild(createButton('↑', '2', '1', () => movePlayer(0, -1)));
+        controlsDiv.appendChild(createButton('←', '1', '2', () => movePlayer(-1, 0)));
+        controlsDiv.appendChild(createButton('→', '3', '2', () => movePlayer(1, 0)));
+        controlsDiv.appendChild(createButton('↓', '2', '3', () => movePlayer(0, 1)));
+        
+        gameArea.appendChild(controlsDiv);
+        
+        // Instructions
+        const instructions = document.createElement('div');
+        instructions.style.cssText = `
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+            font-size: ${screenWidth <= 480 ? '14px' : '16px'};
+        `;
+        instructions.textContent = 'Vind de uitgang! Gebruik de pijltjestoetsen of swipe om te bewegen.';
+        gameArea.appendChild(instructions);
+        
+        // Initial draw
+        drawMaze();
+        document.getElementById('minigameScore').textContent = `Stappen: ${moveCount}`;
+        
+        this.minigameModal.classList.remove('hidden');
+        
+        // Store cleanup function
+        this.currentCleanup = () => {
+            window.removeEventListener('keydown', handleKeydown);
+            gameActive = false;
+        };
+    }
+    
     shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
