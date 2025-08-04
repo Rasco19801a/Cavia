@@ -48,6 +48,12 @@ export class Game {
         this.dragStartX = 0;
         this.dragStartY = 0;
         
+        // Mouse position for hover effects
+        this.mouseX = 0;
+        this.mouseY = 0;
+        
+        // Expose game instance globally for debugging and integration
+        
         // Setup world
         this.setupWorld();
         
@@ -200,6 +206,18 @@ export class Game {
                 }
             }
             
+            // Check if in swimming pool world and clicked on water bath button
+            if (this.currentWorld === 'zwembad' && this.waterBathButton) {
+                if (worldCoords.x >= this.waterBathButton.x && 
+                    worldCoords.x <= this.waterBathButton.x + this.waterBathButton.width &&
+                    worldCoords.y >= this.waterBathButton.y && 
+                    worldCoords.y <= this.waterBathButton.y + this.waterBathButton.height) {
+                    // Start bath minigame
+                    this.startBathMinigame();
+                    return;
+                }
+            }
+            
             // Check if clicked on a building
             let clickedBuilding = false;
             
@@ -265,12 +283,28 @@ export class Game {
     }
     
     handleMouseMove(e) {
-        if (!this.isDragging) return;
-        
         const rect = this.canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
         const worldCoords = this.camera.screenToWorld(screenX, screenY);
+        
+        // Store mouse position for hover effects
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+        
+        // Check if hovering over water bath button
+        if (this.currentWorld === 'zwembad' && this.waterBathButton && !this.isInside) {
+            if (worldCoords.x >= this.waterBathButton.x && 
+                worldCoords.x <= this.waterBathButton.x + this.waterBathButton.width &&
+                worldCoords.y >= this.waterBathButton.y && 
+                worldCoords.y <= this.waterBathButton.y + this.waterBathButton.height) {
+                this.canvas.style.cursor = 'pointer';
+            } else {
+                this.canvas.style.cursor = 'default';
+            }
+        }
+        
+        if (!this.isDragging) return;
         
         this.homeInventory.handleDragMove(worldCoords.x, worldCoords.y);
     }

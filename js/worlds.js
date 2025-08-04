@@ -502,6 +502,60 @@ function drawZwembad(ctx) {
             ctx.fillStyle = '#00FF00';
             ctx.font = 'bold 14px Nunito, sans-serif';
             ctx.fillText('✨ Klaar om te zwemmen! ✨', pool.x + pool.w/2, pool.y + pool.h + 20);
+            
+            // Add "Start Minigame" button
+            const buttonWidth = 150;
+            const buttonHeight = 40;
+            const buttonX = pool.x + pool.w/2 - buttonWidth/2;
+            const buttonY = pool.y + pool.h + 40;
+            
+            // Check if hovering
+            let isHovering = false;
+            if (window.game && window.game.waterBathButton) {
+                const rect = window.game.canvas.getBoundingClientRect();
+                const mouseX = window.game.mouseX || 0;
+                const mouseY = window.game.mouseY || 0;
+                const worldCoords = window.game.camera.screenToWorld(mouseX - rect.left, mouseY - rect.top);
+                
+                isHovering = worldCoords.x >= buttonX && 
+                            worldCoords.x <= buttonX + buttonWidth &&
+                            worldCoords.y >= buttonY && 
+                            worldCoords.y <= buttonY + buttonHeight;
+            }
+            
+            // Button background with hover effect
+            ctx.fillStyle = isHovering ? '#5179F1' : '#4169E1';
+            ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+            
+            // Button border
+            ctx.strokeStyle = isHovering ? '#3EA0FF' : '#1E90FF';
+            ctx.lineWidth = isHovering ? 3 : 2;
+            ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+            
+            // Button shadow when hovering
+            if (isHovering) {
+                ctx.shadowColor = 'rgba(30, 144, 255, 0.5)';
+                ctx.shadowBlur = 10;
+                ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+                ctx.shadowBlur = 0;
+            }
+            
+            // Button text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Start Minigame', pool.x + pool.w/2, buttonY + buttonHeight/2);
+            
+            // Store button coordinates for click detection
+            if (window.game) {
+                window.game.waterBathButton = {
+                    x: buttonX,
+                    y: buttonY,
+                    width: buttonWidth,
+                    height: buttonHeight
+                };
+            }
         } else if (pool.name === 'Water') {
             // Add lock icon if badbehandeling not purchased
             ctx.fillStyle = '#FF0000';
