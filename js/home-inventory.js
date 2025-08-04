@@ -481,33 +481,7 @@ export class HomeInventory {
                     ctx.lineTo(0, -20);
                     ctx.stroke();
                     
-                    // Check if guinea pig is in this basket (bottom basket when i === 6)
-                    if (item.guineaPigRiding && i === 6) {
-                        // Draw guinea pig in basket
-                        ctx.fillStyle = this.game.player.color || '#8B4513';
-                        ctx.beginPath();
-                        ctx.ellipse(0, 5, 15, 12, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        // Guinea pig head
-                        ctx.beginPath();
-                        ctx.arc(-8, 0, 8, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        // Eyes
-                        ctx.fillStyle = '#000';
-                        ctx.beginPath();
-                        ctx.arc(-10, -2, 2, 0, Math.PI * 2);
-                        ctx.arc(-6, -2, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    
                     ctx.restore();
-                }
-                
-                // Rotate the wheel if guinea pig is riding
-                if (item.guineaPigRiding) {
-                    item.rotation = (item.rotation || 0) + 0.01;
                 }
             } else if (item.id === 'tunnel') {
                 // Draw tunnel/maze house
@@ -561,6 +535,51 @@ export class HomeInventory {
             
             ctx.restore();
         });
+        
+        // Draw buttons for interactive items
+        this.items.filter(item => !item.consumed && (item.id === 'wheel' || item.id === 'tunnel')).forEach(item => {
+            ctx.save();
+            
+            // Calculate button position
+            let buttonY;
+            let buttonWidth = 150;
+            let buttonHeight = 40;
+            let buttonX = item.x;
+            
+            if (item.id === 'wheel') {
+                buttonX = item.x + 100;
+                buttonY = item.y + 260;
+            } else if (item.id === 'tunnel') {
+                buttonX = item.x + 100;
+                buttonY = item.y + 180;
+            }
+            
+            // Draw button background
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
+            
+            // Draw button border
+            ctx.strokeStyle = '#45a049';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
+            
+            // Draw button text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Start Mini Game', buttonX, buttonY + buttonHeight/2);
+            
+            // Store button bounds for click detection
+            item.buttonBounds = {
+                x: buttonX - buttonWidth/2,
+                y: buttonY,
+                width: buttonWidth,
+                height: buttonHeight
+            };
+            
+            ctx.restore();
+        });
     }
     
     handleClick(x, y) {
@@ -571,35 +590,25 @@ export class HomeInventory {
             return false;
         }
         
-        // Check if clicking on ferris wheel
-        const wheel = this.items.find(item => 
-            item.id === 'wheel' && 
-            x >= item.x && x <= item.x + 200 && 
-            y >= item.y && y <= item.y + 240
-        );
+        // Check if clicking on any mini game button
+        const clickedItem = this.items.find(item => {
+            if (!item.buttonBounds) return false;
+            return x >= item.buttonBounds.x && 
+                   x <= item.buttonBounds.x + item.buttonBounds.width &&
+                   y >= item.buttonBounds.y && 
+                   y <= item.buttonBounds.y + item.buttonBounds.height;
+        });
         
-        if (wheel) {
-            // Toggle guinea pig riding
-            wheel.guineaPigRiding = !wheel.guineaPigRiding;
-            if (wheel.guineaPigRiding) {
-                // Show notification
-                if (this.game.ui && this.game.ui.showNotification) {
-                    this.game.ui.showNotification('🎡 Je cavia gaat een ritje maken in het reuzenrad! 🎡');
-                }
+        if (clickedItem) {
+            if (clickedItem.id === 'wheel') {
+                // Start ferris wheel minigame
+                this.startFerrisWheelGame();
+                return true;
+            } else if (clickedItem.id === 'tunnel') {
+                // Start maze minigame
+                this.startMazeGame();
+                return true;
             }
-            return true;
-        }
-        
-        // Check if clicking on tunnel
-        const tunnel = this.items.find(item => 
-            item.id === 'tunnel' && 
-            x >= item.x && x <= item.x + 200 && 
-            y >= item.y && y <= item.y + 150
-        );
-        
-        if (tunnel) {
-            this.startMazeGame();
-            return true;
         }
         
         // Only show mission modal if it's a quick click (not a drag attempt)
@@ -1005,6 +1014,229 @@ export class HomeInventory {
                 this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
             }
         }, 3000); // Give new mission after 3 seconds
+    }
+    
+    startFerrisWheelGame() {
+        // Find the wheel item
+        const wheel = this.items.find(item => item.id === 'wheel');
+        if (!wheel) return;
+        
+        // Create ferris wheel minigame modal
+        const modal = document.createElement('div');
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        `;
+        
+        gameContainer.innerHTML = `
+            <h2 style="color: #333; margin-bottom: 20px;">🎡 Reuzenrad Ritje 🎡</h2>
+            <p style="color: #666; margin-bottom: 20px;">Je cavia maakt een ritje in het reuzenrad!</p>
+            <div id="ferrisWheelContainer" style="margin: 20px 0;">
+                <canvas id="ferrisWheelCanvas" width="400" height="400" style="border: 3px solid #4A5568; border-radius: 10px;"></canvas>
+            </div>
+            <p id="ferrisScore" style="font-size: 20px; color: #333; font-weight: bold;">Rondjes: 0</p>
+            <button id="stopRide" style="
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 30px;
+                font-size: 18px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 10px;
+            ">Stop het ritje</button>
+            <button id="closeFerrisWheel" style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #E53E3E;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            ">✖</button>
+        `;
+        
+        modal.appendChild(gameContainer);
+        document.body.appendChild(modal);
+        
+        // Setup canvas
+        const canvas = document.getElementById('ferrisWheelCanvas');
+        const ctx = canvas.getContext('2d');
+        let rotation = 0;
+        let rounds = 0;
+        let lastRotation = 0;
+        let isRiding = true;
+        
+        // Animation function
+        const animate = () => {
+            if (!isRiding) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw ferris wheel
+            ctx.save();
+            ctx.translate(200, 200);
+            ctx.rotate(rotation);
+            
+            // Main wheel
+            ctx.strokeStyle = '#4A5568';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, 150, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Spokes
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI / 4);
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(angle) * 40, Math.sin(angle) * 40);
+                ctx.lineTo(Math.cos(angle) * 150, Math.sin(angle) * 150);
+                ctx.stroke();
+            }
+            
+            // Draw gondolas
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI / 4);
+                const gondolaX = Math.cos(angle) * 150;
+                const gondolaY = Math.sin(angle) * 150;
+                
+                ctx.save();
+                ctx.translate(gondolaX, gondolaY);
+                ctx.rotate(-rotation); // Keep gondolas upright
+                
+                // Gondola
+                ctx.fillStyle = '#E53E3E';
+                ctx.fillRect(-25, -15, 50, 40);
+                
+                // Bottom
+                ctx.fillStyle = '#C53030';
+                ctx.fillRect(-25, 25, 50, 5);
+                
+                // Guinea pig in bottom gondola
+                if (i === 6) {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 10, 18, 15, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Head
+                    ctx.beginPath();
+                    ctx.arc(-10, 5, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Eyes
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(-12, 3, 2, 0, Math.PI * 2);
+                    ctx.arc(-8, 3, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Happy expression
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(-10, 8, 3, 0, Math.PI);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+            
+            ctx.restore();
+            
+            // Draw support
+            ctx.strokeStyle = '#2D3748';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(100, 350);
+            ctx.lineTo(200, 200);
+            ctx.lineTo(300, 350);
+            ctx.stroke();
+            
+            // Base
+            ctx.fillStyle = '#4A5568';
+            ctx.fillRect(80, 350, 240, 20);
+            
+            // Update rotation
+            rotation += 0.02;
+            
+            // Count rounds
+            if (rotation > lastRotation + Math.PI * 2) {
+                rounds++;
+                lastRotation = rotation;
+                document.getElementById('ferrisScore').textContent = `Rondjes: ${rounds}`;
+                
+                // Give rewards every 5 rounds
+                if (rounds % 5 === 0) {
+                    this.game.player.carrots += 10;
+                    if (this.game.ui) {
+                        this.game.ui.updateDisplay();
+                        this.game.ui.showNotification(`🎡 ${rounds} rondjes gedraaid! +10 wortels! 🎡`);
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        };
+        
+        // Start animation
+        animate();
+        
+        // Stop button
+        document.getElementById('stopRide').addEventListener('click', () => {
+            isRiding = !isRiding;
+            if (isRiding) {
+                document.getElementById('stopRide').textContent = 'Stop het ritje';
+                animate();
+            } else {
+                document.getElementById('stopRide').textContent = 'Start het ritje';
+            }
+        });
+        
+        // Close button
+        document.getElementById('closeFerrisWheel').addEventListener('click', () => {
+            isRiding = false;
+            modal.remove();
+            
+            // Final reward
+            if (rounds > 0) {
+                const totalReward = rounds * 2;
+                this.game.player.carrots += totalReward;
+                if (this.game.ui) {
+                    this.game.ui.updateDisplay();
+                    this.game.ui.showNotification(`🎡 Leuk ritje! Je krijgt ${totalReward} wortels voor ${rounds} rondjes! 🎡`);
+                }
+            }
+        });
     }
     
     startWaterBathGame(pig) {
