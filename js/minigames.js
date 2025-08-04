@@ -418,6 +418,276 @@ export class Minigames {
         }
     }
     
+    startBathMinigame() {
+        this.activeMinigame = 'bath';
+        document.getElementById('minigameTitle').textContent = '🛁 Badtijd - Maak de Cavia Schoon!';
+        
+        const gameArea = document.getElementById('minigameArea');
+        gameArea.innerHTML = '';
+        
+        // Create canvas for bath minigame
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 400;
+        canvas.style.cssText = `
+            border: 2px solid #87CEEB;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #E0F6FF 0%, #B0E0E6 100%);
+        `;
+        gameArea.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        let score = 0;
+        let isMouseDown = false;
+        let cleanedSpots = new Set();
+        
+        // Create dirt spots
+        const dirtSpots = [];
+        const numSpots = 8;
+        
+        for (let i = 0; i < numSpots; i++) {
+            dirtSpots.push({
+                x: 150 + Math.random() * 300,
+                y: 100 + Math.random() * 200,
+                radius: 20 + Math.random() * 15,
+                cleaned: false,
+                id: i
+            });
+        }
+        
+        // Bath bubbles for decoration
+        const bubbles = [];
+        for (let i = 0; i < 15; i++) {
+            bubbles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: 5 + Math.random() * 15,
+                speed: 0.5 + Math.random() * 1.5,
+                opacity: 0.3 + Math.random() * 0.4
+            });
+        }
+        
+        // Sponge position
+        let spongeX = 0;
+        let spongeY = 0;
+        
+        // Draw function
+        const draw = () => {
+            // Clear canvas
+            ctx.fillStyle = 'rgba(176, 224, 230, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw bubbles
+            bubbles.forEach(bubble => {
+                ctx.beginPath();
+                ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${bubble.opacity})`;
+                ctx.fill();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${bubble.opacity * 1.5})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            // Draw bathtub edge
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2, canvas.height - 50, 250, 80, 0, 0, Math.PI);
+            ctx.fillStyle = '#F0F0F0';
+            ctx.fill();
+            ctx.strokeStyle = '#D0D0D0';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Draw guinea pig body
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2, canvas.height/2, 150, 100, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#8B4513';
+            ctx.fill();
+            
+            // Draw guinea pig head
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2 - 100, canvas.height/2 - 20, 60, 50, -0.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#A0522D';
+            ctx.fill();
+            
+            // Draw eyes
+            ctx.beginPath();
+            ctx.arc(canvas.width/2 - 120, canvas.height/2 - 30, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(canvas.width/2 - 80, canvas.height/2 - 25, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            
+            // Draw nose
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2 - 140, canvas.height/2 - 10, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF69B4';
+            ctx.fill();
+            
+            // Draw ears
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2 - 110, canvas.height/2 - 60, 15, 20, -0.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#8B4513';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2 - 70, canvas.height/2 - 55, 15, 20, 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#8B4513';
+            ctx.fill();
+            
+            // Draw dirt spots
+            dirtSpots.forEach(spot => {
+                if (!spot.cleaned) {
+                    ctx.beginPath();
+                    ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(101, 67, 33, 0.6)';
+                    ctx.fill();
+                    
+                    // Add some texture
+                    for (let i = 0; i < 5; i++) {
+                        ctx.beginPath();
+                        ctx.arc(
+                            spot.x + (Math.random() - 0.5) * spot.radius,
+                            spot.y + (Math.random() - 0.5) * spot.radius,
+                            spot.radius * 0.2,
+                            0, Math.PI * 2
+                        );
+                        ctx.fillStyle = 'rgba(80, 52, 26, 0.4)';
+                        ctx.fill();
+                    }
+                }
+            });
+            
+            // Draw sponge if mouse is down
+            if (isMouseDown) {
+                // Sponge
+                ctx.beginPath();
+                ctx.rect(spongeX - 30, spongeY - 20, 60, 40);
+                ctx.fillStyle = '#FFD700';
+                ctx.fill();
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Sponge texture
+                for (let i = 0; i < 6; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        ctx.beginPath();
+                        ctx.arc(spongeX - 25 + i * 10, spongeY - 15 + j * 10, 2, 0, Math.PI * 2);
+                        ctx.fillStyle = '#FFA500';
+                        ctx.fill();
+                    }
+                }
+                
+                // Soap bubbles around sponge
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        spongeX + (Math.random() - 0.5) * 50,
+                        spongeY + (Math.random() - 0.5) * 50,
+                        5 + Math.random() * 5,
+                        0, Math.PI * 2
+                    );
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.fill();
+                }
+            }
+            
+            // Update score display
+            document.getElementById('minigameScore').textContent = `Schoongemaakt: ${score}/${numSpots}`;
+        };
+        
+        // Animation loop
+        const animate = () => {
+            if (this.activeMinigame !== 'bath') return;
+            
+            // Move bubbles
+            bubbles.forEach(bubble => {
+                bubble.y -= bubble.speed;
+                if (bubble.y + bubble.radius < 0) {
+                    bubble.y = canvas.height + bubble.radius;
+                    bubble.x = Math.random() * canvas.width;
+                }
+            });
+            
+            draw();
+            requestAnimationFrame(animate);
+        };
+        
+        // Mouse events
+        const getMousePos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        };
+        
+        canvas.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            const pos = getMousePos(e);
+            spongeX = pos.x;
+            spongeY = pos.y;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isMouseDown) {
+                const pos = getMousePos(e);
+                spongeX = pos.x;
+                spongeY = pos.y;
+                
+                // Check if cleaning dirt spots
+                dirtSpots.forEach(spot => {
+                    if (!spot.cleaned) {
+                        const dist = Math.sqrt(
+                            Math.pow(pos.x - spot.x, 2) + 
+                            Math.pow(pos.y - spot.y, 2)
+                        );
+                        
+                        if (dist < spot.radius + 20) {
+                            spot.cleaned = true;
+                            score++;
+                            
+                            // Check if all spots are cleaned
+                            if (score === numSpots) {
+                                setTimeout(() => {
+                                    this.game.ui.showNotification('🎉 Perfect! De cavia is helemaal schoon!');
+                                    this.game.player.addCarrots(10);
+                                    this.closeMinigame();
+                                }, 500);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            isMouseDown = false;
+        });
+        
+        // Show instructions
+        const instructions = document.createElement('div');
+        instructions.style.cssText = `
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+            font-size: 16px;
+        `;
+        instructions.textContent = 'Gebruik de spons om alle vuile plekken schoon te maken!';
+        gameArea.appendChild(instructions);
+        
+        this.minigameModal.classList.remove('hidden');
+        animate();
+    }
+    
     shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
