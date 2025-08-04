@@ -415,32 +415,100 @@ export class HomeInventory {
             ctx.globalAlpha = opacity;
             
             if (item.id === 'wheel') {
-                // Draw giant wheel
+                // Draw giant ferris wheel (reuzenrad)
                 ctx.translate(item.x + 100, item.y + 100);
-                ctx.rotate(item.rotation);
+                ctx.rotate(item.rotation || 0);
                 
-                // Wheel structure
-                ctx.strokeStyle = '#8B4513';
-                ctx.lineWidth = 8;
+                // Main wheel structure
+                ctx.strokeStyle = '#4A5568';
+                ctx.lineWidth = 6;
                 ctx.beginPath();
-                ctx.arc(0, 0, 100, 0, Math.PI * 2);
+                ctx.arc(0, 0, 120, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Inner circle
+                ctx.beginPath();
+                ctx.arc(0, 0, 30, 0, Math.PI * 2);
                 ctx.stroke();
                 
                 // Spokes
+                ctx.lineWidth = 4;
                 for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI / 4);
                     ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(Math.cos(i * Math.PI / 4) * 100, Math.sin(i * Math.PI / 4) * 100);
+                    ctx.moveTo(Math.cos(angle) * 30, Math.sin(angle) * 30);
+                    ctx.lineTo(Math.cos(angle) * 120, Math.sin(angle) * 120);
                     ctx.stroke();
                 }
                 
-                // Running surface
-                ctx.fillStyle = '#DEB887';
+                // Support structure
+                ctx.strokeStyle = '#2D3748';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(-100, 120);
+                ctx.lineTo(0, 0);
+                ctx.lineTo(100, 120);
+                ctx.stroke();
+                
+                // Base
+                ctx.fillStyle = '#4A5568';
+                ctx.fillRect(-120, 120, 240, 20);
+                
+                // Draw baskets/gondolas
                 for (let i = 0; i < 8; i++) {
-                    ctx.fillRect(Math.cos(i * Math.PI / 4) * 80 - 10, Math.sin(i * Math.PI / 4) * 80 - 5, 20, 10);
+                    const angle = (i * Math.PI / 4) + (item.rotation || 0);
+                    const basketX = Math.cos(angle) * 120;
+                    const basketY = Math.sin(angle) * 120;
+                    
+                    ctx.save();
+                    ctx.translate(basketX, basketY);
+                    // Keep basket upright
+                    ctx.rotate(-(item.rotation || 0));
+                    
+                    // Basket
+                    ctx.fillStyle = '#E53E3E';
+                    ctx.fillRect(-20, -10, 40, 30);
+                    
+                    // Basket bottom
+                    ctx.fillStyle = '#C53030';
+                    ctx.fillRect(-20, 20, 40, 5);
+                    
+                    // Connection bar
+                    ctx.strokeStyle = '#4A5568';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(0, -20);
+                    ctx.stroke();
+                    
+                    // Check if guinea pig is in this basket (bottom basket when i === 6)
+                    if (item.guineaPigRiding && i === 6) {
+                        // Draw guinea pig in basket
+                        ctx.fillStyle = this.game.player.color || '#8B4513';
+                        ctx.beginPath();
+                        ctx.ellipse(0, 5, 15, 12, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Guinea pig head
+                        ctx.beginPath();
+                        ctx.arc(-8, 0, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Eyes
+                        ctx.fillStyle = '#000';
+                        ctx.beginPath();
+                        ctx.arc(-10, -2, 2, 0, Math.PI * 2);
+                        ctx.arc(-6, -2, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.restore();
                 }
                 
-                item.rotation += 0.02; // Rotate the wheel
+                // Rotate the wheel if guinea pig is riding
+                if (item.guineaPigRiding) {
+                    item.rotation = (item.rotation || 0) + 0.01;
+                }
             } else if (item.id === 'tunnel') {
                 // Draw tunnel/maze house
                 ctx.translate(item.x, item.y);
@@ -501,6 +569,25 @@ export class HomeInventory {
         // Don't handle clicks if we're dragging
         if (this.isDragging) {
             return false;
+        }
+        
+        // Check if clicking on ferris wheel
+        const wheel = this.items.find(item => 
+            item.id === 'wheel' && 
+            x >= item.x && x <= item.x + 200 && 
+            y >= item.y && y <= item.y + 240
+        );
+        
+        if (wheel) {
+            // Toggle guinea pig riding
+            wheel.guineaPigRiding = !wheel.guineaPigRiding;
+            if (wheel.guineaPigRiding) {
+                // Show notification
+                if (this.game.ui && this.game.ui.showNotification) {
+                    this.game.ui.showNotification('🎡 Je cavia gaat een ritje maken in het reuzenrad! 🎡');
+                }
+            }
+            return true;
         }
         
         // Check if clicking on tunnel
@@ -1052,8 +1139,253 @@ export class HomeInventory {
     }
     
     startMazeGame() {
-        alert('Doolhof spel! Tap om je cavia door het doolhof te leiden!');
-        // TODO: Implement maze mini-game
+        // Create maze minigame modal
+        const modal = document.createElement('div');
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        `;
+        
+        // Title
+        const title = document.createElement('h2');
+        title.textContent = '🌀 Doolhof Spel - Help je cavia de uitgang vinden! 🌀';
+        title.style.cssText = `
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        `;
+        gameContainer.appendChild(title);
+        
+        // Create maze canvas
+        const mazeCanvas = document.createElement('canvas');
+        mazeCanvas.width = 600;
+        mazeCanvas.height = 600;
+        mazeCanvas.style.cssText = `
+            border: 3px solid #333;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        `;
+        gameContainer.appendChild(mazeCanvas);
+        
+        // Score display
+        const scoreDisplay = document.createElement('div');
+        scoreDisplay.style.cssText = `
+            text-align: center;
+            font-size: 20px;
+            margin-top: 10px;
+            color: #333;
+        `;
+        scoreDisplay.textContent = 'Tijd: 0s';
+        gameContainer.appendChild(scoreDisplay);
+        
+        // Close button
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✖';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E53E3E;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+        `;
+        
+        gameContainer.appendChild(closeBtn);
+        modal.appendChild(gameContainer);
+        document.body.appendChild(modal);
+        
+        // Maze game logic
+        const ctx = mazeCanvas.getContext('2d');
+        const cellSize = 30;
+        const mazeWidth = 20;
+        const mazeHeight = 20;
+        
+        // Simple maze generation
+        const maze = [];
+        for (let y = 0; y < mazeHeight; y++) {
+            maze[y] = [];
+            for (let x = 0; x < mazeWidth; x++) {
+                // Create walls and paths
+                if (x === 0 || y === 0 || x === mazeWidth - 1 || y === mazeHeight - 1) {
+                    maze[y][x] = 1; // Wall
+                } else if (Math.random() < 0.3 && !(x === 1 && y === 1) && !(x === mazeWidth - 2 && y === mazeHeight - 2)) {
+                    maze[y][x] = 1; // Random walls
+                } else {
+                    maze[y][x] = 0; // Path
+                }
+            }
+        }
+        
+        // Ensure start and end are clear
+        maze[1][1] = 0;
+        maze[mazeHeight - 2][mazeWidth - 2] = 0;
+        
+        // Create a clear path from start to end
+        let pathX = 1, pathY = 1;
+        while (pathX < mazeWidth - 2 || pathY < mazeHeight - 2) {
+            maze[pathY][pathX] = 0;
+            if (Math.random() < 0.5 && pathX < mazeWidth - 2) {
+                pathX++;
+            } else if (pathY < mazeHeight - 2) {
+                pathY++;
+            } else {
+                pathX++;
+            }
+            maze[pathY][pathX] = 0;
+        }
+        
+        // Player position
+        let playerX = 1;
+        let playerY = 1;
+        let startTime = Date.now();
+        let gameWon = false;
+        
+        // Draw maze function
+        const drawMaze = () => {
+            ctx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+            
+            // Draw maze
+            for (let y = 0; y < mazeHeight; y++) {
+                for (let x = 0; x < mazeWidth; x++) {
+                    if (maze[y][x] === 1) {
+                        // Wall
+                        ctx.fillStyle = '#2D3748';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    } else {
+                        // Path
+                        ctx.fillStyle = '#F7FAFC';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Draw exit
+            ctx.fillStyle = '#48BB78';
+            ctx.fillRect((mazeWidth - 2) * cellSize, (mazeHeight - 2) * cellSize, cellSize, cellSize);
+            ctx.fillStyle = '#FFF';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏁', (mazeWidth - 2) * cellSize + cellSize/2, (mazeHeight - 2) * cellSize + cellSize/2 + 5);
+            
+            // Draw player (guinea pig)
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.arc(playerX * cellSize + cellSize/2, playerY * cellSize + cellSize/2, cellSize/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Update time
+            if (!gameWon) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                scoreDisplay.textContent = `Tijd: ${elapsed}s`;
+            }
+        };
+        
+        // Handle movement
+        const movePlayer = (dx, dy) => {
+            if (gameWon) return;
+            
+            const newX = playerX + dx;
+            const newY = playerY + dy;
+            
+            // Check bounds and walls
+            if (newX >= 0 && newX < mazeWidth && newY >= 0 && newY < mazeHeight && maze[newY][newX] === 0) {
+                playerX = newX;
+                playerY = newY;
+                
+                // Check if reached exit
+                if (playerX === mazeWidth - 2 && playerY === mazeHeight - 2) {
+                    gameWon = true;
+                    const finalTime = Math.floor((Date.now() - startTime) / 1000);
+                    scoreDisplay.textContent = `🎉 Gewonnen! Tijd: ${finalTime}s 🎉`;
+                    
+                    // Reward
+                    this.game.player.carrots += 20;
+                    if (this.game.ui) {
+                        this.game.ui.updateDisplay();
+                        this.game.ui.showNotification('🎉 Je hebt het doolhof uitgespeeld! +20 wortels! 🎉');
+                    }
+                }
+                
+                drawMaze();
+            }
+        };
+        
+        // Keyboard controls
+        const handleKeyPress = (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer(1, 0);
+                    break;
+            }
+        };
+        
+        // Touch/click controls
+        mazeCanvas.addEventListener('click', (e) => {
+            const rect = mazeCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cellX = Math.floor(x / cellSize);
+            const cellY = Math.floor(y / cellSize);
+            
+            // Move towards clicked cell
+            if (cellX > playerX) movePlayer(1, 0);
+            else if (cellX < playerX) movePlayer(-1, 0);
+            else if (cellY > playerY) movePlayer(0, 1);
+            else if (cellY < playerY) movePlayer(0, -1);
+        });
+        
+        window.addEventListener('keydown', handleKeyPress);
+        
+        // Close button functionality
+        closeBtn.addEventListener('click', () => {
+            window.removeEventListener('keydown', handleKeyPress);
+            modal.remove();
+        });
+        
+        // Initial draw
+        drawMaze();
     }
     
     checkPlayerInWheel() {
@@ -1071,12 +1403,6 @@ export class HomeInventory {
     update() {
         // Remove consumed items from the items array
         this.items = this.items.filter(item => !item.consumed);
-        
-        // Update wheel rotation if it exists
-        const wheel = this.items.find(item => item.id === 'wheel');
-        if (wheel && this.checkPlayerInWheel()) {
-            wheel.rotation += 0.05;
-        }
     }
 
     saveProgress() {
