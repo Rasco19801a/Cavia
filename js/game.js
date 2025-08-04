@@ -218,20 +218,41 @@ export class Game {
                 }
             }
             
-            // Check if in desert world and clicked on play button (under cave)
-            if (this.currentWorld === 'woestijn' && this.shop.hasPurchased('tunnel')) {
-                const playButtonX = 1725; // Cave is at x=1700, centered under it
-                const playButtonY = 620;  // Below the cave
-                const playButtonWidth = 100;
-                const playButtonHeight = 40;
+            // Check if in desert world and clicked on cave area
+            if (this.currentWorld === 'woestijn') {
+                const caveX = 1700;
+                const caveY = 500;
+                const caveWidth = 150;
+                const caveHeight = 120;
                 
-                if (worldCoords.x >= playButtonX && 
-                    worldCoords.x <= playButtonX + playButtonWidth &&
-                    worldCoords.y >= playButtonY && 
-                    worldCoords.y <= playButtonY + playButtonHeight) {
-                    // Start maze minigame
-                    this.minigames.startMazeMinigame();
-                    return;
+                // Check if clicked on cave
+                if (worldCoords.x >= caveX && 
+                    worldCoords.x <= caveX + caveWidth &&
+                    worldCoords.y >= caveY && 
+                    worldCoords.y <= caveY + caveHeight) {
+                    
+                    if (!this.shop.hasPurchased('tunnel')) {
+                        // Show notification that tunnel is needed
+                        this.ui.showNotification('Je hebt een speeltunnel nodig om het doolhof te spelen! Koop het in de Cavia Shop.');
+                        return;
+                    }
+                }
+                
+                // Check if clicked on play button (under cave)
+                if (this.shop.hasPurchased('tunnel')) {
+                    const playButtonX = 1725; // Cave is at x=1700, centered under it
+                    const playButtonY = 620;  // Below the cave
+                    const playButtonWidth = 100;
+                    const playButtonHeight = 40;
+                    
+                    if (worldCoords.x >= playButtonX && 
+                        worldCoords.x <= playButtonX + playButtonWidth &&
+                        worldCoords.y >= playButtonY && 
+                        worldCoords.y <= playButtonY + playButtonHeight) {
+                        // Start maze minigame
+                        this.minigames.startMazeMinigame();
+                        return;
+                    }
                 }
             }
             

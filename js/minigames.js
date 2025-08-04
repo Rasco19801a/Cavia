@@ -97,7 +97,7 @@ export class Minigames {
                     font-size: ${screenWidth <= 480 ? '18px' : '24px'};
                     font-weight: bold;
                     cursor: pointer;
-                    border-radius: 10px;
+                    border-radius: 50%;
                     transition: all 0.3s ease;
                     user-select: none;
                     -webkit-user-select: none;
@@ -1123,7 +1123,7 @@ export class Minigames {
                 background-color: #4CAF50;
                 color: white;
                 border: none;
-                border-radius: 10px;
+                border-radius: 50%;
                 cursor: pointer;
                 touch-action: manipulation;
             `;
