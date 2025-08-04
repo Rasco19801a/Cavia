@@ -25,8 +25,8 @@ export class Shop {
                 { id: 'hay_premium', name: 'Premium Hooi', price: 35, emoji: '🌾', description: 'Extra zacht premium hooi' }
             ],
             'Speeltjes & Meer': [
-                { id: 'tunnel', name: 'Speeltunnel', price: 30, emoji: '🎪', description: 'Een tunnel om doorheen te rennen' },
-                { id: 'wheel', name: 'Loopwiel', price: 40, emoji: '🎡', description: 'Een wiel om in te rennen' },
+                { id: 'tunnel', name: 'Speeltunnel', price: 30, emoji: '🎪', description: 'Een doolhof tunnel - tap erop voor een minigame!' },
+                { id: 'wheel', name: 'Loopwiel', price: 40, emoji: '🎡', description: 'Een reuzenrad - tap erop om een ritje te maken!' },
                 { id: 'house', name: 'Speelhuisje', price: 50, emoji: '🏠', description: 'Een gezellig huisje' },
                 { id: 'slide', name: 'Glijbaan', price: 35, emoji: '🛝', description: 'Een kleine glijbaan' }
             ],

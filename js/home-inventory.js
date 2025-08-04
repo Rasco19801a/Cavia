@@ -415,32 +415,74 @@ export class HomeInventory {
             ctx.globalAlpha = opacity;
             
             if (item.id === 'wheel') {
-                // Draw giant wheel
+                // Draw giant ferris wheel (reuzenrad)
                 ctx.translate(item.x + 100, item.y + 100);
-                ctx.rotate(item.rotation);
+                ctx.rotate(item.rotation || 0);
                 
-                // Wheel structure
-                ctx.strokeStyle = '#8B4513';
-                ctx.lineWidth = 8;
+                // Main wheel structure
+                ctx.strokeStyle = '#4A5568';
+                ctx.lineWidth = 6;
                 ctx.beginPath();
-                ctx.arc(0, 0, 100, 0, Math.PI * 2);
+                ctx.arc(0, 0, 120, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Inner circle
+                ctx.beginPath();
+                ctx.arc(0, 0, 30, 0, Math.PI * 2);
                 ctx.stroke();
                 
                 // Spokes
+                ctx.lineWidth = 4;
                 for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI / 4);
                     ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(Math.cos(i * Math.PI / 4) * 100, Math.sin(i * Math.PI / 4) * 100);
+                    ctx.moveTo(Math.cos(angle) * 30, Math.sin(angle) * 30);
+                    ctx.lineTo(Math.cos(angle) * 120, Math.sin(angle) * 120);
                     ctx.stroke();
                 }
                 
-                // Running surface
-                ctx.fillStyle = '#DEB887';
-                for (let i = 0; i < 8; i++) {
-                    ctx.fillRect(Math.cos(i * Math.PI / 4) * 80 - 10, Math.sin(i * Math.PI / 4) * 80 - 5, 20, 10);
-                }
+                // Support structure
+                ctx.strokeStyle = '#2D3748';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(-100, 120);
+                ctx.lineTo(0, 0);
+                ctx.lineTo(100, 120);
+                ctx.stroke();
                 
-                item.rotation += 0.02; // Rotate the wheel
+                // Base
+                ctx.fillStyle = '#4A5568';
+                ctx.fillRect(-120, 120, 240, 20);
+                
+                // Draw baskets/gondolas
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI / 4) + (item.rotation || 0);
+                    const basketX = Math.cos(angle) * 120;
+                    const basketY = Math.sin(angle) * 120;
+                    
+                    ctx.save();
+                    ctx.translate(basketX, basketY);
+                    // Keep basket upright
+                    ctx.rotate(-(item.rotation || 0));
+                    
+                    // Basket
+                    ctx.fillStyle = '#E53E3E';
+                    ctx.fillRect(-20, -10, 40, 30);
+                    
+                    // Basket bottom
+                    ctx.fillStyle = '#C53030';
+                    ctx.fillRect(-20, 20, 40, 5);
+                    
+                    // Connection bar
+                    ctx.strokeStyle = '#4A5568';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(0, -20);
+                    ctx.stroke();
+                    
+                    ctx.restore();
+                }
             } else if (item.id === 'tunnel') {
                 // Draw tunnel/maze house
                 ctx.translate(item.x, item.y);
@@ -493,6 +535,51 @@ export class HomeInventory {
             
             ctx.restore();
         });
+        
+        // Draw buttons for interactive items
+        this.items.filter(item => !item.consumed && (item.id === 'wheel' || item.id === 'tunnel')).forEach(item => {
+            ctx.save();
+            
+            // Calculate button position
+            let buttonY;
+            let buttonWidth = 150;
+            let buttonHeight = 40;
+            let buttonX = item.x;
+            
+            if (item.id === 'wheel') {
+                buttonX = item.x + 100;
+                buttonY = item.y + 260;
+            } else if (item.id === 'tunnel') {
+                buttonX = item.x + 100;
+                buttonY = item.y + 180;
+            }
+            
+            // Draw button background
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
+            
+            // Draw button border
+            ctx.strokeStyle = '#45a049';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
+            
+            // Draw button text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Start Mini Game', buttonX, buttonY + buttonHeight/2);
+            
+            // Store button bounds for click detection
+            item.buttonBounds = {
+                x: buttonX - buttonWidth/2,
+                y: buttonY,
+                width: buttonWidth,
+                height: buttonHeight
+            };
+            
+            ctx.restore();
+        });
     }
     
     handleClick(x, y) {
@@ -503,16 +590,25 @@ export class HomeInventory {
             return false;
         }
         
-        // Check if clicking on tunnel
-        const tunnel = this.items.find(item => 
-            item.id === 'tunnel' && 
-            x >= item.x && x <= item.x + 200 && 
-            y >= item.y && y <= item.y + 150
-        );
+        // Check if clicking on any mini game button
+        const clickedItem = this.items.find(item => {
+            if (!item.buttonBounds) return false;
+            return x >= item.buttonBounds.x && 
+                   x <= item.buttonBounds.x + item.buttonBounds.width &&
+                   y >= item.buttonBounds.y && 
+                   y <= item.buttonBounds.y + item.buttonBounds.height;
+        });
         
-        if (tunnel) {
-            this.startMazeGame();
-            return true;
+        if (clickedItem) {
+            if (clickedItem.id === 'wheel') {
+                // Start ferris wheel minigame
+                this.startFerrisWheelGame();
+                return true;
+            } else if (clickedItem.id === 'tunnel') {
+                // Start maze minigame
+                this.startMazeGame();
+                return true;
+            }
         }
         
         // Only show mission modal if it's a quick click (not a drag attempt)
@@ -920,25 +1016,282 @@ export class HomeInventory {
         }, 3000); // Give new mission after 3 seconds
     }
     
+    startFerrisWheelGame() {
+        // Find the wheel item
+        const wheel = this.items.find(item => item.id === 'wheel');
+        if (!wheel) return;
+        
+        // Create ferris wheel minigame modal
+        const modal = document.createElement('div');
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        `;
+        
+        gameContainer.innerHTML = `
+            <h2 style="color: #333; margin-bottom: 20px;">🎡 Reuzenrad Ritje 🎡</h2>
+            <p style="color: #666; margin-bottom: 20px;">Je cavia maakt een ritje in het reuzenrad!</p>
+            <div id="ferrisWheelContainer" style="margin: 20px 0;">
+                <canvas id="ferrisWheelCanvas" width="400" height="400" style="border: 3px solid #4A5568; border-radius: 10px;"></canvas>
+            </div>
+            <p id="ferrisScore" style="font-size: 20px; color: #333; font-weight: bold;">Rondjes: 0</p>
+            <button id="stopRide" style="
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 30px;
+                font-size: 18px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 10px;
+            ">Stop het ritje</button>
+            <button id="closeFerrisWheel" style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #E53E3E;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            ">✖</button>
+        `;
+        
+        modal.appendChild(gameContainer);
+        document.body.appendChild(modal);
+        
+        // Setup canvas
+        const canvas = document.getElementById('ferrisWheelCanvas');
+        const ctx = canvas.getContext('2d');
+        let rotation = 0;
+        let rounds = 0;
+        let lastRotation = 0;
+        let isRiding = true;
+        
+        // Animation function
+        const animate = () => {
+            if (!isRiding) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw ferris wheel
+            ctx.save();
+            ctx.translate(200, 200);
+            ctx.rotate(rotation);
+            
+            // Main wheel
+            ctx.strokeStyle = '#4A5568';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, 150, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Spokes
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI / 4);
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(angle) * 40, Math.sin(angle) * 40);
+                ctx.lineTo(Math.cos(angle) * 150, Math.sin(angle) * 150);
+                ctx.stroke();
+            }
+            
+            // Draw gondolas
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI / 4);
+                const gondolaX = Math.cos(angle) * 150;
+                const gondolaY = Math.sin(angle) * 150;
+                
+                ctx.save();
+                ctx.translate(gondolaX, gondolaY);
+                ctx.rotate(-rotation); // Keep gondolas upright
+                
+                // Gondola
+                ctx.fillStyle = '#E53E3E';
+                ctx.fillRect(-25, -15, 50, 40);
+                
+                // Bottom
+                ctx.fillStyle = '#C53030';
+                ctx.fillRect(-25, 25, 50, 5);
+                
+                // Guinea pig in bottom gondola
+                if (i === 6) {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 10, 18, 15, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Head
+                    ctx.beginPath();
+                    ctx.arc(-10, 5, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Eyes
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(-12, 3, 2, 0, Math.PI * 2);
+                    ctx.arc(-8, 3, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Happy expression
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(-10, 8, 3, 0, Math.PI);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+            
+            ctx.restore();
+            
+            // Draw support
+            ctx.strokeStyle = '#2D3748';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(100, 350);
+            ctx.lineTo(200, 200);
+            ctx.lineTo(300, 350);
+            ctx.stroke();
+            
+            // Base
+            ctx.fillStyle = '#4A5568';
+            ctx.fillRect(80, 350, 240, 20);
+            
+            // Update rotation
+            rotation += 0.02;
+            
+            // Count rounds
+            if (rotation > lastRotation + Math.PI * 2) {
+                rounds++;
+                lastRotation = rotation;
+                document.getElementById('ferrisScore').textContent = `Rondjes: ${rounds}`;
+                
+                // Give rewards every 5 rounds
+                if (rounds % 5 === 0) {
+                    this.game.player.carrots += 10;
+                    if (this.game.ui) {
+                        this.game.ui.updateDisplay();
+                        this.game.ui.showNotification(`🎡 ${rounds} rondjes gedraaid! +10 wortels! 🎡`);
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        };
+        
+        // Start animation
+        animate();
+        
+        // Stop button
+        document.getElementById('stopRide').addEventListener('click', () => {
+            isRiding = !isRiding;
+            if (isRiding) {
+                document.getElementById('stopRide').textContent = 'Stop het ritje';
+                animate();
+            } else {
+                document.getElementById('stopRide').textContent = 'Start het ritje';
+            }
+        });
+        
+        // Close button
+        document.getElementById('closeFerrisWheel').addEventListener('click', () => {
+            isRiding = false;
+            modal.remove();
+            
+            // Final reward
+            if (rounds > 0) {
+                const totalReward = rounds * 2;
+                this.game.player.carrots += totalReward;
+                if (this.game.ui) {
+                    this.game.ui.updateDisplay();
+                    this.game.ui.showNotification(`🎡 Leuk ritje! Je krijgt ${totalReward} wortels voor ${rounds} rondjes! 🎡`);
+                }
+            }
+        });
+    }
+    
     startWaterBathGame(pig) {
         console.log('Starting water bath game with:', pig.name);
         
         // Create a simple water bath minigame
         const modal = document.createElement('div');
-        modal.className = 'mission-modal';
-        modal.innerHTML = `
-            <div class="mission-content">
-                <h2>🛁 Waterbad Minigame - ${pig.name}</h2>
-                <p>Help ${pig.name} een lekker badje nemen!</p>
-                <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
-                    <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px;"></canvas>
-                </div>
-                <p id="bathGameInstructions">Klik op de bubbels om ze te laten knappen! 🫧</p>
-                <p id="bathGameScore">Score: 0</p>
-                <button id="closeBathGame" class="close-button">Sluiten</button>
-            </div>
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         `;
         
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+        `;
+        
+        gameContainer.innerHTML = `
+            <h2 style="text-align: center; color: #333; margin-bottom: 10px;">🛁 Waterbad Minigame - ${pig.name} 🛁</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Help ${pig.name} een lekker badje nemen!</p>
+            <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
+                <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px; max-width: 100%;"></canvas>
+            </div>
+            <p id="bathGameInstructions" style="text-align: center; color: #666;">Klik op de bubbels om ze te laten knappen! 🫧</p>
+            <p id="bathGameScore" style="text-align: center; font-size: 20px; color: #333; font-weight: bold;">Score: 0</p>
+            <button id="closeBathGame" style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #E53E3E;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            ">✖</button>
+        `;
+        
+        modal.appendChild(gameContainer);
         document.body.appendChild(modal);
         
         const canvas = document.getElementById('bathGameCanvas');
@@ -1030,7 +1383,7 @@ export class HomeInventory {
         // Close button
         document.getElementById('closeBathGame').addEventListener('click', () => {
             gameActive = false;
-            document.body.removeChild(modal);
+            modal.remove();
             
             // Give reward based on score
             if (score > 0) {
@@ -1052,8 +1405,253 @@ export class HomeInventory {
     }
     
     startMazeGame() {
-        alert('Doolhof spel! Tap om je cavia door het doolhof te leiden!');
-        // TODO: Implement maze mini-game
+        // Create maze minigame modal
+        const modal = document.createElement('div');
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        `;
+        
+        // Title
+        const title = document.createElement('h2');
+        title.textContent = '🌀 Doolhof Spel - Help je cavia de uitgang vinden! 🌀';
+        title.style.cssText = `
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        `;
+        gameContainer.appendChild(title);
+        
+        // Create maze canvas
+        const mazeCanvas = document.createElement('canvas');
+        mazeCanvas.width = 600;
+        mazeCanvas.height = 600;
+        mazeCanvas.style.cssText = `
+            border: 3px solid #333;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        `;
+        gameContainer.appendChild(mazeCanvas);
+        
+        // Score display
+        const scoreDisplay = document.createElement('div');
+        scoreDisplay.style.cssText = `
+            text-align: center;
+            font-size: 20px;
+            margin-top: 10px;
+            color: #333;
+        `;
+        scoreDisplay.textContent = 'Tijd: 0s';
+        gameContainer.appendChild(scoreDisplay);
+        
+        // Close button
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✖';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E53E3E;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+        `;
+        
+        gameContainer.appendChild(closeBtn);
+        modal.appendChild(gameContainer);
+        document.body.appendChild(modal);
+        
+        // Maze game logic
+        const ctx = mazeCanvas.getContext('2d');
+        const cellSize = 30;
+        const mazeWidth = 20;
+        const mazeHeight = 20;
+        
+        // Simple maze generation
+        const maze = [];
+        for (let y = 0; y < mazeHeight; y++) {
+            maze[y] = [];
+            for (let x = 0; x < mazeWidth; x++) {
+                // Create walls and paths
+                if (x === 0 || y === 0 || x === mazeWidth - 1 || y === mazeHeight - 1) {
+                    maze[y][x] = 1; // Wall
+                } else if (Math.random() < 0.3 && !(x === 1 && y === 1) && !(x === mazeWidth - 2 && y === mazeHeight - 2)) {
+                    maze[y][x] = 1; // Random walls
+                } else {
+                    maze[y][x] = 0; // Path
+                }
+            }
+        }
+        
+        // Ensure start and end are clear
+        maze[1][1] = 0;
+        maze[mazeHeight - 2][mazeWidth - 2] = 0;
+        
+        // Create a clear path from start to end
+        let pathX = 1, pathY = 1;
+        while (pathX < mazeWidth - 2 || pathY < mazeHeight - 2) {
+            maze[pathY][pathX] = 0;
+            if (Math.random() < 0.5 && pathX < mazeWidth - 2) {
+                pathX++;
+            } else if (pathY < mazeHeight - 2) {
+                pathY++;
+            } else {
+                pathX++;
+            }
+            maze[pathY][pathX] = 0;
+        }
+        
+        // Player position
+        let playerX = 1;
+        let playerY = 1;
+        let startTime = Date.now();
+        let gameWon = false;
+        
+        // Draw maze function
+        const drawMaze = () => {
+            ctx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+            
+            // Draw maze
+            for (let y = 0; y < mazeHeight; y++) {
+                for (let x = 0; x < mazeWidth; x++) {
+                    if (maze[y][x] === 1) {
+                        // Wall
+                        ctx.fillStyle = '#2D3748';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    } else {
+                        // Path
+                        ctx.fillStyle = '#F7FAFC';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Draw exit
+            ctx.fillStyle = '#48BB78';
+            ctx.fillRect((mazeWidth - 2) * cellSize, (mazeHeight - 2) * cellSize, cellSize, cellSize);
+            ctx.fillStyle = '#FFF';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏁', (mazeWidth - 2) * cellSize + cellSize/2, (mazeHeight - 2) * cellSize + cellSize/2 + 5);
+            
+            // Draw player (guinea pig)
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.arc(playerX * cellSize + cellSize/2, playerY * cellSize + cellSize/2, cellSize/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Update time
+            if (!gameWon) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                scoreDisplay.textContent = `Tijd: ${elapsed}s`;
+            }
+        };
+        
+        // Handle movement
+        const movePlayer = (dx, dy) => {
+            if (gameWon) return;
+            
+            const newX = playerX + dx;
+            const newY = playerY + dy;
+            
+            // Check bounds and walls
+            if (newX >= 0 && newX < mazeWidth && newY >= 0 && newY < mazeHeight && maze[newY][newX] === 0) {
+                playerX = newX;
+                playerY = newY;
+                
+                // Check if reached exit
+                if (playerX === mazeWidth - 2 && playerY === mazeHeight - 2) {
+                    gameWon = true;
+                    const finalTime = Math.floor((Date.now() - startTime) / 1000);
+                    scoreDisplay.textContent = `🎉 Gewonnen! Tijd: ${finalTime}s 🎉`;
+                    
+                    // Reward
+                    this.game.player.carrots += 20;
+                    if (this.game.ui) {
+                        this.game.ui.updateDisplay();
+                        this.game.ui.showNotification('🎉 Je hebt het doolhof uitgespeeld! +20 wortels! 🎉');
+                    }
+                }
+                
+                drawMaze();
+            }
+        };
+        
+        // Keyboard controls
+        const handleKeyPress = (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer(1, 0);
+                    break;
+            }
+        };
+        
+        // Touch/click controls
+        mazeCanvas.addEventListener('click', (e) => {
+            const rect = mazeCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cellX = Math.floor(x / cellSize);
+            const cellY = Math.floor(y / cellSize);
+            
+            // Move towards clicked cell
+            if (cellX > playerX) movePlayer(1, 0);
+            else if (cellX < playerX) movePlayer(-1, 0);
+            else if (cellY > playerY) movePlayer(0, 1);
+            else if (cellY < playerY) movePlayer(0, -1);
+        });
+        
+        window.addEventListener('keydown', handleKeyPress);
+        
+        // Close button functionality
+        closeBtn.addEventListener('click', () => {
+            window.removeEventListener('keydown', handleKeyPress);
+            modal.remove();
+        });
+        
+        // Initial draw
+        drawMaze();
     }
     
     checkPlayerInWheel() {
@@ -1071,12 +1669,6 @@ export class HomeInventory {
     update() {
         // Remove consumed items from the items array
         this.items = this.items.filter(item => !item.consumed);
-        
-        // Update wheel rotation if it exists
-        const wheel = this.items.find(item => item.id === 'wheel');
-        if (wheel && this.checkPlayerInWheel()) {
-            wheel.rotation += 0.05;
-        }
     }
 
     saveProgress() {
