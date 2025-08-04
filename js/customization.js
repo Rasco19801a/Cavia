@@ -3,21 +3,6 @@ export class Customization {
     constructor() {
         // Check if customization was already done
         const savedCustomization = Customization.loadCustomization();
-        if (savedCustomization && savedCustomization.skipCustomization) {
-            // Skip customization screen and start game directly
-            setTimeout(() => {
-                const customizationScreen = document.getElementById('customizationScreen');
-                if (customizationScreen) {
-                    customizationScreen.style.display = 'none';
-                    customizationScreen.remove();
-                }
-                
-                window.dispatchEvent(new CustomEvent('startGame', {
-                    detail: savedCustomization
-                }));
-            }, 100);
-            return;
-        }
         
         this.bodyColor = savedCustomization.bodyColor || '#D2691E';
         this.bellyColor = savedCustomization.bellyColor || '#F5DEB3';
