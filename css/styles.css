@@ -465,10 +465,10 @@ body {
 /* Challenge Modal Styles */
 .challenge-modal {
     position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
@@ -649,10 +649,10 @@ body {
 /* Mission Modal Styles */
 .mission-modal {
     position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
@@ -742,10 +742,10 @@ body {
 
 .inventory-modal {
     position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
@@ -926,10 +926,10 @@ body {
 /* Minigame Styles */
 .minigame-modal {
     position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
@@ -1086,10 +1086,10 @@ body {
 /* Unified Modal Base Styles */
 .modal-base {
     position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
