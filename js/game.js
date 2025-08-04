@@ -218,6 +218,23 @@ export class Game {
                 }
             }
             
+            // Check if in desert world and clicked on play button (under cave)
+            if (this.currentWorld === 'woestijn' && this.shop.hasPurchased('tunnel')) {
+                const playButtonX = 1725; // Cave is at x=1700, centered under it
+                const playButtonY = 620;  // Below the cave
+                const playButtonWidth = 100;
+                const playButtonHeight = 40;
+                
+                if (worldCoords.x >= playButtonX && 
+                    worldCoords.x <= playButtonX + playButtonWidth &&
+                    worldCoords.y >= playButtonY && 
+                    worldCoords.y <= playButtonY + playButtonHeight) {
+                    // Start maze minigame
+                    this.minigames.startMazeMinigame();
+                    return;
+                }
+            }
+            
             // Check if clicked on a building
             let clickedBuilding = false;
             
