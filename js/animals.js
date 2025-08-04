@@ -53,27 +53,35 @@ export const ANIMALS = {
     ]
 };
 
-// Spelling words for group 7 level
-const SPELLING_WORDS = [
-    'bibliotheek', 'gymnasium', 'chocolade', 'politieagent', 'ziekenhuis',
-    'vakantie', 'restaurant', 'computer', 'telefoon', 'televisie',
-    'olifant', 'krokodil', 'giraffe', 'nijlpaard', 'chimpansee',
-    'muziekinstrument', 'vioolspelen', 'pianolessen', 'gitaarakkoord',
-    'wetenschapper', 'laboratorium', 'experiment', 'microscoop',
-    'geschiedenis', 'aardrijkskunde', 'natuurkunde', 'scheikunde',
-    'brandweerauto', 'ambulance', 'helikopter', 'vliegtuig',
-    'zwembad', 'voetbalveld', 'tennisbaan', 'schaatsbaan',
-    'ontbijt', 'middageten', 'avondmaaltijd', 'tussendoortje',
-    'vriendschap', 'eerlijkheid', 'behulpzaam', 'verantwoordelijk',
-    'belangrijk', 'moeilijk', 'makkelijk', 'mogelijk', 'onmogelijk',
-    'gezellig', 'vrolijk', 'verdrietig', 'boos', 'blij',
-    'pannenkoek', 'appelmoes', 'aardappel', 'spaghetti', 'macaroni',
-    'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag',
-    'januari', 'februari', 'augustus', 'september', 'december',
-    'schrijven', 'tekenen', 'rekenen', 'lezen', 'spelen',
-    'Nederland', 'België', 'Duitsland', 'Frankrijk', 'Engeland',
-    'hoofdstad', 'provincie', 'gemeente', 'dorpje', 'wereldstad'
-];
+// Spelling words organized by difficulty level
+const SPELLING_WORDS = {
+    6: [
+        // Groep 6 - Basic words
+        'computer', 'telefoon', 'televisie', 'vakantie', 'zwembad',
+        'olifant', 'giraffe', 'ontbijt', 'gezellig', 'vrolijk',
+        'verdrietig', 'boos', 'blij', 'pannenkoek', 'appelmoes',
+        'aardappel', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag',
+        'zaterdag', 'januari', 'februari', 'schrijven', 'tekenen',
+        'rekenen', 'lezen', 'spelen', 'Nederland', 'België',
+        'makkelijk', 'belangrijk', 'mogelijk'
+    ],
+    7: [
+        // Groep 7 - Intermediate words
+        'bibliotheek', 'chocolade', 'restaurant', 'krokodil', 'nijlpaard',
+        'brandweerauto', 'ambulance', 'helikopter', 'vliegtuig', 'voetbalveld',
+        'tennisbaan', 'schaatsbaan', 'middageten', 'vriendschap', 'eerlijkheid',
+        'behulpzaam', 'moeilijk', 'onmogelijk', 'spaghetti', 'macaroni',
+        'augustus', 'september', 'december', 'Duitsland', 'Frankrijk',
+        'Engeland', 'hoofdstad', 'provincie', 'gemeente', 'dorpje'
+    ],
+    8: [
+        // Groep 8 - Advanced words
+        'gymnasium', 'politieagent', 'ziekenhuis', 'chimpansee', 'muziekinstrument',
+        'vioolspelen', 'pianolessen', 'gitaarakkoord', 'wetenschapper', 'laboratorium',
+        'experiment', 'microscoop', 'geschiedenis', 'aardrijkskunde', 'natuurkunde',
+        'scheikunde', 'avondmaaltijd', 'tussendoortje', 'verantwoordelijk', 'wereldstad'
+    ]
+};
 
 export class AnimalChallenge {
     constructor(game) {
@@ -139,7 +147,23 @@ export class AnimalChallenge {
     }
 
     startSpellingChallenge() {
-        const word = SPELLING_WORDS[Math.floor(Math.random() * SPELLING_WORDS.length)];
+        // Use selected difficulties from game settings
+        const selectedDifficulties = this.game.selectedDifficulties || [6, 7];
+        
+        // Collect all words from selected difficulty levels
+        let availableWords = [];
+        selectedDifficulties.forEach(level => {
+            if (SPELLING_WORDS[level]) {
+                availableWords = availableWords.concat(SPELLING_WORDS[level]);
+            }
+        });
+        
+        // If no words available, use default
+        if (availableWords.length === 0) {
+            availableWords = SPELLING_WORDS[6];
+        }
+        
+        const word = availableWords[Math.floor(Math.random() * availableWords.length)];
         this.currentChallenge = {
             type: 'spelling',
             word: word,
@@ -160,7 +184,9 @@ export class AnimalChallenge {
     }
 
     startMathChallenge() {
-        const table = Math.floor(Math.random() * 10) + 1;
+        // Use selected tables from game settings
+        const selectedTables = this.game.selectedTables || [1, 2, 3, 4, 5];
+        const table = selectedTables[Math.floor(Math.random() * selectedTables.length)];
         const multiplier = Math.floor(Math.random() * 10) + 1;
         const answer = table * multiplier;
 
