@@ -1012,20 +1012,54 @@ export class HomeInventory {
         
         // Create a simple water bath minigame
         const modal = document.createElement('div');
-        modal.className = 'mission-modal';
-        modal.innerHTML = `
-            <div class="mission-content">
-                <h2>🛁 Waterbad Minigame - ${pig.name}</h2>
-                <p>Help ${pig.name} een lekker badje nemen!</p>
-                <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
-                    <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px;"></canvas>
-                </div>
-                <p id="bathGameInstructions">Klik op de bubbels om ze te laten knappen! 🫧</p>
-                <p id="bathGameScore">Score: 0</p>
-                <button id="closeBathGame" class="close-button">Sluiten</button>
-            </div>
+        modal.className = 'minigame-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         `;
         
+        const gameContainer = document.createElement('div');
+        gameContainer.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+        `;
+        
+        gameContainer.innerHTML = `
+            <h2 style="text-align: center; color: #333; margin-bottom: 10px;">🛁 Waterbad Minigame - ${pig.name} 🛁</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Help ${pig.name} een lekker badje nemen!</p>
+            <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
+                <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px; max-width: 100%;"></canvas>
+            </div>
+            <p id="bathGameInstructions" style="text-align: center; color: #666;">Klik op de bubbels om ze te laten knappen! 🫧</p>
+            <p id="bathGameScore" style="text-align: center; font-size: 20px; color: #333; font-weight: bold;">Score: 0</p>
+            <button id="closeBathGame" style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #E53E3E;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            ">✖</button>
+        `;
+        
+        modal.appendChild(gameContainer);
         document.body.appendChild(modal);
         
         const canvas = document.getElementById('bathGameCanvas');
@@ -1117,7 +1151,7 @@ export class HomeInventory {
         // Close button
         document.getElementById('closeBathGame').addEventListener('click', () => {
             gameActive = false;
-            document.body.removeChild(modal);
+            modal.remove();
             
             // Give reward based on score
             if (score > 0) {
