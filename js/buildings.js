@@ -82,9 +82,9 @@ function drawShopInterior(ctx, name) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200; // Fixed Y position for all items
         
-        // Item background
+        // Item background with rounded corners
         ctx.fillStyle = '#FFE4E1';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Item emoji
         ctx.font = '60px sans-serif';
@@ -325,9 +325,9 @@ function drawGroenteMarkt(ctx) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200;
         
-        // Item background
+        // Item background with rounded corners
         ctx.fillStyle = '#8FBC8F';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Item emoji
         ctx.font = '70px sans-serif';
@@ -394,9 +394,9 @@ function drawHooiWinkel(ctx) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200;
         
-        // Hay bale background
+        // Hay bale background with rounded corners
         ctx.fillStyle = '#F0E68C';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Hay texture
         ctx.strokeStyle = '#DAA520';
@@ -472,9 +472,9 @@ function drawSpeeltjesShop(ctx) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200;
         
-        // Item background
+        // Item background with rounded corners
         ctx.fillStyle = '#FFE4B5';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Item emoji
         ctx.font = '70px sans-serif';
@@ -541,9 +541,9 @@ function drawCaviaSpa(ctx) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200;
         
-        // Item background
+        // Item background with rounded corners
         ctx.fillStyle = '#E6E6FA';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Item emoji
         ctx.font = '70px sans-serif';
@@ -610,9 +610,9 @@ function drawAccessoiresShop(ctx) {
         const x = startX + index * (itemWidth + spacing);
         const y = 200;
         
-        // Item background
+        // Item background with rounded corners
         ctx.fillStyle = '#E6E6FA';
-        ctx.fillRect(x, y, itemWidth, itemHeight);
+        drawRoundedRect(ctx, x, y, itemWidth, itemHeight, 8);
         
         // Item emoji
         ctx.font = '70px sans-serif';
