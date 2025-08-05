@@ -82,7 +82,8 @@ export class Inventory {
         
         // Add click outside to close
         this.inventoryModal.addEventListener('click', (e) => {
-            if (e.target === this.inventoryModal) {
+            // Prevent immediate close right after opening to avoid tap-through from previous modal
+            if (e.target === this.inventoryModal && !this.justOpened) {
                 this.closeInventory();
             }
         });
@@ -158,6 +159,11 @@ export class Inventory {
     
     openInventory() {
         console.log('openInventory called');
+        // Mark as just opened to debounce backdrop click for a short period
+        this.justOpened = true;
+        setTimeout(() => {
+            this.justOpened = false;
+        }, 150);
         
         // Check if modal exists
         if (!this.inventoryModal) {
