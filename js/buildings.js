@@ -67,43 +67,43 @@ function drawShopInterior(ctx, name) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '20px Nunito, sans-serif';
+    ctx.font = '24px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Welkom in de ' + name + '!', 400, 50);
+    ctx.fillText('Welkom in de ' + name + '!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items in a grid - 4 columns for more horizontal layout
+    // Draw items in a single row horizontally - items side by side
+    const itemWidth = 200;
+    const itemHeight = 250;
+    const spacing = 50;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2; // Center the items
+    
     items.forEach((item, index) => {
-        const columns = 4;
-        const itemWidth = 150;
-        const itemHeight = 120;
-        const spacing = 20;
-        const startX = 50;
-        
-        const x = startX + (index % columns) * (itemWidth + spacing);
-        const y = 100 + Math.floor(index / columns) * (itemHeight + spacing);
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200; // Fixed Y position for all items
         
         // Item background
         ctx.fillStyle = '#FFE4E1';
         ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Item emoji
-        ctx.font = '40px sans-serif';
+        ctx.font = '60px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + itemWidth/2, y + 40);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 80);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(item.name, x + itemWidth/2, y + 60);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 120);
         
         // Item price
-        ctx.font = '12px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 75);
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 150);
         
         // Buy button
-        const buttonY = y + 85;
-        const buttonWidth = 60;
-        const buttonHeight = 20;
+        const buttonY = y + 180;
+        const buttonWidth = 100;
+        const buttonHeight = 35;
         const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
@@ -114,8 +114,8 @@ function drawShopInterior(ctx, name) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '12px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 14);
+        ctx.font = '18px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 24);
         
         // Store click area
         game.shop.clickAreas.push({
@@ -310,38 +310,44 @@ function drawGroenteMarkt(ctx) {
     game.shop.clearClickAreas(); // Clear previous click areas
     
     ctx.fillStyle = 'black';
-    ctx.font = '20px Nunito, sans-serif';
+    ctx.font = '24px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Verse Groenten voor je Cavia!', 400, 50);
+    ctx.fillText('Verse Groenten voor je Cavia!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items in a grid - 2 columns to fit in 800px width
+    // Draw items in a single row horizontally
+    const itemWidth = 220;
+    const itemHeight = 280;
+    const spacing = 60;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200;
         
         // Item background
         ctx.fillStyle = '#8FBC8F';
-        ctx.fillRect(x, y, 200, 150);
+        ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Item emoji
-        ctx.font = '50px sans-serif';
+        ctx.font = '70px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + 100, y + 60);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 90);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Nunito, sans-serif';
-        ctx.fillText(item.name, x + 100, y + 90);
+        ctx.font = '22px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 140);
         
         // Item price
-        ctx.font = '16px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
-        const buttonY = y + 120;
-        const buttonWidth = 80;
-        const buttonHeight = 25;
-        const buttonX = x + 60;
+        const buttonY = y + 210;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
             ctx.fillStyle = '#4CAF50';
@@ -351,8 +357,8 @@ function drawGroenteMarkt(ctx) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 27);
         
         // Store click area
         game.shop.clickAreas.push({
@@ -373,47 +379,53 @@ function drawHooiWinkel(ctx) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '25px Nunito, sans-serif';
+    ctx.font = '28px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Het Beste Hooi!', 400, 50);
+    ctx.fillText('Het Beste Hooi!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items - 2 columns to fit in 800px width
+    // Draw items in a single row horizontally
+    const itemWidth = 220;
+    const itemHeight = 280;
+    const spacing = 60;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200;
         
         // Hay bale background
         ctx.fillStyle = '#F0E68C';
-        ctx.fillRect(x, y, 200, 150);
+        ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Hay texture
         ctx.strokeStyle = '#DAA520';
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < 8; j++) {
             ctx.beginPath();
-            ctx.moveTo(x, y + 10 + j * 20);
-            ctx.lineTo(x + 200, y + 10 + j * 20);
+            ctx.moveTo(x, y + 20 + j * 30);
+            ctx.lineTo(x + itemWidth, y + 20 + j * 30);
             ctx.stroke();
         }
         
         // Item emoji
-        ctx.font = '50px sans-serif';
+        ctx.font = '70px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + 100, y + 60);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 90);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Nunito, sans-serif';
-        ctx.fillText(item.name, x + 100, y + 90);
+        ctx.font = '22px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 140);
         
         // Item price
-        ctx.font = '16px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
-        const buttonY = y + 120;
-        const buttonWidth = 80;
-        const buttonHeight = 25;
-        const buttonX = x + 60;
+        const buttonY = y + 210;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
             ctx.fillStyle = '#4CAF50';
@@ -423,8 +435,8 @@ function drawHooiWinkel(ctx) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 27);
         
         // Store click area
         game.shop.clickAreas.push({
@@ -445,38 +457,44 @@ function drawSpeeltjesShop(ctx) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '20px Nunito, sans-serif';
+    ctx.font = '24px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Speeltjes voor Blije Cavia\'s!', 400, 50);
+    ctx.fillText('Speeltjes voor Blije Cavia\'s!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items - 2 columns to fit in 800px width
+    // Draw items in a single row horizontally
+    const itemWidth = 220;
+    const itemHeight = 280;
+    const spacing = 60;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200;
         
         // Item background
         ctx.fillStyle = '#FFE4B5';
-        ctx.fillRect(x, y, 200, 150);
+        ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Item emoji
-        ctx.font = '50px sans-serif';
+        ctx.font = '70px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + 100, y + 60);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 90);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Nunito, sans-serif';
-        ctx.fillText(item.name, x + 100, y + 90);
+        ctx.font = '22px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 140);
         
         // Item price
-        ctx.font = '16px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
-        const buttonY = y + 120;
-        const buttonWidth = 80;
-        const buttonHeight = 25;
-        const buttonX = x + 60;
+        const buttonY = y + 210;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
             ctx.fillStyle = '#4CAF50';
@@ -486,8 +504,8 @@ function drawSpeeltjesShop(ctx) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 27);
         
         // Store click area
         game.shop.clickAreas.push({
@@ -508,38 +526,44 @@ function drawCaviaSpa(ctx) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '50px Nunito, sans-serif';
+    ctx.font = '24px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Spa', 400, 80);
+    ctx.fillText('Wellness voor je Cavia!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items - 2 columns to fit in 800px width
+    // Draw items in a single row horizontally
+    const itemWidth = 220;
+    const itemHeight = 280;
+    const spacing = 60;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200;
         
-        // Spa background
-        ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(x, y, 200, 150);
+        // Item background
+        ctx.fillStyle = '#E6E6FA';
+        ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Item emoji
-        ctx.font = '50px sans-serif';
+        ctx.font = '70px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + 100, y + 60);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 90);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Nunito, sans-serif';
-        ctx.fillText(item.name, x + 100, y + 90);
+        ctx.font = '22px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 140);
         
         // Item price
-        ctx.font = '16px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
-        const buttonY = y + 120;
-        const buttonWidth = 80;
-        const buttonHeight = 25;
-        const buttonX = x + 60;
+        const buttonY = y + 210;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
             ctx.fillStyle = '#4CAF50';
@@ -549,8 +573,8 @@ function drawCaviaSpa(ctx) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 27);
         
         // Store click area
         game.shop.clickAreas.push({
@@ -561,10 +585,6 @@ function drawCaviaSpa(ctx) {
             item: item
         });
     });
-    
-    ctx.fillStyle = 'black';
-    ctx.font = '16px Nunito, sans-serif';
-    ctx.fillText('Ontspan en geniet!', 400, 480);
 }
 
 function drawAccessoiresShop(ctx) {
@@ -575,38 +595,44 @@ function drawAccessoiresShop(ctx) {
     game.shop.clearClickAreas();
     
     ctx.fillStyle = 'black';
-    ctx.font = '20px Nunito, sans-serif';
+    ctx.font = '24px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Pimp je Cavia!', 400, 50);
+    ctx.fillText('Pimp je Cavia!', CONFIG.WORLD_WIDTH / 2, 80);
     
-    // Draw items - 2 columns to fit in 800px width
+    // Draw items in a single row horizontally
+    const itemWidth = 220;
+    const itemHeight = 280;
+    const spacing = 60;
+    const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
+    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    
     items.forEach((item, index) => {
-        const x = 150 + (index % 2) * 250;
-        const y = 120 + Math.floor(index / 2) * 200;
+        const x = startX + index * (itemWidth + spacing);
+        const y = 200;
         
         // Item background
         ctx.fillStyle = '#E6E6FA';
-        ctx.fillRect(x, y, 200, 150);
+        ctx.fillRect(x, y, itemWidth, itemHeight);
         
         // Item emoji
-        ctx.font = '50px sans-serif';
+        ctx.font = '70px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(item.emoji, x + 100, y + 60);
+        ctx.fillText(item.emoji, x + itemWidth/2, y + 90);
         
         // Item name
         ctx.fillStyle = 'black';
-        ctx.font = '18px Nunito, sans-serif';
-        ctx.fillText(item.name, x + 100, y + 90);
+        ctx.font = '22px Nunito, sans-serif';
+        ctx.fillText(item.name, x + itemWidth/2, y + 140);
         
         // Item price
-        ctx.font = '16px Nunito, sans-serif';
-        ctx.fillText(`🥕 ${item.price}`, x + 100, y + 110);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
-        const buttonY = y + 120;
-        const buttonWidth = 80;
-        const buttonHeight = 25;
-        const buttonX = x + 60;
+        const buttonY = y + 210;
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = x + (itemWidth - buttonWidth) / 2;
         
         if (game.player.carrots >= item.price) {
             ctx.fillStyle = '#4CAF50';
@@ -616,8 +642,8 @@ function drawAccessoiresShop(ctx) {
         drawRoundedRect(ctx, buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
         
         ctx.fillStyle = 'white';
-        ctx.font = '14px Nunito, sans-serif';
-        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + 40, buttonY + 17);
+        ctx.font = '20px Nunito, sans-serif';
+        ctx.fillText(game.player.carrots >= item.price ? 'Kopen' : 'Te duur', buttonX + buttonWidth/2, buttonY + 27);
         
         // Store click area
         game.shop.clickAreas.push({
