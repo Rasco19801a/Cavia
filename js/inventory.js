@@ -428,10 +428,9 @@ export class Inventory {
     }
     
     loadInventory() {
-        const saved = localStorage.getItem('guineaPigInventory');
-        if (saved) {
-            this.items = JSON.parse(saved);
-        }
+        // Clear inventory on page refresh
+        this.items = [];
+        localStorage.removeItem('guineaPigInventory');
     }
     
     resetInventory() {
