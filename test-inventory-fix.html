@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Inventory Fix</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-info {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>Test: Rugzak Selectie Fix</h1>
+        <p>Deze pagina test of het selecteren uit de rugzak nu werkt.</p>
+        <p>Instructies:</p>
+        <ol>
+            <li>Klik op "Start Game" om het spel te starten</li>
+            <li>Ga naar de "Thuis" wereld</li>
+            <li>Klik op een cavia om een missie te openen</li>
+            <li>Klik op "Selecteer uit Rugzak" - dit zou nu moeten werken!</li>
+        </ol>
+    </div>
+
+    <div>
+        <button class="test-button" onclick="startGame()">Start Game</button>
+        <button class="test-button" onclick="testInventory()">Test Inventory Direct</button>
+        <button class="test-button" onclick="addTestItems()">Add Test Items</button>
+        <button class="test-button" onclick="showDebugInfo()">Show Debug Info</button>
+    </div>
+
+    <div id="debugOutput" style="margin-top: 20px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; display: none;">
+        <h3>Debug Output:</h3>
+        <pre id="debugContent"></pre>
+    </div>
+
+    <!-- Game screens -->
+    <div id="tablesScreen" class="screen hidden"></div>
+    <div id="difficultyScreen" class="screen hidden"></div>
+    <div id="customizationScreen" class="screen hidden"></div>
+
+    <!-- Game canvas -->
+    <canvas id="gameCanvas" width="1200" height="600"></canvas>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        window.startGame = function() {
+            const canvas = document.getElementById('gameCanvas');
+            const game = new Game(canvas, {
+                skipCustomization: true,
+                selectedTables: [1, 2, 3, 4, 5],
+                selectedDifficulties: [6, 7],
+                bodyColor: '#8B4513',
+                bellyColor: '#D2691E',
+                accessory: null
+            });
+            
+            window.game = game;
+            console.log('Game started!');
+            
+            // Add some test items to inventory
+            setTimeout(() => {
+                addTestItems();
+            }, 1000);
+        };
+        
+        window.testInventory = function() {
+            if (window.game && window.game.inventory) {
+                console.log('Opening inventory...');
+                window.game.inventory.openInventory();
+            } else {
+                alert('Start the game first!');
+            }
+        };
+        
+        window.addTestItems = function() {
+            if (window.game && window.game.inventory) {
+                // Add test items
+                window.game.inventory.addItem({
+                    id: 'carrot',
+                    name: 'Wortel',
+                    emoji: '🥕',
+                    description: 'Een verse wortel'
+                });
+                
+                window.game.inventory.addItem({
+                    id: 'lettuce',
+                    name: 'Sla',
+                    emoji: '🥬',
+                    description: 'Verse sla'
+                });
+                
+                window.game.inventory.addItem({
+                    id: 'bow',
+                    name: 'Strik',
+                    emoji: '🎀',
+                    description: 'Een mooie strik'
+                });
+                
+                console.log('Test items added!');
+            } else {
+                alert('Start the game first!');
+            }
+        };
+        
+        window.showDebugInfo = function() {
+            const debugDiv = document.getElementById('debugOutput');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (window.game) {
+                const info = {
+                    inventory: window.game.inventory ? 'Loaded' : 'Not loaded',
+                    inventoryItems: window.game.inventory ? window.game.inventory.items.length : 0,
+                    currentWorld: window.game.currentWorld,
+                    guineaPigMissions: window.game.guineaPigMissions ? 'Loaded' : 'Not loaded',
+                    currentMissionPig: window.game.currentMissionPig
+                };
+                
+                debugContent.textContent = JSON.stringify(info, null, 2);
+                debugDiv.style.display = 'block';
+            } else {
+                debugContent.textContent = 'Game not started yet';
+                debugDiv.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>
