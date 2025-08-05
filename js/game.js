@@ -169,7 +169,6 @@ export class Game {
         
         // World change event using event system
         eventSystem.on(GameEvents.WORLD_CHANGE, (world) => {
-            console.log('[Game] WORLD_CHANGE event received:', world);
             this.logger.info('World change requested', { world });
             this.changeWorld(world);
         });
@@ -439,19 +438,12 @@ export class Game {
     }
 
     changeWorld(world) {
-        console.log(`[Game] changeWorld() called with: "${world}"`);
         console.log(`changeWorld called with: ${world}`);
         console.log(`Current world before change: ${this.currentWorld}`);
-        
-        // Debug alert for mobile
-        if (world === 'paarden wei') {
-            alert(`changeWorld received: "${world}"\nWORLDS.includes: ${WORLDS.includes(world)}`);
-        }
         
         // Validate world parameter
         if (!WORLDS.includes(world)) {
             console.error(`Invalid world: ${world}. Valid worlds are:`, WORLDS);
-            alert(`ERROR: Invalid world: "${world}"`);
             return;
         }
         
@@ -492,8 +484,7 @@ export class Game {
             'jungle': 'de Jungle',
             'zwembad': 'het Zwembad',
             'dierenstad': 'de Dierenstad',
-            'thuis': 'Thuis',
-            'paarden wei': 'de Paarden Weide'
+            'thuis': 'Thuis'
         };
         return names[world] || world;
     }
