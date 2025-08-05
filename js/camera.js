@@ -8,7 +8,14 @@ export class Camera {
         this.y = 0;
     }
 
-    update(player, isInside, currentBuilding = null) {
+    update(player, isInside, currentBuilding = null, currentWorld = null) {
+        // Keep camera stationary in home world
+        if (currentWorld === 'thuis') {
+            this.x = 0;
+            this.y = 0;
+            return;
+        }
+        
         if (!isInside) {
             // Follow player with camera
             this.x = Math.max(0, Math.min(
