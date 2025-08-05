@@ -69,6 +69,11 @@ export class UI {
                 const world = btn.getAttribute('data-world');
                 console.log(`[UI] World button clicked: "${world}"`);
                 
+                // Show debug alert for mobile
+                if (world === 'paarden wei') {
+                    alert(`Debug: Clicked paarden wei\nWorld value: "${world}"\nLength: ${world.length}`);
+                }
+                
                 // Update active state
                 worldButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');

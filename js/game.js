@@ -443,9 +443,15 @@ export class Game {
         console.log(`changeWorld called with: ${world}`);
         console.log(`Current world before change: ${this.currentWorld}`);
         
+        // Debug alert for mobile
+        if (world === 'paarden wei') {
+            alert(`changeWorld received: "${world}"\nWORLDS.includes: ${WORLDS.includes(world)}`);
+        }
+        
         // Validate world parameter
         if (!WORLDS.includes(world)) {
             console.error(`Invalid world: ${world}. Valid worlds are:`, WORLDS);
+            alert(`ERROR: Invalid world: "${world}"`);
             return;
         }
         
