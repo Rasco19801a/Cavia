@@ -1,96 +1,97 @@
-// Underwater World module - handles underwater mini-game
-import { CONFIG } from './config.js';
+// Underwater World module - handles underwater minigame
+import { CONFIG, UNDERWATER_CONFIG, ANIMATION_CONFIG, GAME_CONFIG } from './config.js';
 
 export class UnderwaterWorld {
     constructor(game) {
         this.game = game;
         this.active = false;
-        this.carrots = [];
-        this.goldfish = [];
         this.collectedCarrots = 0;
-        this.playerY = 300;
-        this.playerVelocityY = 0;
+        this.playerX = CONFIG.WORLD_WIDTH / 2;
+        this.playerY = UNDERWATER_CONFIG.PLAYER_START_Y;
+        this.velocity = { x: 0, y: 0 };
+        this.carrots = [];
+        this.fish = [];
         this.bubbles = [];
-        this.setupWorld();
+        this.setupUnderwaterElements();
     }
     
-    setupWorld() {
+    setupUnderwaterElements() {
         // Create carrots to collect
-        this.carrots = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < UNDERWATER_CONFIG.FISH_COUNT; i++) {
             this.carrots.push({
                 x: 200 + Math.random() * (CONFIG.WORLD_WIDTH - 400),
                 y: 100 + Math.random() * 400,
                 collected: false,
-                size: 30
+                size: UNDERWATER_CONFIG.FISH_SIZE
             });
         }
         
-        // Create goldfish
-        this.goldfish = [];
-        for (let i = 0; i < 5; i++) {
-            this.goldfish.push({
-                x: Math.random() * CONFIG.WORLD_WIDTH,
+        // Create decorative fish
+        this.fish = [
+            {
+                x: 300,
                 y: 100 + Math.random() * 400,
-                speedX: 1 + Math.random() * 2,
-                direction: Math.random() > 0.5 ? 1 : -1,
-                size: 40,
-                tailPhase: Math.random() * Math.PI * 2
-            });
-        }
+                speed: 1,
+                direction: 1,
+                size: UNDERWATER_CONFIG.SHARK_SIZE,
+                color: '#FF6347',
+                type: 'normal',
+                tailPhase: 0
+            }
+        ];
         
         // Create bubbles
-        this.bubbles = [];
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < UNDERWATER_CONFIG.BUBBLE_COUNT; i++) {
             this.bubbles.push({
                 x: Math.random() * CONFIG.WORLD_WIDTH,
                 y: Math.random() * CONFIG.WORLD_HEIGHT,
-                size: 5 + Math.random() * 10,
+                size: UNDERWATER_CONFIG.BUBBLE_MIN_SIZE + Math.random() * (UNDERWATER_CONFIG.BUBBLE_MAX_SIZE - UNDERWATER_CONFIG.BUBBLE_MIN_SIZE),
                 speed: 0.5 + Math.random() * 1.5
             });
         }
     }
     
-    enter() {
+    activate() {
         this.active = true;
         this.collectedCarrots = 0;
-        this.playerY = 300;
-        this.playerVelocityY = 0;
-        this.setupWorld();
+        this.playerX = CONFIG.WORLD_WIDTH / 2;
+        this.playerY = UNDERWATER_CONFIG.PLAYER_START_Y;
+        this.velocity = { x: 0, y: 0 };
+        this.setupUnderwaterElements();
     }
     
-    exit() {
+    deactivate() {
         this.active = false;
-        // Give carrots to player
-        this.game.player.carrots += this.collectedCarrots * 5;
-        this.game.ui.updateDisplay();
-        alert(`Je hebt ${this.collectedCarrots} wortels verzameld! (+${this.collectedCarrots * 5} wortels)`);
     }
     
     update() {
         if (!this.active) return;
         
-        // Update player physics
-        this.playerVelocityY += 0.3; // Gravity
-        this.playerY += this.playerVelocityY;
+        // Apply simple physics
+        this.velocity.y += 0.3; // Gravity
+        this.playerX += this.velocity.x;
+        this.playerY += this.velocity.y;
         
-        // Constrain player
-        if (this.playerY < 50) {
-            this.playerY = 50;
-            this.playerVelocityY = 0;
+        // Friction
+        this.velocity.x *= 0.95;
+        this.velocity.y *= 0.95;
+        
+        // Keep player in bounds
+        if (this.playerY < UNDERWATER_CONFIG.MIN_Y) {
+            this.playerY = UNDERWATER_CONFIG.MIN_Y;
+            this.velocity.y = 0;
         }
-        if (this.playerY > CONFIG.WORLD_HEIGHT - 100) {
-            this.playerY = CONFIG.WORLD_HEIGHT - 100;
-            this.playerVelocityY = 0;
+        if (this.playerY > CONFIG.WORLD_HEIGHT - UNDERWATER_CONFIG.MAX_Y_OFFSET) {
+            this.playerY = CONFIG.WORLD_HEIGHT - UNDERWATER_CONFIG.MAX_Y_OFFSET;
+            this.velocity.y = 0;
         }
         
-        // Update goldfish
-        this.goldfish.forEach(fish => {
-            fish.x += fish.speedX * fish.direction;
+        // Update fish
+        this.fish.forEach(fish => {
+            fish.x += fish.speed * fish.direction;
             fish.tailPhase += 0.1;
             
-            // Bounce off edges
-            if (fish.x < 0 || fish.x > CONFIG.WORLD_WIDTH) {
+            if (fish.x < -50 || fish.x > CONFIG.WORLD_WIDTH + 50) {
                 fish.direction *= -1;
             }
         });
@@ -108,20 +109,23 @@ export class UnderwaterWorld {
         this.carrots.forEach(carrot => {
             if (!carrot.collected) {
                 const distance = Math.sqrt(
-                    Math.pow(this.game.player.x - carrot.x, 2) + 
+                    Math.pow(this.playerX - carrot.x, 2) + 
                     Math.pow(this.playerY - carrot.y, 2)
                 );
                 
-                if (distance < 40) {
+                if (distance < UNDERWATER_CONFIG.COLLECT_DISTANCE) {
                     carrot.collected = true;
                     this.collectedCarrots++;
+                    this.game.ui.showNotification('Wortel verzameld!');
                 }
             }
         });
         
-        // Check if all carrots collected
-        if (this.collectedCarrots >= 10) {
-            this.exit();
+        // Check win condition
+        if (this.collectedCarrots >= UNDERWATER_CONFIG.CARROTS_TO_COLLECT) {
+            this.game.ui.showNotification('Gefeliciteerd! Je hebt alle wortels verzameld!');
+            this.game.player.carrots += GAME_CONFIG.CARROT_REWARD;
+            this.deactivate();
         }
     }
     
@@ -166,7 +170,7 @@ export class UnderwaterWorld {
         });
         
         // Draw goldfish
-        this.goldfish.forEach(fish => {
+        this.fish.forEach(fish => {
             ctx.save();
             ctx.translate(fish.x, fish.y);
             
@@ -221,7 +225,7 @@ export class UnderwaterWorld {
         
         // Draw player as swimming guinea pig
         ctx.save();
-        ctx.translate(this.game.player.x, this.playerY);
+        ctx.translate(this.playerX, this.playerY);
         
         // Swimming animation
         const swimPhase = Math.sin(Date.now() * 0.005) * 5;
@@ -294,12 +298,12 @@ export class UnderwaterWorld {
         
         // Check exit button
         if (x >= CONFIG.WORLD_WIDTH - 60 && x <= CONFIG.WORLD_WIDTH - 20 && y >= 20 && y <= 60) {
-            this.exit();
+            this.deactivate();
             return true;
         }
         
         // Swim up
-        this.playerVelocityY = -8;
+        this.velocity.y = -8;
         return true;
     }
 }

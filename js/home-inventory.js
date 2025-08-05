@@ -1,629 +1,108 @@
-// Home Inventory module - handles items in the home world
-import { CONFIG } from './config.js';
+// Home Inventory module - coordinates home world functionality
+import { CONFIG, UI_CONFIG, GAME_CONFIG } from './config.js';
+import { GuineaPigMissions } from './guinea-pig-missions.js';
+import { HomeItemManager } from './home-item-manager.js';
 
 export class HomeInventory {
     constructor(game) {
         this.game = game;
-        this.items = [];
-        this.draggedItem = null;
-        this.dragOffset = { x: 0, y: 0 };
-        this.otherGuineaPigs = [];
-        this.currentMissionPig = null;
-        this.missionModal = null;
-        this.isDragging = false; // Add flag to track dragging state
-        this.dragStartTime = 0; // Track when drag started
-        this.setupOtherGuineaPigs();
-        this.setupMissionModal();
+        this.guineaPigMissions = new GuineaPigMissions(game);
+        this.itemManager = new HomeItemManager(game);
+        
+        // Expose missions for game to access
+        this.game.guineaPigMissions = this.guineaPigMissions;
+        
+        // Hamster wheel properties
+        this.hamsterWheel = {
+            x: 1500,
+            y: 500,
+            radius: 80,
+            rotation: 0,
+            spinning: false,
+            spinSpeed: 0,
+            lastSpinTime: 0
+        };
+        
         this.loadProgress();
-        
-        // Reorganize any existing items to prevent overlapping
-        if (this.items.length > 0) {
-            this.reorganizeItems();
-        }
-    }
-    
-    setupOtherGuineaPigs() {
-        // Create 3 other guinea pigs in the home - spaced out evenly
-        this.otherGuineaPigs = [
-            {
-                id: 1,
-                name: 'Ginger',
-                x: 600,
-                y: 480,
-                color: {
-                    body: '#FFFFFF',  // White body
-                    belly: '#F5DEB3'  // Beige belly
-                },
-                mission: 'Ik heb zo\'n honger! Breng me 3 wortels!',
-                missionProgress: 0,
-                missionTarget: 3,
-                missionItem: 'carrot',
-                accessory: null
-            },
-            {
-                id: 2,
-                name: 'Chinto',
-                x: 900,
-                y: 480,
-                color: {
-                    body: '#FFFFFF',  // White body
-                    belly: '#000000'  // Black belly
-                },
-                mission: 'Ik wil graag een mooie strik!',
-                missionProgress: 0,
-                missionTarget: 1,
-                missionItem: 'bow',
-                accessory: null
-            },
-            {
-                id: 3,
-                name: 'Luxy',
-                x: 1200,
-                y: 480,
-                color: {
-                    body: '#FFFFFF',  // White body
-                    belly: '#8B4513'  // Brown belly
-                },
-                mission: 'Help me 2 stukken sla te vinden!',
-                missionProgress: 0,
-                missionTarget: 2,
-                missionItem: 'lettuce',
-                accessory: null
-            }
-        ];
-    }
-    
-    setupMissionModal() {
-        // Create mission modal
-        this.missionModal = document.createElement('div');
-        this.missionModal.id = 'missionModal';
-        this.missionModal.className = 'mission-modal hidden';
-        this.missionModal.innerHTML = `
-            <div class="mission-content">
-                <h2 id="missionPigName">Missie</h2>
-                <div class="mission-pig-icon">🐹</div>
-                <p id="missionText"></p>
-                <div class="mission-progress">
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-                    <p id="progressText"></p>
-                </div>
-                <button class="inventory-select-btn" id="selectFromInventory">Selecteer uit Rugzak 🎒</button>
-                <button class="modal-close-btn" id="closeMission">✖</button>
-            </div>
-        `;
-        document.body.appendChild(this.missionModal);
-        
-        // Event listener for close button
-        document.getElementById('closeMission').addEventListener('click', () => {
-            this.missionModal.classList.add('hidden');
-            this.currentMissionPig = null;
-        });
-        
-        // Event listener for inventory select button
-        document.getElementById('selectFromInventory').addEventListener('click', () => {
-            // Store current mission pig in game object for inventory to access
-            this.game.currentMissionPig = this.currentMissionPig;
-            // Open inventory
-            this.game.inventory.openInventory();
-            // Close mission modal
-            this.missionModal.classList.add('hidden');
-        });
-        
-        // Close on escape key
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !this.missionModal.classList.contains('hidden')) {
-                this.missionModal.classList.add('hidden');
-                this.currentMissionPig = null;
-            }
-        });
     }
     
     addItem(itemData) {
-        // Calculate grid position to prevent overlapping
-        const gridColumns = 8; // Number of columns in the grid
-        const gridSpacing = 150; // Space between items
-        const startX = 200; // Starting X position
-        const startY = 480; // Starting Y position - now on the ground
-        
-        // Find the next available position
-        const existingPositions = this.items.map(item => ({ x: item.x, y: item.y }));
-        
-        // Also consider guinea pig positions to avoid overlapping with them
-        const guineaPigPositions = this.otherGuineaPigs.map(pig => ({ x: pig.x, y: pig.y }));
-        const allOccupiedPositions = [...existingPositions, ...guineaPigPositions];
-        
-        let gridIndex = 0;
-        let x, y;
-        
-        // Find an empty grid position
-        while (true) {
-            const col = gridIndex % gridColumns;
-            const row = Math.floor(gridIndex / gridColumns);
-            x = startX + (col * gridSpacing);
-            y = startY + (row * gridSpacing);
-            
-            // Check if this position is already occupied
-            const isOccupied = allOccupiedPositions.some(pos => 
-                Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 100
-            );
-            
-            if (!isOccupied || gridIndex > 50) { // Safety limit
-                break;
-            }
-            
-            gridIndex++;
-        }
-        
-        const item = {
-            ...itemData,
-            x: x,
-            y: y,
-            consumed: false
-        };
-        
-        // Special handling for interactive items - place them at specific positions
-        if (item.id === 'wheel') {
-            item.x = CONFIG.WORLD_WIDTH / 2 - 100;
-            item.y = 250; // Move up to avoid overlap
-        } else if (item.id === 'tunnel') {
-            item.x = 1100;
-            item.y = 350;
-        }
-        
-        this.items.push(item);
-        console.log('Item added to home inventory:', item);
-        this.logInventory();
-    }
-    
-    logInventory() {
-        console.log('Current home inventory items:');
-        this.items.forEach((item, index) => {
-            console.log(`${index}: ${item.id} - ${item.name} at (${Math.round(item.x)}, ${Math.round(item.y)}) - consumed: ${item.consumed}`);
-        });
+        return this.itemManager.addItem(itemData);
     }
     
     reorganizeItems() {
-        // Reorganize all items to prevent overlapping
-        const gridColumns = 8; // Number of columns in the grid
-        const gridSpacing = 150; // Space between items
-        const startX = 200; // Starting X position
-        const startY = 480; // Starting Y position - on the ground
-        
-        // Get guinea pig positions to avoid
-        const guineaPigPositions = this.otherGuineaPigs.map(pig => ({ x: pig.x, y: pig.y }));
-        
-        // Sort items by their current position to maintain some order
-        this.items.sort((a, b) => {
-            if (Math.abs(a.y - b.y) < 50) {
-                return a.x - b.x;
-            }
-            return a.y - b.y;
-        });
-        
-        // Reassign positions
-        this.items.forEach((item, index) => {
-            // Skip special items that have fixed positions
-            if (item.id === 'wheel' || item.id === 'tunnel') {
-                return;
-            }
-            
-            let gridIndex = index;
-            let x, y;
-            let attempts = 0;
-            
-            // Find an empty grid position
-            while (attempts < 100) {
-                const col = gridIndex % gridColumns;
-                const row = Math.floor(gridIndex / gridColumns);
-                x = startX + (col * gridSpacing);
-                y = startY + (row * gridSpacing);
-                
-                // Check if this position conflicts with guinea pigs
-                const conflictsWithPig = guineaPigPositions.some(pos => 
-                    Math.abs(pos.x - x) < 100 && Math.abs(pos.y - y) < 100
-                );
-                
-                // Check if this position conflicts with other already placed items
-                const conflictsWithItem = this.items.slice(0, index).some(otherItem => 
-                    otherItem.id !== 'wheel' && otherItem.id !== 'tunnel' &&
-                    Math.abs(otherItem.x - x) < 100 && Math.abs(otherItem.y - y) < 100
-                );
-                
-                if (!conflictsWithPig && !conflictsWithItem) {
-                    break;
-                }
-                
-                gridIndex++;
-                attempts++;
-            }
-            
-            // Update item position
-            item.x = x;
-            item.y = y;
-        });
-        
-        console.log('Items reorganized to prevent overlapping');
-        this.logInventory();
+        this.itemManager.reorganizeItems();
     }
     
     draw(ctx) {
-        // Don't draw floor and walls here - the living room interior is already drawn in drawThuis()
-        // The home world has its own detailed interior design
-        
-        // Draw other guinea pigs first (before items so they appear behind)
-        this.otherGuineaPigs.forEach(pig => {
-            const screenX = pig.x - this.game.camera.x;
-            const screenY = pig.y - this.game.camera.y;
-            
-            // Check if this pig is a potential drop target
-            let isDropTarget = false;
-            if (this.draggedItem && this.draggedItem.x && this.draggedItem.y) {
-                const distance = Math.sqrt(
-                    Math.pow(this.draggedItem.x - pig.x, 2) + 
-                    Math.pow(this.draggedItem.y - pig.y, 2)
-                );
-                isDropTarget = distance < 100; // Slightly larger than drop radius for visual feedback
-            }
-            
-            // Draw drop zone indicator if dragging
-            if (isDropTarget) {
-                ctx.save();
-                ctx.globalAlpha = 0.3;
-                ctx.fillStyle = '#4ECDC4';
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, 80, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-                
-                // Draw pulsing effect
-                const pulse = Math.sin(Date.now() * 0.005) * 0.2 + 0.8;
-                ctx.strokeStyle = '#4ECDC4';
-                ctx.lineWidth = 3;
-                ctx.globalAlpha = pulse;
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, 85, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.restore();
-            }
-            
-            // Draw guinea pig body
-            ctx.save();
-            ctx.translate(pig.x, pig.y);
-            
-            // Check if an item is being dragged over this pig
-            let scale = 1;
-            if (this.draggedItem) {
-                const distance = Math.sqrt(
-                    Math.pow(this.draggedItem.x - pig.x, 2) + 
-                    Math.pow(this.draggedItem.y - pig.y, 2)
-                );
-                if (distance < 80) { // Increased detection radius
-                    scale = 1.2; // Scale up when item is near
-                }
-            }
-            
-            // Apply scale
-            ctx.scale(scale, scale);
-            
-            // Draw guinea pig body
-            ctx.fillStyle = pig.color.body;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 40, 30, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw belly
-            ctx.fillStyle = pig.color.belly;
-            ctx.beginPath();
-            ctx.ellipse(0, 10, 25, 15, 0, 0, Math.PI);
-            ctx.fill();
-            
-            // Head
-            ctx.fillStyle = pig.color.body;
-            ctx.beginPath();
-            ctx.arc(-25, -10, 20, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Ears
-            ctx.fillStyle = pig.color.body;
-            // Left ear
-            ctx.beginPath();
-            ctx.ellipse(-35, -25, 8, 12, -0.3, 0, Math.PI * 2);
-            ctx.fill();
-            // Right ear
-            ctx.beginPath();
-            ctx.ellipse(-15, -25, 8, 12, 0.3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Inner ears
-            ctx.fillStyle = '#FFB6C1';
-            // Left inner ear
-            ctx.beginPath();
-            ctx.ellipse(-35, -25, 4, 6, -0.3, 0, Math.PI * 2);
-            ctx.fill();
-            // Right inner ear
-            ctx.beginPath();
-            ctx.ellipse(-15, -25, 4, 6, 0.3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Eyes
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(-30, -15, 3, 0, Math.PI * 2);
-            ctx.arc(-20, -15, 3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Nose
-            ctx.fillStyle = '#FFB6C1';
-            ctx.beginPath();
-            ctx.arc(-25, -5, 4, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Eating animation
-            if (pig.isEating) {
-                ctx.fillStyle = '#FF6B6B';
-                ctx.beginPath();
-                ctx.arc(-25, 0, 5, 0, Math.PI);
-                ctx.fill();
-            }
-            
-            // Accessory
-            if (pig.accessory) {
-                ctx.font = '20px Arial';
-                ctx.textAlign = 'center';
-                const accessoryEmoji = {
-                    'bow': '🎀',
-                    'hat': '🎩',
-                    'glasses': '👓',
-                    'necklace': '💎'
-                }[pig.accessory];
-                ctx.fillText(accessoryEmoji, -25, -30);
-            }
-            
-            // Name
-            ctx.fillStyle = '#333';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(pig.name, 0, -50);
-            
-            // Mission progress
-            if (pig.missionProgress < pig.missionTarget) {
-                ctx.fillStyle = '#666';
-                ctx.font = '14px Arial';
-                const missionEmoji = this.getMissionEmoji(pig.missionItem);
-                ctx.fillText(`${missionEmoji} ${pig.missionProgress}/${pig.missionTarget}`, 0, 50);
-            }
-            
-            ctx.restore();
-        });
+        // Draw hamster wheel
+        this.drawHamsterWheel(ctx);
         
         // Draw items
-        this.items.filter(item => !item.consumed).forEach(item => {
-            ctx.save();
-            
-            // Check if this item is being dragged
-            const isDragging = this.draggedItem === item;
-            
-            // Apply transformations
-            const scale = item.scale || (isDragging ? 1.1 : 1);
-            const opacity = item.opacity !== undefined ? item.opacity : (isDragging ? 0.8 : 1);
-            
-            ctx.translate(item.x, item.y);
-            ctx.scale(scale, scale);
-            ctx.translate(-item.x, -item.y);
-            ctx.globalAlpha = opacity;
-            
-            if (item.id === 'wheel') {
-                // Draw giant ferris wheel (reuzenrad)
-                ctx.translate(item.x + 100, item.y + 100);
-                ctx.rotate(item.rotation || 0);
-                
-                // Main wheel structure
-                ctx.strokeStyle = '#4A5568';
-                ctx.lineWidth = 6;
-                ctx.beginPath();
-                ctx.arc(0, 0, 120, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Inner circle
-                ctx.beginPath();
-                ctx.arc(0, 0, 30, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Spokes
-                ctx.lineWidth = 4;
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i * Math.PI / 4);
-                    ctx.beginPath();
-                    ctx.moveTo(Math.cos(angle) * 30, Math.sin(angle) * 30);
-                    ctx.lineTo(Math.cos(angle) * 120, Math.sin(angle) * 120);
-                    ctx.stroke();
-                }
-                
-                // Support structure
-                ctx.strokeStyle = '#2D3748';
-                ctx.lineWidth = 8;
-                ctx.beginPath();
-                ctx.moveTo(-100, 120);
-                ctx.lineTo(0, 0);
-                ctx.lineTo(100, 120);
-                ctx.stroke();
-                
-                // Base
-                ctx.fillStyle = '#4A5568';
-                ctx.fillRect(-120, 120, 240, 20);
-                
-                // Draw baskets/gondolas
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i * Math.PI / 4) + (item.rotation || 0);
-                    const basketX = Math.cos(angle) * 120;
-                    const basketY = Math.sin(angle) * 120;
-                    
-                    ctx.save();
-                    ctx.translate(basketX, basketY);
-                    // Keep basket upright
-                    ctx.rotate(-(item.rotation || 0));
-                    
-                    // Basket
-                    ctx.fillStyle = '#E53E3E';
-                    ctx.fillRect(-20, -10, 40, 30);
-                    
-                    // Basket bottom
-                    ctx.fillStyle = '#C53030';
-                    ctx.fillRect(-20, 20, 40, 5);
-                    
-                    // Connection bar
-                    ctx.strokeStyle = '#4A5568';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.moveTo(0, -10);
-                    ctx.lineTo(0, -20);
-                    ctx.stroke();
-                    
-                    ctx.restore();
-                }
-            } else if (item.id === 'tunnel') {
-                // Draw tunnel/maze house
-                ctx.translate(item.x, item.y);
-                
-                // House structure
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(0, 0, 200, 150);
-                
-                // Roof
-                ctx.fillStyle = '#DC143C';
-                ctx.beginPath();
-                ctx.moveTo(-20, 0);
-                ctx.lineTo(100, -50);
-                ctx.lineTo(220, 0);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Entrance
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(100, 100, 30, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Maze hint
-                ctx.fillStyle = '#FFF';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Doolhof', 100, 75);
-            } else {
-                // Draw regular items
-                ctx.translate(item.x, item.y);
-                
-                // Add shadow if dragging
-                if (isDragging) {
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-                    ctx.shadowBlur = 10;
-                    ctx.shadowOffsetX = 5;
-                    ctx.shadowOffsetY = 5;
-                }
-                
-                ctx.font = '40px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(item.emoji, 0, 0);
-                
-                // Item name
-                ctx.font = '14px Arial';
-                ctx.fillStyle = '#333';
-                ctx.fillText(item.name, 0, 20);
-            }
-            
-            ctx.restore();
-        });
+        this.itemManager.drawItems(ctx, this.game.camera);
         
-        // Draw buttons for interactive items
-        this.items.filter(item => !item.consumed && (item.id === 'wheel' || item.id === 'tunnel')).forEach(item => {
-            ctx.save();
-            
-            // Calculate button position
-            let buttonY;
-            let buttonWidth = 150;
-            let buttonHeight = 40;
-            let buttonX = item.x;
-            
-            if (item.id === 'wheel') {
-                buttonX = item.x + 100;
-                buttonY = item.y + 260;
-            } else if (item.id === 'tunnel') {
-                buttonX = item.x + 100;
-                buttonY = item.y + 180;
-            }
-            
-            // Draw button background
-            ctx.fillStyle = '#4CAF50';
-            ctx.fillRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
-            
-            // Draw button border
-            ctx.strokeStyle = '#45a049';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(buttonX - buttonWidth/2, buttonY, buttonWidth, buttonHeight);
-            
-            // Draw button text
-            ctx.fillStyle = 'white';
+        // Draw other guinea pigs
+        this.guineaPigMissions.drawGuineaPigs(ctx, this.game.camera);
+    }
+    
+    drawHamsterWheel(ctx) {
+        ctx.save();
+        ctx.translate(
+            this.hamsterWheel.x - this.game.camera.x, 
+            this.hamsterWheel.y - this.game.camera.y
+        );
+        
+        // Rotate wheel if spinning
+        ctx.rotate(this.hamsterWheel.rotation);
+        
+        // Draw wheel
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.hamsterWheel.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Draw spokes
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(
+                Math.cos(angle) * this.hamsterWheel.radius,
+                Math.sin(angle) * this.hamsterWheel.radius
+            );
+            ctx.stroke();
+        }
+        
+        // Draw running surface
+        ctx.strokeStyle = '#654321';
+        ctx.lineWidth = 4;
+        for (let i = 0; i < 16; i++) {
+            const angle = (i / 16) * Math.PI * 2;
+            const nextAngle = ((i + 1) / 16) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.hamsterWheel.radius - 10, angle, nextAngle);
+            ctx.stroke();
+        }
+        
+        ctx.restore();
+        
+        // Draw "Press SPACE to run!" hint if player is in wheel
+        if (this.checkPlayerInWheel()) {
+            ctx.fillStyle = 'black';
             ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Start Mini Game', buttonX, buttonY + buttonHeight/2);
-            
-            // Store button bounds for click detection
-            item.buttonBounds = {
-                x: buttonX - buttonWidth/2,
-                y: buttonY,
-                width: buttonWidth,
-                height: buttonHeight
-            };
-            
-            ctx.restore();
-        });
+            ctx.fillText(
+                'Druk op SPATIE om te rennen!', 
+                this.hamsterWheel.x - this.game.camera.x,
+                this.hamsterWheel.y - this.game.camera.y - 120
+            );
+        }
     }
     
     handleClick(x, y) {
-        console.log('Click at:', x, y);
-        
-        // Don't handle clicks if we're dragging
-        if (this.isDragging) {
-            return false;
-        }
-        
-        // Check if clicking on any mini game button
-        const clickedItem = this.items.find(item => {
-            if (!item.buttonBounds) return false;
-            return x >= item.buttonBounds.x && 
-                   x <= item.buttonBounds.x + item.buttonBounds.width &&
-                   y >= item.buttonBounds.y && 
-                   y <= item.buttonBounds.y + item.buttonBounds.height;
-        });
-        
-        if (clickedItem) {
-            if (clickedItem.id === 'wheel') {
-                // Start ferris wheel minigame
-                this.startFerrisWheelGame();
-                return true;
-            } else if (clickedItem.id === 'tunnel') {
-                // Start maze minigame
-                this.startMazeGame();
-                return true;
-            }
-        }
-        
-        // Only show mission modal if it's a quick click (not a drag attempt)
-        const clickedPig = this.otherGuineaPigs.find(pig => {
-            const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
-            return distance < 50;
-        });
-        
-        if (clickedPig && !this.draggedItem) {
-            // Small delay to ensure it's not a drag
-            setTimeout(() => {
-                if (!this.isDragging && !this.draggedItem) {
-                    this.showMission(clickedPig);
-                }
-            }, 100);
+        // Check guinea pig clicks first
+        if (this.guineaPigMissions.checkGuineaPigClick(x, y)) {
             return true;
         }
         
@@ -631,769 +110,91 @@ export class HomeInventory {
     }
     
     handleDragStart(x, y) {
-        // Check if clicking on an item to drag it
-        const item = this.items.find(item => {
-            if (item.consumed) return false;
-            const distance = Math.sqrt(Math.pow(x - item.x, 2) + Math.pow(y - item.y, 2));
-            return distance < 30;
-        });
-        
-        if (item) {
-            this.draggedItem = item;
-            this.dragOffset.x = x - item.x;
-            this.dragOffset.y = y - item.y;
-            this.isDragging = true;
-            this.dragStartTime = Date.now();
-            console.log('Started dragging:', item);
-            return true;
-        }
-        
-        return false;
+        return this.itemManager.handleDragStart(x, y);
     }
     
     handleDragMove(x, y) {
-        if (this.draggedItem) {
-            this.draggedItem.x = x - this.dragOffset.x;
-            this.draggedItem.y = y - this.dragOffset.y;
-        }
+        this.itemManager.handleDragMove(x, y);
     }
     
     handleDragEnd(x, y) {
-        if (!this.draggedItem) {
-            this.isDragging = false;
-            return;
-        }
-        
-        console.log('Drag ended at:', x, y);
-        console.log('Dragged item:', this.draggedItem);
-        
-        // Check if dropped on another guinea pig (increased detection radius)
-        const targetPig = this.otherGuineaPigs.find(pig => {
-            const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
-            console.log(`Distance to ${pig.name}: ${distance}`);
-            return distance < 80; // Increased from 50 to 80
-        });
-        
-        console.log('Target pig:', targetPig);
-        
-        if (targetPig) {
-            // Check if it's a water bath being dropped
-            if (this.draggedItem.id === 'bath') {
-                // Start water bath minigame
-                this.startWaterBathGame(targetPig);
-                // Don't consume the bath item
-                this.draggedItem = null;
-                this.isDragging = false;
-                return;
-            }
-            
-            if (this.isEdible(this.draggedItem.id)) {
-                console.log('Item is edible:', this.draggedItem.id);
-                console.log('Pig wants:', targetPig.missionItem);
-                console.log('Current progress:', targetPig.missionProgress, '/', targetPig.missionTarget);
-                
-                // Feed the guinea pig - DONT set consumed yet, let animation handle it
-                // this.draggedItem.consumed = true; // REMOVED - let animation handle this
-                
-                // Check mission progress BEFORE animation
-                if (targetPig.missionItem === this.draggedItem.id) {
-                    targetPig.missionProgress++;
-                    console.log(`Mission progress updated: ${targetPig.name} - ${targetPig.missionProgress}/${targetPig.missionTarget}`);
-                    
-                    // Save progress immediately
-                    this.saveProgress();
-                    
-                    // Update mission modal if open with immediate visual feedback
-                    if (this.currentMissionPig && this.currentMissionPig.id === targetPig.id) {
-                        this.updateMissionModal();
-                    }
-                    
-                    // Force immediate re-render to show updated progress
-                    if (this.game && this.game.draw) {
-                        this.game.draw();
-                    }
-                    
-                    // Show progress feedback
-                    if (this.game.ui && this.game.ui.showNotification) {
-                        if (targetPig.missionProgress < targetPig.missionTarget) {
-                            this.game.ui.showNotification(`${targetPig.name}: Nog ${targetPig.missionTarget - targetPig.missionProgress} ${this.draggedItem.name} te gaan! 🐹`);
-                        }
-                    }
-                    
-                    if (targetPig.missionProgress >= targetPig.missionTarget) {
-                        this.completeMission(targetPig);
-                    }
-                } else {
-                    console.log(`Item mismatch: dragged ${this.draggedItem.id}, pig wants ${targetPig.missionItem}`);
-                    // Still show eating animation even if it's not the mission item
-                    if (this.game.ui && this.game.ui.showNotification) {
-                        this.game.ui.showNotification(`${targetPig.name} eet ${this.draggedItem.name}! 😊`);
-                    }
-                }
-                
-                // Show eating animation - this will handle item removal
-                this.showEatingAnimation(this.draggedItem, targetPig);
-                
-                // DONT Remove consumed item here - let animation handle it
-                // this.items = this.items.filter(item => item !== this.draggedItem); // REMOVED
-            } else if (this.isAccessory(this.draggedItem.id)) {
-                // Put accessory on guinea pig
-                targetPig.accessory = this.draggedItem.id;
-                
-                // Mark as consumed and remove immediately for accessories
-                this.draggedItem.consumed = true;
-                
-                // Check mission progress
-                if (targetPig.missionItem === this.draggedItem.id) {
-                    this.completeMission(targetPig);
-                }
-                
-                // Save progress
-                this.saveProgress();
-                
-                // Show feedback
-                if (this.game.ui && this.game.ui.showNotification) {
-                    this.game.ui.showNotification(`${targetPig.name} draagt nu een ${this.draggedItem.name}! 🎀`);
-                }
-                
-                // Remove consumed item from array immediately for accessories
-                this.items = this.items.filter(item => item !== this.draggedItem);
-            }
-        }
-        
-        // Reset dragging state
-        this.draggedItem = null;
-        this.isDragging = false;
-    }
-    
-    isEdible(itemId) {
-        const edibleItems = ['carrot', 'lettuce', 'cucumber', 'corn', 'hay_small', 'hay_medium', 'hay_large', 'hay_premium', 'endive', 'celery', 'spinach'];
-        return edibleItems.includes(itemId);
-    }
-    
-    isAccessory(itemId) {
-        const accessories = ['bow', 'hat', 'glasses', 'necklace'];
-        return accessories.includes(itemId);
-    }
-    
-    getMissionEmoji(itemId) {
-        const emojis = {
-            'carrot': '🥕',
-            'lettuce': '🥬',
-            'cucumber': '🥒',
-            'corn': '🌽',
-            'hay_small': '🌾',
-            'hay_medium': '🌾',
-            'hay_large': '🌾',
-            'hay_premium': '🌾',
-            'bow': '🎀',
-            'hat': '🎩',
-            'glasses': '👓',
-            'necklace': '💎'
-        };
-        return emojis[itemId] || '❓';
-    }
-    
-    showEatingAnimation(item, pig = null) {
-        // Simple eating animation feedback
-        const target = pig || this.game.player;
-        
-        // Show eating animation on the guinea pig
-        if (pig) {
-            pig.isEating = true;
-            
-            // Create a simple disappearing effect
-            const startTime = Date.now();
-            const duration = 500; // milliseconds
-            const startX = item.x;
-            const startY = item.y;
-            const targetX = pig.x;
-            const targetY = pig.y;
-            
-            // Animation loop
-            const animate = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Interpolate position
-                item.x = startX + (targetX - startX) * progress;
-                item.y = startY + (targetY - startY) * progress;
-                
-                // Scale down
-                item.scale = 1 - (progress * 0.8);
-                
-                // Fade out
-                item.opacity = 1 - progress;
-                
-                // Continue animation if not finished
-                if (progress < 1) {
-                    if (this.game && this.game.draw) {
-                        this.game.draw();
-                    }
-                    requestAnimationFrame(animate);
-                } else {
-                    // Animation complete - remove item
-                    item.consumed = true;
-                    this.items = this.items.filter(i => i !== item);
-                    pig.isEating = false;
-                    
-                    // Final render
-                    if (this.game && this.game.draw) {
-                        this.game.draw();
-                    }
-                }
-            };
-            
-            // Start animation
-            animate();
-        }
-    }
-    
-    showMission(pig) {
-        // Show mission dialog
-        document.getElementById('missionPigName').textContent = pig.name;
-        document.getElementById('missionText').textContent = pig.mission;
-        document.getElementById('progressText').textContent = `Voortgang: ${pig.missionProgress}/${pig.missionTarget}`;
-        
-        // Update progress bar
-        const progressPercentage = (pig.missionProgress / pig.missionTarget) * 100;
-        const progressFill = document.getElementById('progressFill');
-        
-        // Reset transition and width first
-        progressFill.style.transition = 'none';
-        progressFill.style.width = '0%';
-        
-        // Force reflow
-        progressFill.offsetHeight;
-        
-        // Now animate to the correct width
-        progressFill.style.transition = 'width 0.5s ease-in-out';
-        progressFill.style.width = progressPercentage + '%';
-        progressFill.style.backgroundColor = ''; // Reset to default color
-        
-        // Show modal
-        this.missionModal.classList.remove('hidden');
-        
-        // Store reference to current mission pig
-        this.currentMissionPig = pig;
-    }
-    
-    updateMissionModal() {
-        if (this.currentMissionPig && !this.missionModal.classList.contains('hidden')) {
-            console.log('Updating mission modal for:', this.currentMissionPig.name);
-            console.log('Progress:', this.currentMissionPig.missionProgress, '/', this.currentMissionPig.missionTarget);
-            
-            // Update progress text
-            const progressText = document.getElementById('progressText');
-            if (progressText) {
-                progressText.textContent = `Voortgang: ${this.currentMissionPig.missionProgress}/${this.currentMissionPig.missionTarget}`;
-            } else {
-                console.error('progressText element not found!');
-            }
-            
-            // Update progress bar with animation
-            const progressPercentage = (this.currentMissionPig.missionProgress / this.currentMissionPig.missionTarget) * 100;
-            const progressFill = document.getElementById('progressFill');
-            
-            if (progressFill) {
-                console.log('Setting progress bar to:', progressPercentage + '%');
-                // Add transition for smooth animation
-                progressFill.style.transition = 'width 0.5s ease-in-out';
-                progressFill.style.width = progressPercentage + '%';
-                
-                // Check if mission is complete
-                if (this.currentMissionPig.missionProgress >= this.currentMissionPig.missionTarget) {
-                    setTimeout(() => {
-                        progressFill.style.backgroundColor = '#4CAF50';
-                    }, 500);
-                }
-            } else {
-                console.error('progressFill element not found!');
-            }
-        }
-    }
-    
-    createItemDisappearAnimation(item) {
-        // Create a visual effect for item disappearing
-        const animationDuration = 500; // milliseconds
-        const startTime = Date.now();
-        
-        // Store original position
-        const originalX = item.x;
-        const originalY = item.y;
-        
-        // Animation function
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / animationDuration, 1);
-            
-            // Move item towards pig's mouth with a curve
-            item.y = originalY - (progress * 30); // Move up
-            item.scale = 1 - (progress * 0.5); // Shrink
-            item.opacity = 1 - progress; // Fade out
-            
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
-        };
-        
-        animate();
-    }
-    
-    completeMission(pig) {
-        console.log(`Mission completed for ${pig.name}!`);
-        
-        // Update mission modal to show completion
-        this.updateMissionModal();
-        
-        // Show completion in modal if it's open
-        if (this.currentMissionPig && this.currentMissionPig.id === pig.id && !this.missionModal.classList.contains('hidden')) {
-            const progressFill = document.getElementById('progressFill');
-            if (progressFill) {
-                progressFill.style.width = '100%';
-                progressFill.style.backgroundColor = '#4CAF50';
-            }
-            
-            const missionText = document.getElementById('missionText');
-            if (missionText) {
-                missionText.innerHTML = pig.mission + '<br><strong style="color: #4CAF50;">✓ Voltooid!</strong>';
-            }
-        }
-        
-        // Show heart emoticon and happy message
-        if (this.game.ui && this.game.ui.showNotification) {
-            this.game.ui.showNotification(`💖 ${pig.name} is heel blij! 💖`);
-        }
-        
-        // Add heart effect to the guinea pig
-        pig.showHeart = true;
-        setTimeout(() => {
-            pig.showHeart = false;
-        }, 3000); // Show heart for 3 seconds
-        
-        this.game.player.carrots += 50; // Reward
-        
-        // Update UI immediately
-        if (this.game.ui) {
-            this.game.ui.updateDisplay();
-        }
-        
-        // Force re-render
-        if (this.game && this.game.draw) {
-            this.game.draw();
-        }
-        
-        // Wait a bit before giving new mission
-        setTimeout(() => {
-            // Give new mission
-            const newMissions = [
-                { mission: 'Ik wil graag 2 komkommers!', item: 'cucumber', target: 2 },
-                { mission: 'Breng me een hoed!', item: 'hat', target: 1 },
-                { mission: 'Ik heb 3 mais nodig!', item: 'corn', target: 3 },
-                { mission: 'Help me 2 stukken sla te vinden!', item: 'lettuce', target: 2 },
-                { mission: 'Ik heb zo\'n honger! Breng me 3 wortels!', item: 'carrot', target: 3 }
-            ];
-            
-            const newMission = newMissions[Math.floor(Math.random() * newMissions.length)];
-            pig.mission = newMission.mission;
-            pig.missionItem = newMission.item;
-            pig.missionTarget = newMission.target;
-            pig.missionProgress = 0;
-            
-            // Save the new mission
-            this.saveProgress();
-            
-            // Update the mission modal if it's still open
-            if (this.currentMissionPig === pig && !this.missionModal.classList.contains('hidden')) {
-                document.getElementById('missionText').textContent = pig.mission;
-                this.updateMissionModal();
-            }
-            
-            // Show notification about new mission
-            if (this.game.ui && this.game.ui.showNotification) {
-                this.game.ui.showNotification(`${pig.name} heeft een nieuwe missie!`);
-            }
-        }, 3000); // Give new mission after 3 seconds
-    }
-    
-    startFerrisWheelGame() {
-        // Find the wheel item
-        const wheel = this.items.find(item => item.id === 'wheel');
-        if (!wheel) return;
-        
-        // Create ferris wheel minigame modal
-        const modal = document.createElement('div');
-        modal.className = 'minigame-modal';
-        
-        const gameContainer = document.createElement('div');
-        gameContainer.className = 'minigame-content';
-        gameContainer.style.cssText = `
-            text-align: center;
-        `;
-        
-        gameContainer.innerHTML = `
-            <h2 style="color: #333; margin-bottom: 20px;">🎡 Reuzenrad Ritje 🎡</h2>
-            <p style="color: #666; margin-bottom: 20px;">Je cavia maakt een ritje in het reuzenrad!</p>
-            <div id="ferrisWheelContainer" style="margin: 20px 0;">
-                <canvas id="ferrisWheelCanvas" width="400" height="400" style="border: 3px solid #4A5568; border-radius: 10px;"></canvas>
-            </div>
-            <p id="ferrisScore" style="font-size: 20px; color: #333; font-weight: bold;">Rondjes: 0</p>
-            <button id="stopRide" style="
-                background: #4CAF50;
-                color: white;
-                border: none;
-                padding: 10px 30px;
-                font-size: 18px;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-top: 10px;
-            ">Stop het ritje</button>
-            <button id="closeFerrisWheel" class="modal-close-btn">✖</button>
-        `;
-        
-        modal.appendChild(gameContainer);
-        document.body.appendChild(modal);
-        
-        // Setup canvas
-        const canvas = document.getElementById('ferrisWheelCanvas');
-        const ctx = canvas.getContext('2d');
-        let rotation = 0;
-        let rounds = 0;
-        let lastRotation = 0;
-        let isRiding = true;
-        
-        // Animation function
-        const animate = () => {
-            if (!isRiding) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw ferris wheel
-            ctx.save();
-            ctx.translate(200, 200);
-            ctx.rotate(rotation);
-            
-            // Main wheel
-            ctx.strokeStyle = '#4A5568';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(0, 0, 150, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Inner circle
-            ctx.beginPath();
-            ctx.arc(0, 0, 40, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Spokes
-            for (let i = 0; i < 8; i++) {
-                const angle = (i * Math.PI / 4);
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(angle) * 40, Math.sin(angle) * 40);
-                ctx.lineTo(Math.cos(angle) * 150, Math.sin(angle) * 150);
-                ctx.stroke();
-            }
-            
-            // Draw gondolas
-            for (let i = 0; i < 8; i++) {
-                const angle = (i * Math.PI / 4);
-                const gondolaX = Math.cos(angle) * 150;
-                const gondolaY = Math.sin(angle) * 150;
-                
-                ctx.save();
-                ctx.translate(gondolaX, gondolaY);
-                ctx.rotate(-rotation); // Keep gondolas upright
-                
-                // Gondola
-                ctx.fillStyle = '#E53E3E';
-                ctx.fillRect(-25, -15, 50, 40);
-                
-                // Bottom
-                ctx.fillStyle = '#C53030';
-                ctx.fillRect(-25, 25, 50, 5);
-                
-                // Guinea pig in bottom gondola
-                if (i === 6) {
-                    ctx.fillStyle = '#8B4513';
-                    ctx.beginPath();
-                    ctx.ellipse(0, 10, 18, 15, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Head
-                    ctx.beginPath();
-                    ctx.arc(-10, 5, 10, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Eyes
-                    ctx.fillStyle = '#000';
-                    ctx.beginPath();
-                    ctx.arc(-12, 3, 2, 0, Math.PI * 2);
-                    ctx.arc(-8, 3, 2, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Happy expression
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(-10, 8, 3, 0, Math.PI);
-                    ctx.stroke();
-                }
-                
-                ctx.restore();
-            }
-            
-            ctx.restore();
-            
-            // Draw support
-            ctx.strokeStyle = '#2D3748';
-            ctx.lineWidth = 6;
-            ctx.beginPath();
-            ctx.moveTo(100, 350);
-            ctx.lineTo(200, 200);
-            ctx.lineTo(300, 350);
-            ctx.stroke();
-            
-            // Base
-            ctx.fillStyle = '#4A5568';
-            ctx.fillRect(80, 350, 240, 20);
-            
-            // Update rotation
-            rotation += 0.02;
-            
-            // Count rounds
-            if (rotation > lastRotation + Math.PI * 2) {
-                rounds++;
-                lastRotation = rotation;
-                document.getElementById('ferrisScore').textContent = `Rondjes: ${rounds}`;
-                
-                // Give rewards every 5 rounds
-                if (rounds % 5 === 0) {
-                    this.game.player.carrots += 10;
-                    if (this.game.ui) {
-                        this.game.ui.updateDisplay();
-                        this.game.ui.showNotification(`🎡 ${rounds} rondjes gedraaid! +10 wortels! 🎡`);
-                    }
-                }
-            }
-            
-            requestAnimationFrame(animate);
-        };
-        
-        // Start animation
-        animate();
-        
-        // Stop button
-        document.getElementById('stopRide').addEventListener('click', () => {
-            isRiding = !isRiding;
-            if (isRiding) {
-                document.getElementById('stopRide').textContent = 'Stop het ritje';
-                animate();
-            } else {
-                document.getElementById('stopRide').textContent = 'Start het ritje';
-            }
-        });
-        
-        // Close button
-        document.getElementById('closeFerrisWheel').addEventListener('click', () => {
-            isRiding = false;
-            modal.remove();
-            
-            // Final reward
-            if (rounds > 0) {
-                const totalReward = rounds * 2;
-                this.game.player.carrots += totalReward;
-                if (this.game.ui) {
-                    this.game.ui.updateDisplay();
-                    this.game.ui.showNotification(`🎡 Leuk ritje! Je krijgt ${totalReward} wortels voor ${rounds} rondjes! 🎡`);
-                }
-            }
-        });
-    }
-    
-    startWaterBathGame(pig) {
-        console.log('Starting water bath game with:', pig.name);
-        
-        // Create a simple water bath minigame
-        const modal = document.createElement('div');
-        modal.className = 'minigame-modal';
-        
-        const gameContainer = document.createElement('div');
-        gameContainer.className = 'minigame-content';
-        gameContainer.style.cssText = `
-            max-width: 500px;
-        `;
-        
-        gameContainer.innerHTML = `
-            <h2 style="text-align: center; color: #333; margin-bottom: 10px;">🛁 Waterbad Minigame - ${pig.name} 🛁</h2>
-            <p style="text-align: center; color: #666; margin-bottom: 20px;">Help ${pig.name} een lekker badje nemen!</p>
-            <div id="bathGameContainer" style="text-align: center; margin: 20px 0;">
-                <canvas id="bathGameCanvas" width="400" height="300" style="border: 2px solid #4ECDC4; border-radius: 10px; max-width: 100%;"></canvas>
-            </div>
-            <p id="bathGameInstructions" style="text-align: center; color: #666;">Klik op de bubbels om ze te laten knappen! 🫧</p>
-            <p id="bathGameScore" style="text-align: center; font-size: 20px; color: #333; font-weight: bold;">Score: 0</p>
-            <button id="closeBathGame" class="modal-close-btn">✖</button>
-        `;
-        
-        modal.appendChild(gameContainer);
-        document.body.appendChild(modal);
-        
-        const canvas = document.getElementById('bathGameCanvas');
-        const ctx = canvas.getContext('2d');
-        let score = 0;
-        let bubbles = [];
-        let gameActive = true;
-        
-        // Create bubbles
-        function createBubble() {
-            bubbles.push({
-                x: Math.random() * (canvas.width - 40) + 20,
-                y: canvas.height,
-                radius: Math.random() * 20 + 10,
-                speed: Math.random() * 2 + 1,
-                popped: false
-            });
-        }
-        
-        // Game loop
-        function gameLoop() {
-            if (!gameActive) return;
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw water
-            ctx.fillStyle = '#87CEEB';
-            ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
-            
-            // Draw guinea pig in bath
-            ctx.fillStyle = pig.color.body;
-            ctx.beginPath();
-            ctx.ellipse(canvas.width / 2, canvas.height * 0.65, 40, 30, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw bubbles
-            bubbles = bubbles.filter(bubble => {
-                if (bubble.popped || bubble.y < -bubble.radius) return false;
-                
-                bubble.y -= bubble.speed;
-                
-                // Draw bubble
-                ctx.strokeStyle = '#4ECDC4';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Add shine
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.beginPath();
-                ctx.arc(bubble.x - bubble.radius * 0.3, bubble.y - bubble.radius * 0.3, bubble.radius * 0.3, 0, Math.PI * 2);
-                ctx.fill();
-                
-                return true;
-            });
-            
-            // Create new bubbles randomly
-            if (Math.random() < 0.03) {
-                createBubble();
-            }
-            
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // Handle clicks
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            bubbles.forEach(bubble => {
-                const dist = Math.sqrt(Math.pow(x - bubble.x, 2) + Math.pow(y - bubble.y, 2));
-                if (dist < bubble.radius && !bubble.popped) {
-                    bubble.popped = true;
-                    score++;
-                    document.getElementById('bathGameScore').textContent = `Score: ${score}`;
-                    
-                    // Add pop effect
-                    ctx.fillStyle = 'rgba(78, 205, 196, 0.3)';
-                    ctx.beginPath();
-                    ctx.arc(bubble.x, bubble.y, bubble.radius * 1.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-        });
-        
-        // Close button
-        document.getElementById('closeBathGame').addEventListener('click', () => {
-            gameActive = false;
-            modal.remove();
-            
-            // Give reward based on score
-            if (score > 0) {
-                const reward = score * 2;
-                this.game.player.carrots += reward;
-                this.game.ui.updateDisplay();
-                this.game.ui.showNotification(`${pig.name} heeft genoten van het badje! Je krijgt ${reward} wortels! 🛁✨`);
-                
-                // Add temporary happiness effect to pig
-                pig.showHeart = true;
-                setTimeout(() => {
-                    pig.showHeart = false;
-                }, 3000);
-            }
-        });
-        
-        // Start the game
-        gameLoop();
-    }
-    
-    startMazeGame() {
-        // Use the minigames system for the maze game
-        if (this.game && this.game.minigames) {
-            this.game.minigames.startMazeMinigame();
-        }
+        this.itemManager.handleDragEnd(x, y);
     }
     
     checkPlayerInWheel() {
-        const wheel = this.items.find(item => item.id === 'wheel');
-        if (!wheel || wheel.consumed) return false;
-        
         const distance = Math.sqrt(
-            Math.pow(this.game.player.x - (wheel.x + 100), 2) + 
-            Math.pow(this.game.player.y - (wheel.y + 100), 2)
+            Math.pow(this.game.player.x - this.hamsterWheel.x, 2) +
+            Math.pow(this.game.player.y - this.hamsterWheel.y, 2)
         );
-        
-        return distance < 80; // Player is in the wheel
+        return distance < this.hamsterWheel.radius;
     }
     
     update() {
-        // Remove consumed items from the items array
-        this.items = this.items.filter(item => !item.consumed);
-    }
-
-    saveProgress() {
-        localStorage.setItem('otherGuineaPigs', JSON.stringify(this.otherGuineaPigs));
-        console.log('Guinea pig progress saved.');
-    }
-
-    loadProgress() {
-        const savedPigs = localStorage.getItem('otherGuineaPigs');
-        if (savedPigs) {
-            try {
-                const savedData = JSON.parse(savedPigs);
-                // Merge saved progress with default data
-                this.otherGuineaPigs.forEach((pig, index) => {
-                    const savedPig = savedData.find(sp => sp.id === pig.id);
-                    if (savedPig) {
-                        pig.missionProgress = savedPig.missionProgress || 0;
-                        pig.accessory = savedPig.accessory || null;
-                        pig.showHeart = savedPig.showHeart || false;
-                    }
-                });
-                console.log('Guinea pig progress loaded:', this.otherGuineaPigs);
-            } catch (e) {
-                console.error('Error loading progress:', e);
+        // Update item animations
+        this.itemManager.updateAnimations();
+        
+        // Update hamster wheel
+        if (this.hamsterWheel.spinning) {
+            this.hamsterWheel.rotation += this.hamsterWheel.spinSpeed;
+            this.hamsterWheel.spinSpeed *= 0.95; // Friction
+            
+            if (this.hamsterWheel.spinSpeed < 0.01) {
+                this.hamsterWheel.spinning = false;
+                this.hamsterWheel.spinSpeed = 0;
+            }
+            
+            // Award carrots based on spinning
+            const now = Date.now();
+            if (now - this.hamsterWheel.lastSpinTime > 1000) {
+                this.game.player.carrots += 1;
+                this.hamsterWheel.lastSpinTime = now;
+                this.game.ui.updateDisplay();
             }
         }
+    }
+    
+    spinWheel() {
+        if (this.checkPlayerInWheel()) {
+            this.hamsterWheel.spinning = true;
+            this.hamsterWheel.spinSpeed = Math.min(this.hamsterWheel.spinSpeed + 0.1, 0.5);
+        }
+    }
+    
+    saveProgress() {
+        const saveData = {
+            missions: this.guineaPigMissions.saveProgress()
+        };
+        localStorage.setItem('homeInventoryProgress', JSON.stringify(saveData));
+    }
+    
+    loadProgress() {
+        const savedData = localStorage.getItem('homeInventoryProgress');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                if (data.missions) {
+                    this.guineaPigMissions.loadProgress(data.missions);
+                }
+            } catch (e) {
+                console.error('Failed to load home inventory progress:', e);
+            }
+        }
+    }
+    
+    // Delegate methods for backward compatibility
+    get items() {
+        return this.itemManager.items;
+    }
+    
+    get otherGuineaPigs() {
+        return this.guineaPigMissions.otherGuineaPigs;
+    }
+    
+    get currentMissionPig() {
+        return this.guineaPigMissions.currentMissionPig;
+    }
+    
+    set currentMissionPig(value) {
+        this.guineaPigMissions.currentMissionPig = value;
     }
 }
