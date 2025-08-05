@@ -433,4 +433,10 @@ export class Inventory {
             this.items = JSON.parse(saved);
         }
     }
+    
+    resetInventory() {
+        this.items = [];
+        this.saveInventory();
+        this.updateInventoryDisplay();
+    }
 }

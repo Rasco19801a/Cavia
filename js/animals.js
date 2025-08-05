@@ -86,10 +86,33 @@ const SPELLING_WORDS = {
 export class AnimalChallenge {
     constructor(game) {
         this.game = game;
-        this.currentChallenge = null;
         this.challengeModal = null;
+        this.currentChallenge = null;
+        this.tableProgress = {}; // Track progress per table
+        this.completedTables = new Set(); // Track completed tables
+        this.correctSpellings = 0; // Track correct spelling answers
         this.audio = new Audio(); // For pronouncing words
         this.setupModal();
+        this.loadProgress();
+    }
+
+    loadProgress() {
+        const saved = localStorage.getItem('animalChallengeProgress');
+        if (saved) {
+            const data = JSON.parse(saved);
+            this.tableProgress = data.tableProgress || {};
+            this.completedTables = new Set(data.completedTables || []);
+            this.correctSpellings = data.correctSpellings || 0;
+        }
+    }
+    
+    saveProgress() {
+        const data = {
+            tableProgress: this.tableProgress,
+            completedTables: Array.from(this.completedTables),
+            correctSpellings: this.correctSpellings
+        };
+        localStorage.setItem('animalChallengeProgress', JSON.stringify(data));
     }
 
     setupModal() {
@@ -243,6 +266,30 @@ export class AnimalChallenge {
             const carrotsEarned = 10;
             this.game.player.addCarrots(carrotsEarned);
             
+            // Track progress
+            if (this.currentChallenge.type === 'math') {
+                const table = parseInt(this.currentChallenge.question.split(' × ')[0]);
+                if (!this.tableProgress[table]) {
+                    this.tableProgress[table] = 0;
+                }
+                this.tableProgress[table]++;
+                
+                // Check if table is completed (10 correct answers)
+                if (this.tableProgress[table] >= 10 && !this.completedTables.has(table)) {
+                    this.completedTables.add(table);
+                    this.showTableCompletionReward(table);
+                }
+            } else if (this.currentChallenge.type === 'spelling') {
+                this.correctSpellings++;
+                
+                // Check for 10 correct spellings milestone
+                if (this.correctSpellings === 10) {
+                    this.showSpellingMilestoneReward();
+                }
+            }
+            
+            this.saveProgress();
+            
             // Update UI to show carrots earned
             setTimeout(() => {
                 feedback.innerHTML += `<br>Je hebt ${carrotsEarned} wortels verdiend!`;
@@ -266,6 +313,58 @@ export class AnimalChallenge {
             input.value = '';
             input.focus();
         }
+    }
+    
+    showTableCompletionReward(table) {
+        // Award 50 carrots for completing a table
+        this.game.player.addCarrots(50);
+        
+        // Create celebration modal
+        const modal = document.createElement('div');
+        modal.className = 'celebration-modal';
+        modal.innerHTML = `
+            <div class="celebration-content">
+                <h2>🎉🎊 GEWELDIG! 🎊🎉</h2>
+                <p>Je hebt de tafel van ${table} helemaal onder de knie!</p>
+                <p class="reward-text">Je hebt 50 wortels verdiend! 🥕</p>
+                <p>🎈🎉🎊🥳🎈</p>
+                <button class="celebration-btn" onclick="this.parentElement.parentElement.remove()">Fantastisch!</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (modal.parentElement) {
+                modal.remove();
+            }
+        }, 5000);
+    }
+    
+    showSpellingMilestoneReward() {
+        // Award 50 carrots for 10 correct spellings
+        this.game.player.addCarrots(50);
+        
+        // Create celebration modal
+        const modal = document.createElement('div');
+        modal.className = 'celebration-modal';
+        modal.innerHTML = `
+            <div class="celebration-content">
+                <h2>🎉📚 SUPER GOED! 📚🎉</h2>
+                <p>Je hebt 10 woorden perfect gespeld!</p>
+                <p class="reward-text">Je hebt 50 wortels verdiend! 🥕</p>
+                <p>🌟📖✨🎊🌟</p>
+                <button class="celebration-btn" onclick="this.parentElement.parentElement.remove()">Geweldig!</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (modal.parentElement) {
+                modal.remove();
+            }
+        }, 5000);
     }
 
     closeChallenge() {
