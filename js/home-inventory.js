@@ -184,15 +184,7 @@ export class HomeInventory {
         return this.itemManager.items;
     }
     
-    get otherGuineaPigs() {
+    getOtherGuineaPigs() {
         return this.guineaPigMissions.otherGuineaPigs;
-    }
-    
-    get currentMissionPig() {
-        return this.guineaPigMissions.currentMissionPig;
-    }
-    
-    set currentMissionPig(value) {
-        this.guineaPigMissions.currentMissionPig = value;
     }
 }
