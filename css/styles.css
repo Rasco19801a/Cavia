@@ -183,7 +183,7 @@ body {
 /* World selector */
 .world-selector {
     position: absolute;
-    bottom: 40px;
+    bottom: 20px;
     left: 10px;
     right: 10px;
     display: flex;
@@ -324,7 +324,7 @@ body {
     .world-selector {
         position: fixed;
         top: auto;
-        bottom: 100px;
+        bottom: 80px;
         left: 10px;
         right: 10px;
         max-width: none;
@@ -441,7 +441,7 @@ body {
     }
     
     .world-selector {
-        bottom: 80px;
+        bottom: 60px;
         padding: 8px;
     }
     
