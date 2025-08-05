@@ -505,7 +505,7 @@ export class Game {
         }
         
         // Update camera
-        this.camera.update(this.player, this.isInside, this.currentBuilding, this.currentWorld);
+        this.camera.update(this.player, this.isInside, this.currentBuilding);
         
         // Update home inventory if in home world
         if (this.currentWorld === 'thuis') {

@@ -1,4 +1,6 @@
 // Inventory module - handles player's inventory system
+import { GAME_CONFIG } from './config.js';
+
 export class Inventory {
     constructor(game) {
         this.game = game;
@@ -78,11 +80,23 @@ export class Inventory {
         
         document.body.appendChild(this.inventoryModal);
         
-        // Event listeners
-        document.getElementById('closeInventory').addEventListener('click', () => this.closeInventory());
-        document.getElementById('useItemBtn').addEventListener('click', () => this.useSelectedItem());
-        document.getElementById('playMinigameBtn').addEventListener('click', () => this.playItemMinigame());
-        document.getElementById('placeInHomeBtn').addEventListener('click', () => this.placeItemInHome());
+        // Add click outside to close
+        this.inventoryModal.addEventListener('click', (e) => {
+            if (e.target === this.inventoryModal) {
+                this.closeInventory();
+            }
+        });
+        
+        // Event listeners - use arrow functions to preserve 'this' context
+        const closeBtn = document.getElementById('closeInventory');
+        const useBtn = document.getElementById('useItemBtn');
+        const playBtn = document.getElementById('playMinigameBtn');
+        const placeBtn = document.getElementById('placeInHomeBtn');
+        
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeInventory());
+        if (useBtn) useBtn.addEventListener('click', () => this.useSelectedItem());
+        if (playBtn) playBtn.addEventListener('click', () => this.playItemMinigame());
+        if (placeBtn) placeBtn.addEventListener('click', () => this.placeItemInHome());
         
         // ESC key to close
         window.addEventListener('keydown', (e) => {
@@ -143,16 +157,44 @@ export class Inventory {
     }
     
     openInventory() {
+        // Check if modal exists
+        if (!this.inventoryModal) {
+            console.error('Inventory modal not found!');
+            this.setupInventoryModal();
+        }
+        
         this.isOpen = true;
         this.inventoryModal.classList.remove('hidden');
         this.updateInventoryDisplay();
+        
+        // Focus on the modal for keyboard events
+        this.inventoryModal.focus();
+        
+        // Log for debugging
+        console.log('Inventory opened', {
+            isOpen: this.isOpen,
+            modalClassList: this.inventoryModal.classList.toString(),
+            currentMissionPig: this.game.currentMissionPig
+        });
     }
     
     closeInventory() {
         this.isOpen = false;
-        this.inventoryModal.classList.add('hidden');
+        if (this.inventoryModal) {
+            this.inventoryModal.classList.add('hidden');
+        }
         this.selectedItem = null;
         this.updateSelectedItemInfo();
+        
+        // Clear the current mission pig if inventory was opened from mission
+        if (this.game.currentMissionPig) {
+            // Optionally reopen mission modal after a short delay
+            setTimeout(() => {
+                if (this.game.guineaPigMissions && this.game.currentMissionPig) {
+                    this.game.guineaPigMissions.showMissionModal(this.game.currentMissionPig);
+                }
+            }, 100);
+        }
     }
     
     updateInventoryDisplay() {
@@ -284,41 +326,29 @@ export class Inventory {
             
             if (pig.missionProgress >= pig.missionTarget) {
                 // Mission complete!
-                this.game.ui.showNotification(`Missie voltooid! Je hebt 10 wortels verdiend! 🎉`);
-                this.game.player.carrots += 10;
+                this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
+                this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
                 this.game.ui.updateDisplay();
                 
-                // Update mission
-                this.updateMissionForPig(pig);
+                // Update mission through guinea pig missions
+                if (this.game.guineaPigMissions) {
+                    this.game.guineaPigMissions.completeMission(pig);
+                }
+                
+                // Close inventory and clear mission pig
+                this.closeInventory();
+                this.game.currentMissionPig = null;
             } else {
                 this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
+                
+                // Update mission modal if it exists
+                if (this.game.guineaPigMissions) {
+                    this.game.guineaPigMissions.updateMissionModal();
+                }
             }
-            
-            // Update mission modal if open
-            if (this.game.homeInventory.missionModal && !this.game.homeInventory.missionModal.classList.contains('hidden')) {
-                this.game.homeInventory.showMission(pig);
-            }
-            
-            this.game.homeInventory.saveProgress();
         }
     }
-    
-    updateMissionForPig(pig) {
-        // Give pig a new mission
-        const missions = [
-            { item: 'carrot', target: 3, text: 'Ik heb weer honger! Breng me 3 wortels!' },
-            { item: 'lettuce', target: 2, text: 'Ik wil graag 2 stukken sla!' },
-            { item: 'cucumber', target: 2, text: 'Komkommers zijn lekker! Breng er 2!' },
-            { item: 'corn', target: 1, text: 'Ik heb zin in mais! Breng me 1 mais!' },
-            { item: 'hay_small', target: 1, text: 'Ik heb hooi nodig! Breng me een hooi pakket!' }
-        ];
-        
-        const newMission = missions[Math.floor(Math.random() * missions.length)];
-        pig.mission = newMission.text;
-        pig.missionItem = newMission.item;
-        pig.missionTarget = newMission.target;
-        pig.missionProgress = 0;
-    }
+
     
     getItemMinigame(itemId) {
         // Define minigames for certain items
