@@ -1390,3 +1390,84 @@ body {
 .carrots-display {
     z-index: 100;
 }
+
+/* Celebration Modal */
+.celebration-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.celebration-content {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: bounceIn 0.5s ease-out;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.celebration-content h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.celebration-content p {
+    font-size: 20px;
+    margin: 15px 0;
+    color: #333;
+}
+
+.celebration-content .reward-text {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2E7D32;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.celebration-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.celebration-btn:hover {
+    transform: scale(1.1);
+    background: #45a049;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

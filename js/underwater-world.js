@@ -282,7 +282,9 @@ export class UnderwaterWorld {
         
         // Draw exit button - make it more visible as a close button
         ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-        ctx.fillRect(CONFIG.WORLD_WIDTH - 60, 20, 40, 40);
+        ctx.beginPath();
+        ctx.arc(CONFIG.WORLD_WIDTH - 40, 40, 20, 0, Math.PI * 2);
+        ctx.fill();
         ctx.strokeStyle = '#FFF';
         ctx.lineWidth = 3;
         ctx.beginPath();
@@ -297,7 +299,9 @@ export class UnderwaterWorld {
         if (!this.active) return;
         
         // Check exit button
-        if (x >= CONFIG.WORLD_WIDTH - 60 && x <= CONFIG.WORLD_WIDTH - 20 && y >= 20 && y <= 60) {
+        const dx = x - (CONFIG.WORLD_WIDTH - 40);
+        const dy = y - 40;
+        if (Math.sqrt(dx * dx + dy * dy) <= 20) {
             this.deactivate();
             return true;
         }

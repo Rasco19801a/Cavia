@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('startGame', (e) => {
             const gameSettings = ScreenManager.getGameSettings();
             
+            // Reset inventory for new game
+            localStorage.removeItem('playerInventory');
+            localStorage.removeItem('animalChallengeProgress');
+            
             // Initialize the game with customization and settings data
             const game = new Game(canvas, {
                 ...e.detail,

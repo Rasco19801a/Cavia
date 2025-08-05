@@ -200,11 +200,11 @@ export class GuineaPigMissions {
             
             // Draw mission indicator if mission not complete
             if (pig.missionProgress < pig.missionTarget) {
-                ctx.fillStyle = 'yellow';
+                ctx.fillStyle = '#4CAF50'; // Green background
                 ctx.beginPath();
                 ctx.arc(0, -70, 8, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = 'black';
+                ctx.fillStyle = 'white'; // White text
                 ctx.font = 'bold 16px Arial';
                 ctx.fillText('!', 0, -65);
             }
