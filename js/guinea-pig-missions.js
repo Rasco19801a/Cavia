@@ -1,16 +1,14 @@
 // Guinea Pig Missions module - handles NPC guinea pigs and their missions
 import { GAME_CONFIG } from './config.js';
 import { eventSystem, GameEvents } from './event-system.js';
-import { domManager } from './dom-manager.js';
+import { MissionManager } from './mission-manager.js';
 
 export class GuineaPigMissions {
     constructor(game) {
         this.game = game;
         this.otherGuineaPigs = [];
-        this.currentMissionPig = null;
-        this.missionModal = null;
+        this.missionManager = new MissionManager(game);
         this.setupGuineaPigs();
-        this.setupMissionModal();
     }
 
     setupGuineaPigs() {
@@ -64,138 +62,22 @@ export class GuineaPigMissions {
         ];
     }
 
-    setupMissionModal() {
-        // Create mission modal using DOM manager
-        const modalContent = `
-            <div class="mission-content">
-                <h2 id="missionPigName">Missie</h2>
-                <div class="mission-pig-icon">🐹</div>
-                <p id="missionText"></p>
-                <div class="mission-progress">
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-                    <p id="progressText"></p>
-                </div>
-                <button class="inventory-select-btn" id="selectFromInventory">Selecteer uit Rugzak 🎒</button>
-                <button class="modal-close-btn" id="closeMission">✖</button>
-            </div>
-        `;
-        
-        this.missionModal = domManager.createModal({
-            id: 'missionModal',
-            className: 'mission-modal hidden',
-            content: modalContent,
-            closeButton: '#closeMission',
-            closeOnEscape: true
-        });
-        
-        // Remove the old event delegation approach
-        // We'll add direct listeners when the modal is shown instead
-        
-        // Prevent clicks inside modal content from closing the modal
-        // BUT allow clicks on the close button to propagate
-        const missionContent = this.missionModal.querySelector('.mission-content');
-        if (missionContent) {
-            missionContent.addEventListener('click', (e) => {
-                // Don't stop propagation if clicking the close button
-                if (!e.target.matches('#closeMission')) {
-                    e.stopPropagation();
-                }
-            });
-        }
-        
-        // Also add click handler to close modal when clicking outside
-        this.missionModal.addEventListener('click', (e) => {
-            if (e.target === this.missionModal) {
-                this.closeMissionModal();
-            }
-        });
-    }
-
-    closeMissionModal() {
-        domManager.closeModal('missionModal');
-        this.currentMissionPig = null;
-    }
-
-    selectFromInventory() {
-        console.log('Select from inventory clicked', this.currentMissionPig);
-        console.log('Current state:', {
-            currentMissionPig: this.currentMissionPig,
-            game: this.game,
-            inventory: this.game.inventory,
-            inventoryModal: this.game.inventory?.inventoryModal,
-            modalClassList: this.game.inventory?.inventoryModal?.classList?.toString()
-        });
-        
-        // Check if we have a current mission pig
-        if (!this.currentMissionPig) {
-            console.error('No current mission pig!');
-            return;
-        }
-        
-        // Store current mission pig in game object for inventory to access
-        this.game.currentMissionPig = this.currentMissionPig;
-        
-        // Close mission modal first
-        console.log('Closing mission modal...');
-        domManager.closeModal('missionModal');
-        console.log('Mission modal closed, opening inventory immediately...');
-        if (this.game.inventory) {
-            this.game.inventory.openInventory();
-        } else {
-            console.error('Inventory not found in game object');
-        }
-    }
-
     showMissionModal(pig) {
-        this.currentMissionPig = pig;
-        this.updateMissionModal();
-        domManager.openModal({ id: 'missionModal' });
-        eventSystem.emit(GameEvents.MISSION_START, pig);
-        
-        // Add direct event listener to button after modal is shown
-        setTimeout(() => {
-            const inventoryBtn = document.getElementById('selectFromInventory');
-            if (inventoryBtn) {
-                // Remove any existing listeners first
-                const newBtn = inventoryBtn.cloneNode(true);
-                inventoryBtn.parentNode.replaceChild(newBtn, inventoryBtn);
-                
-                // Add fresh listener
-                newBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Button clicked - opening inventory');
-                    this.selectFromInventory();
-                });
-                
-                // Ensure button is not disabled
-                newBtn.disabled = false;
-                newBtn.style.pointerEvents = 'auto';
-                newBtn.style.cursor = 'pointer';
-            }
-        }, 50);
+        const missionData = {
+            pig: pig,
+            name: pig.name,
+            mission: pig.mission,
+            progress: pig.missionProgress,
+            target: pig.missionTarget,
+            item: pig.missionItem
+        };
+        this.missionManager.showMission(missionData);
     }
 
     updateMissionModal() {
-        if (!this.currentMissionPig) return;
-        
-        const pig = this.currentMissionPig;
-        document.getElementById('missionPigName').textContent = pig.name;
-        document.getElementById('missionText').textContent = pig.mission;
-        document.getElementById('progressText').textContent = `${pig.missionProgress}/${pig.missionTarget}`;
-        
-        const progressPercentage = (pig.missionProgress / pig.missionTarget) * 100;
-        document.getElementById('progressFill').style.width = `${progressPercentage}%`;
-        
-        // Update button visibility
-        const selectButton = document.getElementById('selectFromInventory');
-        if (pig.missionProgress >= pig.missionTarget) {
-            selectButton.style.display = 'none';
-            document.getElementById('missionText').textContent = 'Bedankt voor je hulp! 🎉';
-        } else {
-            selectButton.style.display = 'block';
+        const activeMission = this.missionManager.currentMission;
+        if (activeMission && activeMission.pig) {
+            this.missionManager.updateProgress(activeMission.pig.missionProgress);
         }
     }
 
@@ -205,9 +87,7 @@ export class GuineaPigMissions {
             
             if (pig.missionProgress >= pig.missionTarget) {
                 // Mission complete!
-                this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
-                this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
-                this.game.ui.updateDisplay();
+                this.missionManager.completeMission();
                 
                 // Give new mission
                 this.updateMissionForPig(pig);
@@ -216,6 +96,7 @@ export class GuineaPigMissions {
                 return true;
             } else {
                 this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
+                this.updateMissionModal();
                 return true;
             }
         }

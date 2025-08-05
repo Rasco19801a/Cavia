@@ -211,15 +211,14 @@ export class Inventory {
         this.updateSelectedItemInfo();
         
         // If inventory was opened from mission, reopen mission modal
-        if (this.game.currentMissionPig) {
-            const missionPig = this.game.currentMissionPig;
+        if (this.game.activeMission) {
             // Clear the reference first
-            this.game.currentMissionPig = null;
+            this.game.activeMission = null;
             
             // Reopen mission modal after a short delay
             setTimeout(() => {
-                if (this.game.guineaPigMissions) {
-                    this.game.guineaPigMissions.showMissionModal(missionPig);
+                if (this.game.guineaPigMissions && this.game.guineaPigMissions.missionManager) {
+                    this.game.guineaPigMissions.missionManager.reopenAfterInventory();
                 }
             }, 200);
         }
@@ -301,10 +300,10 @@ export class Inventory {
     
     canUseItem(item) {
         // Check if item can be used in current context
-        if (this.game.currentMissionPig) {
+        if (this.game.activeMission) {
             // Check if this item is needed for the mission
-            const pig = this.game.currentMissionPig;
-            return pig.missionItem === item.id;
+            const mission = this.game.activeMission;
+            return mission.item === item.id;
         }
         
         // Check for other use cases
@@ -312,26 +311,31 @@ export class Inventory {
         return usableItems.includes(item.id);
     }
     
+    checkIfItemNeededForMission(item) {
+        if (this.game.activeMission) {
+            // Check if this item is needed for the mission
+            const mission = this.game.activeMission;
+            return mission.item === item.id;
+        }
+        return false;
+    }
+    
     useSelectedItem() {
-        if (!this.selectedItem || !this.canUseItem(this.selectedItem)) return;
+        if (!this.selectedItem) return;
         
-        // If there's a current mission pig, give item to them
-        if (this.game.currentMissionPig) {
+        // If there's an active mission, give item to mission pig
+        if (this.game.activeMission) {
             this.giveItemToMissionPig(this.selectedItem);
         } else {
-            // Other use cases
-            this.game.ui.showNotification(`${this.selectedItem.name} gebruikt!`);
-            this.removeItem(this.selectedItem.id, 1);
-        }
-        
-        // Update display
-        if (this.selectedItem.quantity <= 1) {
+            // Use item normally
+            this.removeItem(this.selectedItem.id);
             this.selectedItem = null;
+            this.updateInventoryDisplay();
+            this.updateSelectedItemInfo();
+            this.game.ui.showNotification(`Je hebt ${this.selectedItem.name} gebruikt!`);
         }
-        this.updateInventoryDisplay();
-        this.updateSelectedItemInfo();
     }
-
+    
     placeItemInHome() {
         if (!this.selectedItem) return;
 
@@ -347,10 +351,13 @@ export class Inventory {
     }
     
     giveItemToMissionPig(item) {
-        const pig = this.game.currentMissionPig;
-        if (pig && pig.missionItem === item.id) {
+        const mission = this.game.activeMission;
+        if (mission && mission.item === item.id) {
+            const pig = mission.pig;
             pig.missionProgress++;
-            this.removeItem(item.id, 1);
+            
+            // Remove one of the item
+            this.removeItem(item.id);
             
             if (pig.missionProgress >= pig.missionTarget) {
                 // Mission complete!
@@ -363,9 +370,9 @@ export class Inventory {
                     this.game.guineaPigMissions.completeMission(pig);
                 }
                 
-                // Close inventory and clear mission pig
+                // Close inventory and clear mission
                 this.closeInventory();
-                this.game.currentMissionPig = null;
+                this.game.activeMission = null;
             } else {
                 this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
                 
@@ -373,6 +380,9 @@ export class Inventory {
                 if (this.game.guineaPigMissions) {
                     this.game.guineaPigMissions.updateMissionModal();
                 }
+                
+                // Update inventory display
+                this.updateInventoryDisplay();
             }
         }
     }

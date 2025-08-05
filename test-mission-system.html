@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mission System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .test-button.secondary {
+            background: #2196F3;
+        }
+        .test-button.secondary:hover {
+            background: #0b7dda;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        #gameCanvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-info">
+            <h1>🐹 Test: Missie Systeem</h1>
+            <p>Deze pagina test het nieuwe missie systeem met de verbeterde modal en inventory integratie.</p>
+            <h3>Instructies:</h3>
+            <ol>
+                <li>Klik op "Start Spel" om het spel te laden</li>
+                <li>Klik op "Ga naar Thuis" om naar de thuis wereld te gaan</li>
+                <li>Klik op een cavia met een geel uitroepteken (!) om een missie te openen</li>
+                <li>Klik op "Selecteer uit Rugzak" in de missie modal</li>
+                <li>Selecteer het juiste item uit je rugzak</li>
+                <li>Klik op "Gebruik" om het item aan de cavia te geven</li>
+            </ol>
+        </div>
+
+        <div class="test-controls">
+            <h3>Test Controls:</h3>
+            <button class="test-button" onclick="startGame()">Start Spel</button>
+            <button class="test-button" onclick="goToHome()">Ga naar Thuis</button>
+            <button class="test-button secondary" onclick="addTestItems()">Voeg Test Items Toe</button>
+            <button class="test-button secondary" onclick="showGameStatus()">Toon Status</button>
+            <button class="test-button secondary" onclick="testMissionModal()">Test Missie Modal Direct</button>
+            
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+
+        <!-- Game screens -->
+        <div id="tablesScreen" class="screen hidden"></div>
+        <div id="difficultyScreen" class="screen hidden"></div>
+        <div id="customizationScreen" class="screen hidden"></div>
+
+        <!-- Game canvas -->
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+
+        <!-- UI Elements -->
+        <div id="gameUI" class="hidden">
+            <div class="carrot-counter">
+                <span class="carrot-icon">🥕</span>
+                <span id="carrotCount">0</span>
+            </div>
+            <div id="notification" class="notification"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        let game = null;
+        
+        window.startGame = function() {
+            const canvas = document.getElementById('gameCanvas');
+            game = new Game(canvas, {
+                skipCustomization: true,
+                selectedTables: [1, 2, 3, 4, 5],
+                selectedDifficulties: [6, 7],
+                bodyColor: '#8B4513',
+                bellyColor: '#D2691E',
+                accessory: null
+            });
+            
+            window.game = game;
+            updateStatus('Spel gestart! Klik op "Ga naar Thuis" om te beginnen.');
+            
+            // Add initial items after a short delay
+            setTimeout(() => {
+                addTestItems();
+            }, 1000);
+        };
+        
+        window.goToHome = function() {
+            if (!game) {
+                alert('Start eerst het spel!');
+                return;
+            }
+            
+            // Switch to home world
+            game.switchWorld('home');
+            updateStatus('Je bent nu in de Thuis wereld. Klik op een cavia met een ! om een missie te starten.');
+        };
+        
+        window.addTestItems = function() {
+            if (!game || !game.inventory) {
+                alert('Start eerst het spel!');
+                return;
+            }
+            
+            // Add various test items
+            const testItems = [
+                { id: 'carrot', name: 'Wortel', emoji: '🥕', description: 'Een verse wortel', quantity: 5 },
+                { id: 'lettuce', name: 'Sla', emoji: '🥬', description: 'Verse sla', quantity: 3 },
+                { id: 'bow', name: 'Strik', emoji: '🎀', description: 'Een mooie strik', quantity: 2 },
+                { id: 'cucumber', name: 'Komkommer', emoji: '🥒', description: 'Een verse komkommer', quantity: 2 },
+                { id: 'corn', name: 'Mais', emoji: '🌽', description: 'Verse mais', quantity: 1 },
+                { id: 'hay_small', name: 'Hooi', emoji: '🌾', description: 'Een pakket hooi', quantity: 1 }
+            ];
+            
+            testItems.forEach(item => {
+                for (let i = 0; i < item.quantity; i++) {
+                    game.inventory.addItem({
+                        id: item.id,
+                        name: item.name,
+                        emoji: item.emoji,
+                        description: item.description
+                    });
+                }
+            });
+            
+            updateStatus('Test items toegevoegd aan je rugzak!');
+        };
+        
+        window.showGameStatus = function() {
+            if (!game) {
+                updateStatus('Spel is nog niet gestart.');
+                return;
+            }
+            
+            const status = {
+                currentWorld: game.currentWorld,
+                carrots: game.player.carrots,
+                inventoryItems: game.inventory ? game.inventory.items.length : 0,
+                guineaPigsLoaded: game.guineaPigMissions ? 'Ja' : 'Nee',
+                activeMission: game.activeMission ? game.activeMission.name : 'Geen'
+            };
+            
+            updateStatus(JSON.stringify(status, null, 2));
+        };
+        
+        window.testMissionModal = function() {
+            if (!game || !game.guineaPigMissions) {
+                alert('Start eerst het spel en ga naar de Thuis wereld!');
+                return;
+            }
+            
+            // Show mission for the first guinea pig
+            const firstPig = game.guineaPigMissions.otherGuineaPigs[0];
+            if (firstPig) {
+                game.guineaPigMissions.showMissionModal(firstPig);
+                updateStatus('Missie modal geopend voor ' + firstPig.name);
+            }
+        };
+        
+        function updateStatus(message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'block';
+            statusDiv.textContent = message;
+        }
+    </script>
+</body>
+</html>

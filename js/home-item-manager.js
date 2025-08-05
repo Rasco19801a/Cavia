@@ -168,20 +168,23 @@ export class HomeItemManager {
             // Check if dropped on a guinea pig (for missions)
             if (this.game.guineaPigMissions) {
                 for (const pig of this.game.guineaPigMissions.otherGuineaPigs) {
-                    const distance = Math.sqrt(
-                        Math.pow(this.draggedItem.x - pig.x, 2) + 
-                        Math.pow(this.draggedItem.y - pig.y, 2)
-                    );
-                    
+                    // Check if pig is close enough
+                    const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
                     if (distance < 60) {
                         // Try to give item to pig for mission
                         if (this.game.guineaPigMissions.handleMissionItem(this.draggedItem, pig)) {
                             // Remove the item if it was used for the mission
-                            this.removeItem(this.draggedItem);
-                            this.draggedItem = null;
-                            this.isDragging = false;
-                            return;
+                            this.items = this.items.filter(item => item !== this.draggedItem);
+                            this.saveItems();
+                            this.game.ui.updateDisplay();
+                        } else {
+                            // Item not needed for mission
+                            this.game.ui.showNotification('Deze cavia heeft dit item niet nodig!');
+                            // Return item to original position
+                            this.draggedItem.x = this.dragStartX;
+                            this.draggedItem.y = this.dragStartY;
                         }
+                        return;
                     }
                 }
             }
