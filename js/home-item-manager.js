@@ -202,7 +202,8 @@ export class HomeItemManager {
     drawItems(ctx, camera) {
         this.items.forEach(item => {
             ctx.save();
-            ctx.translate(item.x - camera.x, item.y - camera.y);
+            // Don't apply camera offset here - it's already applied by game's camera transform
+            ctx.translate(item.x, item.y);
             
             // Apply scale for dragged item
             if (item === this.draggedItem) {

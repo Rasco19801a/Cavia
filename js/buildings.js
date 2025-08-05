@@ -44,12 +44,17 @@ export function createStadBuildings() {
 
 export function createZwembadBuildings() {
     return [
-        {
-            x: 500, y: 400, w: 200, h: 150, 
-            color: '#00CED1', name: 'Zwembad',
-            door: {x: 580, y: 475, w: 40, h: 40},
-            isWaterPool: true  // Special flag to identify this as the water pool
-        }
+        new Building(200, 300, 300, 300, '#87CEEB', 'Zwembad', 'zwembad'),
+        new Building(600, 300, 300, 300, '#4682B4', 'Kleedkamer', 'kleedkamer'),
+        new Building(1000, 300, 300, 300, '#20B2AA', 'Douches', 'douches')
+    ];
+}
+
+// Create home world as a single large interior building
+export function createThuisBuildings() {
+    // Create a single building that represents the entire home interior
+    return [
+        new Building(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT, 'transparent', 'Thuis Interieur', 'thuis_interieur')
     ];
 }
 

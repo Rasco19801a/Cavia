@@ -47,10 +47,8 @@ export class HomeInventory {
     
     drawHamsterWheel(ctx) {
         ctx.save();
-        ctx.translate(
-            this.hamsterWheel.x - this.game.camera.x, 
-            this.hamsterWheel.y - this.game.camera.y
-        );
+        // Don't apply camera offset here - it's already applied by game's camera transform
+        ctx.translate(this.hamsterWheel.x, this.hamsterWheel.y);
         
         // Rotate wheel if spinning
         ctx.rotate(this.hamsterWheel.rotation);

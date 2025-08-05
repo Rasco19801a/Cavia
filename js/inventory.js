@@ -186,14 +186,18 @@ export class Inventory {
         this.selectedItem = null;
         this.updateSelectedItemInfo();
         
-        // Clear the current mission pig if inventory was opened from mission
+        // If inventory was opened from mission, reopen mission modal
         if (this.game.currentMissionPig) {
-            // Optionally reopen mission modal after a short delay
+            const missionPig = this.game.currentMissionPig;
+            // Clear the reference first
+            this.game.currentMissionPig = null;
+            
+            // Reopen mission modal after a short delay
             setTimeout(() => {
-                if (this.game.guineaPigMissions && this.game.currentMissionPig) {
-                    this.game.guineaPigMissions.showMissionModal(this.game.currentMissionPig);
+                if (this.game.guineaPigMissions) {
+                    this.game.guineaPigMissions.showMissionModal(missionPig);
                 }
-            }, 100);
+            }, 200);
         }
     }
     
