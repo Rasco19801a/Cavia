@@ -129,29 +129,12 @@ export class GuineaPigMissions {
         // Close mission modal first
         console.log('Closing mission modal...');
         domManager.closeModal('missionModal');
-        
-        // Check modal state after closing
-        console.log('Mission modal closed, checking inventory...');
-        
-        // Small delay to ensure modal is fully closed before opening inventory
-        setTimeout(() => {
-            if (this.game.inventory) {
-                console.log('Opening inventory after delay...');
-                this.game.inventory.openInventory();
-                
-                // Debug check after opening
-                setTimeout(() => {
-                    console.log('Inventory state after opening:', {
-                        isOpen: this.game.inventory.isOpen,
-                        modalClassList: this.game.inventory.inventoryModal?.classList?.toString(),
-                        modalDisplay: window.getComputedStyle(this.game.inventory.inventoryModal).display,
-                        modalVisibility: window.getComputedStyle(this.game.inventory.inventoryModal).visibility
-                    });
-                }, 100);
-            } else {
-                console.error('Inventory not found in game object');
-            }
-        }, 50);  // Small delay to prevent race conditions
+        console.log('Mission modal closed, opening inventory immediately...');
+        if (this.game.inventory) {
+            this.game.inventory.openInventory();
+        } else {
+            console.error('Inventory not found in game object');
+        }
     }
 
     showMissionModal(pig) {
