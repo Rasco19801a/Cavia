@@ -1,5 +1,7 @@
 // Guinea Pig Missions module - handles NPC guinea pigs and their missions
 import { GAME_CONFIG } from './config.js';
+import { eventSystem, GameEvents } from './event-system.js';
+import { domManager } from './dom-manager.js';
 
 export class GuineaPigMissions {
     constructor(game) {
@@ -63,11 +65,8 @@ export class GuineaPigMissions {
     }
 
     setupMissionModal() {
-        // Create mission modal
-        this.missionModal = document.createElement('div');
-        this.missionModal.id = 'missionModal';
-        this.missionModal.className = 'mission-modal hidden';
-        this.missionModal.innerHTML = `
+        // Create mission modal using DOM manager
+        const modalContent = `
             <div class="mission-content">
                 <h2 id="missionPigName">Missie</h2>
                 <div class="mission-pig-icon">🐹</div>
@@ -82,28 +81,23 @@ export class GuineaPigMissions {
                 <button class="modal-close-btn" id="closeMission">✖</button>
             </div>
         `;
-        document.body.appendChild(this.missionModal);
         
-        // Event listener for close button
-        document.getElementById('closeMission').addEventListener('click', () => {
-            this.closeMissionModal();
+        this.missionModal = domManager.createModal({
+            id: 'missionModal',
+            className: 'mission-modal hidden',
+            content: modalContent,
+            closeButton: '#closeMission',
+            closeOnEscape: true
         });
         
         // Event listener for inventory select button
         document.getElementById('selectFromInventory').addEventListener('click', () => {
             this.selectFromInventory();
         });
-        
-        // Close on escape key
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !this.missionModal.classList.contains('hidden')) {
-                this.closeMissionModal();
-            }
-        });
     }
 
     closeMissionModal() {
-        this.missionModal.classList.add('hidden');
+        domManager.closeModal('missionModal');
         this.currentMissionPig = null;
     }
 
@@ -113,13 +107,14 @@ export class GuineaPigMissions {
         // Open inventory
         this.game.inventory.openInventory();
         // Close mission modal
-        this.missionModal.classList.add('hidden');
+        domManager.closeModal('missionModal');
     }
 
     showMissionModal(pig) {
         this.currentMissionPig = pig;
         this.updateMissionModal();
-        this.missionModal.classList.remove('hidden');
+        domManager.openModal({ id: 'missionModal' });
+        eventSystem.emit(GameEvents.MISSION_START, pig);
     }
 
     updateMissionModal() {
@@ -157,6 +152,19 @@ export class GuineaPigMissions {
                 if (pig.missionItem === 'bow' || pig.missionItem === 'hat' || pig.missionItem === 'glasses') {
                     pig.accessory = pig.missionItem;
                 }
+                
+                // Emit mission complete event
+                eventSystem.emit(GameEvents.MISSION_COMPLETE, {
+                    pig: pig,
+                    reward: GAME_CONFIG.MISSION_REWARD
+                });
+            } else {
+                // Emit mission progress event
+                eventSystem.emit(GameEvents.MISSION_PROGRESS, {
+                    pig: pig,
+                    progress: pig.missionProgress,
+                    target: pig.missionTarget
+                });
             }
             
             return true; // Item was used for mission
