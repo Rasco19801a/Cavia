@@ -109,6 +109,13 @@ export class GuineaPigMissions {
 
     selectFromInventory() {
         console.log('Select from inventory clicked', this.currentMissionPig);
+        console.log('Current state:', {
+            currentMissionPig: this.currentMissionPig,
+            game: this.game,
+            inventory: this.game.inventory,
+            inventoryModal: this.game.inventory?.inventoryModal,
+            modalClassList: this.game.inventory?.inventoryModal?.classList?.toString()
+        });
         
         // Check if we have a current mission pig
         if (!this.currentMissionPig) {
@@ -120,15 +127,31 @@ export class GuineaPigMissions {
         this.game.currentMissionPig = this.currentMissionPig;
         
         // Close mission modal first
+        console.log('Closing mission modal...');
         domManager.closeModal('missionModal');
         
-        // Force immediate inventory opening without delay
-        if (this.game.inventory) {
-            console.log('Opening inventory immediately...');
-            this.game.inventory.openInventory();
-        } else {
-            console.error('Inventory not found in game object');
-        }
+        // Check modal state after closing
+        console.log('Mission modal closed, checking inventory...');
+        
+        // Small delay to ensure modal is fully closed before opening inventory
+        setTimeout(() => {
+            if (this.game.inventory) {
+                console.log('Opening inventory after delay...');
+                this.game.inventory.openInventory();
+                
+                // Debug check after opening
+                setTimeout(() => {
+                    console.log('Inventory state after opening:', {
+                        isOpen: this.game.inventory.isOpen,
+                        modalClassList: this.game.inventory.inventoryModal?.classList?.toString(),
+                        modalDisplay: window.getComputedStyle(this.game.inventory.inventoryModal).display,
+                        modalVisibility: window.getComputedStyle(this.game.inventory.inventoryModal).visibility
+                    });
+                }, 100);
+            } else {
+                console.error('Inventory not found in game object');
+            }
+        }, 50);  // Small delay to prevent race conditions
     }
 
     showMissionModal(pig) {

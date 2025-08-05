@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Debug Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        .debug-panel h3 {
+            margin-top: 0;
+        }
+        .test-controls {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h1>Modal Transition Debug Test</h1>
+        <button onclick="startGame()">1. Start Game</button>
+        <button onclick="goToHome()">2. Go to Home World</button>
+        <button onclick="openMissionModal()">3. Open Mission Modal</button>
+        <button onclick="clickInventoryButton()">4. Click Inventory Button</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <br><br>
+        <button onclick="checkModalStates()">Check Modal States</button>
+        <button onclick="forceOpenInventory()">Force Open Inventory</button>
+        <button onclick="checkEventListeners()">Check Event Listeners</button>
+    </div>
+
+    <div id="gameContainer"></div>
+    
+    <div class="debug-panel" id="debugPanel">
+        <h3>Debug Log</h3>
+        <div id="debugLog"></div>
+    </div>
+
+    <!-- Load all game scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/event-system.js"></script>
+    <script src="js/drawing-utils.js"></script>
+    <script src="js/dom-manager.js"></script>
+    <script src="js/ui-components.js"></script>
+    <script src="js/screen-manager.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/customization.js"></script>
+    <script src="js/animal-shapes.js"></script>
+    <script src="js/animals.js"></script>
+    <script src="js/buildings.js"></script>
+    <script src="js/minigames.js"></script>
+    <script src="js/guinea-pig-missions.js"></script>
+    <script src="js/home-item-manager.js"></script>
+    <script src="js/home-inventory.js"></script>
+    <script src="js/underwater-world.js"></script>
+    <script src="js/worlds.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        let debugLog = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = {timestamp, message, type};
+            debugLog.push(entry);
+            updateDebugDisplay();
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function updateDebugDisplay() {
+            const logDiv = document.getElementById('debugLog');
+            logDiv.innerHTML = debugLog.slice(-20).reverse().map(entry => 
+                `<div class="log-entry ${entry.type}">[${entry.timestamp}] ${entry.message}</div>`
+            ).join('');
+        }
+        
+        function clearLogs() {
+            debugLog = [];
+            updateDebugDisplay();
+        }
+        
+        // Override console methods to capture logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            log(args.join(' '), 'error');
+        };
+        
+        function startGame() {
+            log('Starting game...', 'info');
+            // Game will be initialized by main.js
+        }
+        
+        function goToHome() {
+            if (window.game) {
+                log('Switching to Home world...', 'info');
+                window.game.switchWorld('home');
+            } else {
+                log('Game not initialized!', 'error');
+            }
+        }
+        
+        function openMissionModal() {
+            if (window.game && window.game.guineaPigMissions) {
+                const pigs = window.game.worlds.home?.animals?.filter(a => a.type === 'guinea-pig') || [];
+                if (pigs.length > 0) {
+                    log(`Opening mission modal for pig: ${pigs[0].name}`, 'info');
+                    window.game.guineaPigMissions.showMissionModal(pigs[0]);
+                } else {
+                    log('No guinea pigs found in home world!', 'error');
+                }
+            } else {
+                log('Guinea pig missions not initialized!', 'error');
+            }
+        }
+        
+        function clickInventoryButton() {
+            const btn = document.getElementById('selectFromInventory');
+            if (btn) {
+                log('Clicking inventory button...', 'info');
+                btn.click();
+            } else {
+                log('Inventory button not found!', 'error');
+            }
+        }
+        
+        function checkModalStates() {
+            const missionModal = domManager.modals.get('missionModal');
+            const inventoryModal = document.getElementById('inventoryModal');
+            
+            log('=== Modal States ===', 'info');
+            log(`Mission Modal: ${missionModal ? 'exists' : 'not found'}`, missionModal ? 'success' : 'error');
+            if (missionModal) {
+                log(`- Classes: ${missionModal.classList.toString()}`, 'info');
+                log(`- Display: ${window.getComputedStyle(missionModal).display}`, 'info');
+                log(`- Z-Index: ${window.getComputedStyle(missionModal).zIndex}`, 'info');
+            }
+            
+            log(`Inventory Modal: ${inventoryModal ? 'exists' : 'not found'}`, inventoryModal ? 'success' : 'error');
+            if (inventoryModal) {
+                log(`- Classes: ${inventoryModal.classList.toString()}`, 'info');
+                log(`- Display: ${window.getComputedStyle(inventoryModal).display}`, 'info');
+                log(`- Z-Index: ${window.getComputedStyle(inventoryModal).zIndex}`, 'info');
+            }
+        }
+        
+        function forceOpenInventory() {
+            if (window.game && window.game.inventory) {
+                log('Force opening inventory...', 'info');
+                window.game.inventory.openInventory();
+            } else {
+                log('Inventory not initialized!', 'error');
+            }
+        }
+        
+        function checkEventListeners() {
+            const btn = document.getElementById('selectFromInventory');
+            if (btn) {
+                log('=== Event Listeners Check ===', 'info');
+                // Get event listeners (Chrome DevTools API)
+                if (window.getEventListeners) {
+                    const listeners = getEventListeners(btn);
+                    log(`Button has ${Object.keys(listeners).length} event types`, 'info');
+                    Object.keys(listeners).forEach(type => {
+                        log(`- ${type}: ${listeners[type].length} listeners`, 'info');
+                    });
+                } else {
+                    log('getEventListeners not available (not in Chrome DevTools)', 'info');
+                }
+                
+                // Check button state
+                log(`Button disabled: ${btn.disabled}`, btn.disabled ? 'error' : 'success');
+                log(`Button pointer-events: ${window.getComputedStyle(btn).pointerEvents}`, 'info');
+                log(`Button cursor: ${window.getComputedStyle(btn).cursor}`, 'info');
+            } else {
+                log('Button not found!', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
