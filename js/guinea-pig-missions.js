@@ -92,10 +92,19 @@ export class GuineaPigMissions {
         
         // Event listener for inventory select button using event delegation
         this.missionModal.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
             if (e.target && e.target.id === 'selectFromInventory') {
                 this.selectFromInventory();
             }
         });
+        
+        // Prevent clicks inside modal content from closing the modal
+        const missionContent = this.missionModal.querySelector('.mission-content');
+        if (missionContent) {
+            missionContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
     }
 
     closeMissionModal() {
@@ -104,14 +113,22 @@ export class GuineaPigMissions {
     }
 
     selectFromInventory() {
+        console.log('Select from inventory clicked', this.currentMissionPig);
+        
         // Store current mission pig in game object for inventory to access
         this.game.currentMissionPig = this.currentMissionPig;
-        // Close mission modal first
+        
+        // Close mission modal
         domManager.closeModal('missionModal');
-        // Open inventory after a small delay to ensure modal is closed
+        
+        // Open inventory with a small delay to ensure modal is fully closed
         setTimeout(() => {
-            this.game.inventory.openInventory();
-        }, 100);
+            if (this.game.inventory) {
+                this.game.inventory.openInventory();
+            } else {
+                console.error('Inventory not found in game object');
+            }
+        }, 150); // Increased delay slightly
     }
 
     showMissionModal(pig) {
@@ -143,37 +160,49 @@ export class GuineaPigMissions {
     }
 
     handleMissionItem(item, pig) {
-        if (pig.missionItem === item.type && pig.missionProgress < pig.missionTarget) {
+        if (pig.missionItem === item.id && pig.missionProgress < pig.missionTarget) {
             pig.missionProgress++;
-            this.updateMissionModal();
             
             if (pig.missionProgress >= pig.missionTarget) {
-                // Mission completed!
+                // Mission complete!
                 this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
                 this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
+                this.game.ui.updateDisplay();
                 
-                // Give accessory to pig if it's an accessory mission
-                if (pig.missionItem === 'bow' || pig.missionItem === 'hat' || pig.missionItem === 'glasses') {
-                    pig.accessory = pig.missionItem;
-                }
+                // Give new mission
+                this.updateMissionForPig(pig);
                 
-                // Emit mission complete event
-                eventSystem.emit(GameEvents.MISSION_COMPLETE, {
-                    pig: pig,
-                    reward: GAME_CONFIG.MISSION_REWARD
-                });
+                // Remove the item used
+                return true;
             } else {
-                // Emit mission progress event
-                eventSystem.emit(GameEvents.MISSION_PROGRESS, {
-                    pig: pig,
-                    progress: pig.missionProgress,
-                    target: pig.missionTarget
-                });
+                this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
+                return true;
             }
-            
-            return true; // Item was used for mission
         }
-        return false; // Item was not used
+        return false;
+    }
+    
+    completeMission(pig) {
+        // Give pig a new mission
+        this.updateMissionForPig(pig);
+        this.saveProgress();
+    }
+    
+    updateMissionForPig(pig) {
+        // Give pig a new mission
+        const missions = [
+            { item: 'carrot', target: 3, text: 'Ik heb weer honger! Breng me 3 wortels!' },
+            { item: 'lettuce', target: 2, text: 'Ik wil graag 2 stukken sla!' },
+            { item: 'cucumber', target: 2, text: 'Komkommers zijn lekker! Breng er 2!' },
+            { item: 'corn', target: 1, text: 'Ik heb zin in mais! Breng me 1 mais!' },
+            { item: 'hay_small', target: 1, text: 'Ik heb hooi nodig! Breng me een hooi pakket!' }
+        ];
+        
+        const newMission = missions[Math.floor(Math.random() * missions.length)];
+        pig.mission = newMission.text;
+        pig.missionItem = newMission.item;
+        pig.missionTarget = newMission.target;
+        pig.missionProgress = 0;
     }
 
     checkGuineaPigClick(x, y) {
