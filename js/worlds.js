@@ -27,6 +27,9 @@ export function drawWorld(ctx, worldType, buildings) {
         case 'dierenstad':
             drawDierenstad(ctx, buildings);
             break;
+        case 'paarden wei':
+            drawPaardenWei(ctx);
+            break;
         case 'thuis':
             drawThuis(ctx);
             break;
@@ -1037,4 +1040,117 @@ function drawThuis(ctx) {
     // Title removed
     
     // Instructions removed
+}
+
+function drawPaardenWei(ctx) {
+    // Sky
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    
+    // Sun
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.arc(1800, 100, 50, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Rolling hills in background
+    ctx.fillStyle = '#90EE90';
+    ctx.beginPath();
+    ctx.moveTo(0, 400);
+    ctx.quadraticCurveTo(300, 350, 600, 400);
+    ctx.quadraticCurveTo(900, 300, 1200, 400);
+    ctx.quadraticCurveTo(1500, 350, 1800, 400);
+    ctx.quadraticCurveTo(1900, 380, CONFIG.WORLD_WIDTH, 400);
+    ctx.lineTo(CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    ctx.lineTo(0, CONFIG.WORLD_HEIGHT);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Grass field
+    ctx.fillStyle = '#228B22';
+    ctx.fillRect(0, 500, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 500);
+    
+    // Wooden fence along the back
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 8;
+    // Horizontal rails
+    ctx.beginPath();
+    ctx.moveTo(0, 420);
+    ctx.lineTo(CONFIG.WORLD_WIDTH, 420);
+    ctx.moveTo(0, 460);
+    ctx.lineTo(CONFIG.WORLD_WIDTH, 460);
+    ctx.stroke();
+    
+    // Vertical posts
+    for (let x = 50; x < CONFIG.WORLD_WIDTH; x += 150) {
+        ctx.beginPath();
+        ctx.moveTo(x, 400);
+        ctx.lineTo(x, 480);
+        ctx.stroke();
+    }
+    
+    // Hay bales
+    ctx.fillStyle = '#DAA520';
+    // Large hay bale
+    ctx.fillRect(200, 460, 80, 60);
+    ctx.fillStyle = '#B8860B';
+    ctx.fillRect(200, 470, 80, 5);
+    ctx.fillRect(200, 485, 80, 5);
+    ctx.fillRect(200, 500, 80, 5);
+    
+    // Small hay bale
+    ctx.fillStyle = '#DAA520';
+    ctx.fillRect(1400, 480, 60, 40);
+    ctx.fillStyle = '#B8860B';
+    ctx.fillRect(1400, 485, 60, 3);
+    ctx.fillRect(1400, 495, 60, 3);
+    ctx.fillRect(1400, 505, 60, 3);
+    
+    // Water trough
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(800, 480, 120, 40);
+    ctx.fillStyle = '#4682B4';
+    ctx.fillRect(805, 485, 110, 30);
+    
+    // Some flowers in the grass
+    for (let i = 0; i < 30; i++) {
+        const x = Math.random() * CONFIG.WORLD_WIDTH;
+        const y = 520 + Math.random() * 200;
+        
+        // Flower stem
+        ctx.strokeStyle = '#228B22';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 10);
+        ctx.stroke();
+        
+        // Flower petals
+        ctx.fillStyle = ['#FF69B4', '#FFD700', '#FF6347', '#DA70D6'][i % 4];
+        ctx.beginPath();
+        ctx.arc(x, y - 10, 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // Trees in background
+    for (let i = 0; i < 5; i++) {
+        const x = 100 + i * 400;
+        const y = 380;
+        
+        // Tree trunk
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(x - 15, y, 30, 60);
+        
+        // Tree leaves
+        ctx.fillStyle = '#228B22';
+        ctx.beginPath();
+        ctx.arc(x, y - 20, 40, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x - 20, y - 10, 30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x + 20, y - 10, 30, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }

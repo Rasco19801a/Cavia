@@ -1,5 +1,5 @@
 // Animals module - handles animal placement and educational challenges
-import { CONFIG } from './config.js';
+import { CONFIG, GAME_CONFIG } from './config.js';
 
 // Animal definitions for each world
 export const ANIMALS = {
@@ -50,6 +50,18 @@ export const ANIMALS = {
         { type: 'ezel', name: 'Ezel', emoji: '🫏', x: 650, y: 480, color: { body: '#808080', belly: '#A9A9A9' } },
         { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 480, color: { body: '#000000', belly: '#FFFFFF' } },
         { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 480, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
+    ],
+    'paarden wei': [
+        { type: 'paard', name: 'Thunder', emoji: '🐴', x: 300, y: 480, color: { body: '#2c2c2c', belly: '#696969' }, 
+          mission: 'Ik heb honger! Breng me 3 appels alsjeblieft!', missionProgress: 0, missionTarget: 3, missionItem: 'apple' },
+        { type: 'paard', name: 'Bella', emoji: '🐴', x: 600, y: 480, color: { body: '#8B4513', belly: '#D2691E' }, 
+          mission: 'Ik wil graag 5 wortels eten!', missionProgress: 0, missionTarget: 5, missionItem: 'carrot' },
+        { type: 'paard', name: 'Storm', emoji: '🐴', x: 900, y: 480, color: { body: '#696969', belly: '#A9A9A9' }, 
+          mission: 'Breng me 2 pakketjes hooi!', missionProgress: 0, missionTarget: 2, missionItem: 'hay_small' },
+        { type: 'paard', name: 'Luna', emoji: '🐴', x: 1200, y: 480, color: { body: '#FFFFFF', belly: '#F5F5F5' }, 
+          mission: 'Ik heb zin in 4 appels!', missionProgress: 0, missionTarget: 4, missionItem: 'apple' },
+        { type: 'paard', name: 'Max', emoji: '🐴', x: 1500, y: 480, color: { body: '#D2691E', belly: '#F4A460' }, 
+          mission: 'Kan je 3 wortels voor me vinden?', missionProgress: 0, missionTarget: 3, missionItem: 'carrot' }
     ]
 };
 
@@ -162,11 +174,102 @@ export class AnimalChallenge {
 
     showChallenge(animal) {
         this.currentAnimal = animal;
-        this.challengeModal.classList.remove('hidden');
-        document.getElementById('challengeChoice').classList.remove('hidden');
-        document.getElementById('challengeTask').classList.add('hidden');
-        document.getElementById('feedback').classList.add('hidden');
-        document.getElementById('challengeTitle').textContent = `${animal.name} heeft een opdracht voor je!`;
+        
+        // Check if this animal has a mission (like horses in paarden wei)
+        if (animal.mission) {
+            // Show mission modal instead of challenge modal
+            this.showMissionModal(animal);
+        } else {
+            // Show regular challenge modal
+            this.challengeModal.classList.remove('hidden');
+            document.getElementById('challengeChoice').classList.remove('hidden');
+            document.getElementById('challengeTask').classList.add('hidden');
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('challengeTitle').textContent = `${animal.name} heeft een opdracht voor je!`;
+        }
+    }
+
+    showMissionModal(animal) {
+        // Create mission modal if it doesn't exist
+        if (!this.missionModal) {
+            this.missionModal = document.createElement('div');
+            this.missionModal.className = 'modal hidden';
+            this.missionModal.id = 'missionModal';
+            this.missionModal.innerHTML = `
+                <div class="modal-content">
+                    <h2 id="missionTitle"></h2>
+                    <p id="missionDescription"></p>
+                    <div id="missionProgress"></div>
+                    <button class="modal-close-btn" id="closeMission">✖</button>
+                </div>
+            `;
+            document.body.appendChild(this.missionModal);
+            
+            document.getElementById('closeMission').addEventListener('click', () => {
+                this.missionModal.classList.add('hidden');
+            });
+        }
+        
+        // Update mission content
+        document.getElementById('missionTitle').textContent = animal.name;
+        document.getElementById('missionDescription').textContent = animal.mission;
+        document.getElementById('missionProgress').textContent = 
+            `Voortgang: ${animal.missionProgress}/${animal.missionTarget}`;
+        
+        this.missionModal.classList.remove('hidden');
+    }
+
+    handleMissionItem(item, animal) {
+        if (animal.missionItem === item.id && animal.missionProgress < animal.missionTarget) {
+            animal.missionProgress++;
+            
+            if (animal.missionProgress >= animal.missionTarget) {
+                // Mission complete!
+                this.game.ui.showNotification(`${animal.name} zegt: Dankjewel! Hier zijn ${CONFIG.MISSION_REWARD} wortels voor jou!`);
+                this.game.player.carrots += CONFIG.MISSION_REWARD;
+                this.game.ui.updateDisplay();
+                
+                // Give new mission
+                this.updateMissionForAnimal(animal);
+                
+                // Update modal if still open
+                if (this.missionModal && !this.missionModal.classList.contains('hidden')) {
+                    this.showMissionModal(animal);
+                }
+                
+                return true;
+            } else {
+                this.game.ui.showNotification(`Goed zo! Nog ${animal.missionTarget - animal.missionProgress} ${item.name} te gaan!`);
+                
+                // Update modal if still open
+                if (this.missionModal && !this.missionModal.classList.contains('hidden')) {
+                    document.getElementById('missionProgress').textContent = 
+                        `Voortgang: ${animal.missionProgress}/${animal.missionTarget}`;
+                }
+                
+                return true;
+            }
+        }
+        return false;
+    }
+
+    updateMissionForAnimal(animal) {
+        // Define possible missions for horses
+        const horseMissions = [
+            { mission: 'Ik heb weer honger! Breng me 3 appels!', target: 3, item: 'apple' },
+            { mission: 'Kan je 5 wortels voor me vinden?', target: 5, item: 'carrot' },
+            { mission: 'Ik wil graag 2 pakketjes hooi!', target: 2, item: 'hay_small' },
+            { mission: 'Breng me 4 appels alsjeblieft!', target: 4, item: 'apple' },
+            { mission: 'Ik heb trek in 3 wortels!', target: 3, item: 'carrot' },
+            { mission: 'Mag ik 1 groot pakket hooi?', target: 1, item: 'hay_large' }
+        ];
+        
+        // Pick a random new mission
+        const newMission = horseMissions[Math.floor(Math.random() * horseMissions.length)];
+        animal.mission = newMission.mission;
+        animal.missionProgress = 0;
+        animal.missionTarget = newMission.target;
+        animal.missionItem = newMission.item;
     }
 
     startSpellingChallenge() {
