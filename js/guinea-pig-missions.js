@@ -20,7 +20,7 @@ export class GuineaPigMissions {
                 id: 1,
                 name: 'Ginger',
                 x: 600,
-                y: 480,
+                y: 520,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#F5DEB3'  // Beige belly
@@ -35,7 +35,7 @@ export class GuineaPigMissions {
                 id: 2,
                 name: 'Chinto',
                 x: 900,
-                y: 480,
+                y: 520,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#000000'  // Black belly
@@ -50,7 +50,7 @@ export class GuineaPigMissions {
                 id: 3,
                 name: 'Luxy',
                 x: 1200,
-                y: 480,
+                y: 520,
                 color: {
                     body: '#FFFFFF',  // White body
                     belly: '#8B4513'  // Brown belly
@@ -106,10 +106,12 @@ export class GuineaPigMissions {
     selectFromInventory() {
         // Store current mission pig in game object for inventory to access
         this.game.currentMissionPig = this.currentMissionPig;
-        // Open inventory
-        this.game.inventory.openInventory();
-        // Close mission modal
+        // Close mission modal first
         domManager.closeModal('missionModal');
+        // Open inventory after a small delay to ensure modal is closed
+        setTimeout(() => {
+            this.game.inventory.openInventory();
+        }, 100);
     }
 
     showMissionModal(pig) {
@@ -193,7 +195,7 @@ export class GuineaPigMissions {
             // Draw shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.beginPath();
-            ctx.ellipse(0, 5, 30, 10, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 25, 30, 10, 0, 0, Math.PI * 2);
             ctx.fill();
             
             // Draw guinea pig body
