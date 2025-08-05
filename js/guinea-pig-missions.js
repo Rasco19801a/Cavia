@@ -94,12 +94,23 @@ export class GuineaPigMissions {
         // We'll add direct listeners when the modal is shown instead
         
         // Prevent clicks inside modal content from closing the modal
+        // BUT allow clicks on the close button to propagate
         const missionContent = this.missionModal.querySelector('.mission-content');
         if (missionContent) {
             missionContent.addEventListener('click', (e) => {
-                e.stopPropagation();
+                // Don't stop propagation if clicking the close button
+                if (!e.target.matches('#closeMission')) {
+                    e.stopPropagation();
+                }
             });
         }
+        
+        // Also add click handler to close modal when clicking outside
+        this.missionModal.addEventListener('click', (e) => {
+            if (e.target === this.missionModal) {
+                this.closeMissionModal();
+            }
+        });
     }
 
     closeMissionModal() {
