@@ -11,9 +11,14 @@ import { HomeInventory } from './home-inventory.js';
 import { UnderwaterWorld } from './underwater-world.js';
 import { Inventory } from './inventory.js';
 import { Minigames } from './minigames.js';
+import { createLogger, errorHandler, performanceMonitor } from './logger.js';
+import { eventSystem, GameEvents } from './event-system.js';
 
 export class Game {
     constructor(canvas, customization = {}) {
+        this.logger = createLogger('Game');
+        this.logger.info('Initializing game', customization);
+        
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
@@ -63,17 +68,22 @@ export class Game {
         
         // Show UI panels with a small delay to ensure DOM is ready
         setTimeout(() => {
-            const worldSelector = document.getElementById('worldSelector');
-            const designPanel = document.querySelector('.design-panel');
-            
-            if (worldSelector) {
-                worldSelector.classList.remove('hidden');
-                console.log('World selector shown');
-            } else {
-                console.error('World selector element not found!');
-            }
-            
-            if (designPanel) designPanel.classList.remove('hidden');
+            errorHandler.tryCatch(() => {
+                const worldSelector = document.getElementById('worldSelector');
+                const designPanel = document.querySelector('.design-panel');
+                
+                if (worldSelector) {
+                    worldSelector.classList.remove('hidden');
+                    this.logger.debug('World selector shown');
+                } else {
+                    this.logger.warn('World selector element not found');
+                }
+                
+                if (designPanel) {
+                    designPanel.classList.remove('hidden');
+                    this.logger.debug('Design panel shown');
+                }
+            });
         }, 50);
         
         // Setup event listeners
@@ -157,10 +167,10 @@ export class Game {
             this.handleMouseUp(mouseEvent);
         });
         
-        // World change event
-        window.addEventListener('worldChange', (e) => {
-            console.log('worldChange event received in game.js:', e.detail);
-            this.changeWorld(e.detail.world);
+        // World change event using event system
+        eventSystem.on(GameEvents.WORLD_CHANGE, (world) => {
+            this.logger.info('World change requested', { world });
+            this.changeWorld(world);
         });
     }
 
@@ -455,6 +465,7 @@ export class Game {
     }
 
     setupWorld() {
+        this.logger.debug('Setting up world', { world: this.currentWorld });
         this.buildings = [];
         
         switch (this.currentWorld) {
@@ -471,6 +482,8 @@ export class Game {
                 }
                 break;
         }
+        
+        eventSystem.emit(GameEvents.WORLD_LOADED, this.currentWorld);
     }
 
     update() {
@@ -517,12 +530,15 @@ export class Game {
     }
     
     draw() {
+        performanceMonitor.startTimer('frame');
+        
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw underwater world if active
         if (this.underwaterWorld.active) {
             this.underwaterWorld.draw(this.ctx);
+            performanceMonitor.endTimer('frame');
             return;
         }
         
@@ -570,6 +586,8 @@ export class Game {
             
             this.ctx.restore();
         }
+        
+        performanceMonitor.endTimer('frame');
     }
 
     gameLoop() {
