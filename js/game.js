@@ -190,9 +190,26 @@ export class Game {
         
         // Check if clicking on exit
         if (this.isInside) {
-            if (x >= 350 && x <= 450 && y >= 520 && y <= 570) {
-                this.exitBuilding();
-                return;
+            // Check if in a shop
+            const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+            const isShop = this.currentBuilding && shopBuildings.includes(this.currentBuilding.name);
+            
+            if (isShop) {
+                // For shops, check exit button in world coordinates
+                const worldCoords = this.camera.screenToWorld(x, y);
+                // Exit button is at WORLD_WIDTH/2 (1000) with width 100
+                if (worldCoords.x >= CONFIG.WORLD_WIDTH / 2 - 50 && 
+                    worldCoords.x <= CONFIG.WORLD_WIDTH / 2 + 50 && 
+                    worldCoords.y >= 520 && worldCoords.y <= 570) {
+                    this.exitBuilding();
+                    return;
+                }
+            } else {
+                // For other buildings, use screen coordinates
+                if (x >= 350 && x <= 450 && y >= 520 && y <= 570) {
+                    this.exitBuilding();
+                    return;
+                }
             }
         }
         
@@ -309,12 +326,20 @@ export class Game {
             }
         } else {
             // Inside building
-            if (y > 500) {
-                // Exit building
-                this.exitBuilding();
-            } else {
-                // Move inside building
-                this.player.setTarget(x, y);
+            // Skip the y > 500 check since we already handle exit button above
+            {
+                // Check if in a shop (shops use world coordinates)
+                const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+                const isShop = this.currentBuilding && shopBuildings.includes(this.currentBuilding.name);
+                
+                if (isShop) {
+                    // Convert screen coordinates to world coordinates for shops
+                    const worldCoords = this.camera.screenToWorld(x, y);
+                    this.player.setTarget(worldCoords.x, worldCoords.y);
+                } else {
+                    // Other buildings use screen coordinates
+                    this.player.setTarget(x, y);
+                }
             }
         }
     }
@@ -503,7 +528,17 @@ export class Game {
         if (!this.isInside) {
             this.player.constrainToBounds(30, CONFIG.WORLD_WIDTH - 30, 30, CONFIG.WORLD_HEIGHT - 30);
         } else {
-            this.player.constrainToBounds(30, 770, 30, 570);
+            // Check if in a shop (shops use world coordinates)
+            const shopBuildings = ['Speelgoedwinkel', 'Groente Markt', 'Hooi Winkel', 'Speeltjes & Meer', 'Cavia Spa', 'Accessoires'];
+            const isShop = this.currentBuilding && shopBuildings.includes(this.currentBuilding.name);
+            
+            if (isShop) {
+                // Shops use world coordinates like outside
+                this.player.constrainToBounds(30, CONFIG.WORLD_WIDTH - 30, 30, CONFIG.WORLD_HEIGHT - 30);
+            } else {
+                // Other buildings use screen coordinates
+                this.player.constrainToBounds(30, 770, 30, 570);
+            }
         }
         
         // Update camera
@@ -584,6 +619,16 @@ export class Game {
             }
             
             drawInterior(this.ctx, this.currentBuilding);
+            
+            // Draw click target indicator for shops
+            if (isShop && this.player.targetX !== null && this.player.targetY !== null) {
+                this.ctx.strokeStyle = '#FF69B4';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(this.player.targetX, this.player.targetY, 20, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
+            
             this.player.draw(this.ctx);
             
             this.ctx.restore();
