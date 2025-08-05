@@ -107,6 +107,7 @@ export const WORLDS = [
     'jungle', 
     'zwembad',
     'dierenstad',
+    'paarden wei',
     'thuis'
 ];
 
@@ -130,5 +131,7 @@ export const ITEM_TYPES = {
     GLASSES: 'glasses',
     BALL: 'ball',
     HOUSE: 'house',
-    BED: 'bed'
+    BED: 'bed',
+    HAY: 'hay',
+    APPLE: 'apple'
 };

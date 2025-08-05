@@ -14,6 +14,7 @@ export class Shop {
                 { id: 'lettuce', name: 'Sla', price: 3, emoji: '🥬', description: 'Knapperige sla' },
                 { id: 'cucumber', name: 'Komkommer', price: 4, emoji: '🥒', description: 'Sappige komkommer' },
                 { id: 'corn', name: 'Mais', price: 6, emoji: '🌽', description: 'Zoete mais' },
+                { id: 'apple', name: 'Appel', price: 5, emoji: '🍎', description: 'Verse rode appel' },
                 { id: 'endive', name: 'Andijvie', price: 4, emoji: '🥬', description: 'Verse andijvie, rijk aan vitamines' },
                 { id: 'celery', name: 'Bleekselderij', price: 3, emoji: '🥬', description: 'Knapperige bleekselderij' },
                 { id: 'spinach', name: 'Spinazie', price: 5, emoji: '🥬', description: 'Gezonde spinazie vol ijzer' }

@@ -1082,6 +1082,134 @@ export function drawKoe(ctx, animal, screenX, screenY, scale) {
     ctx.restore();
 }
 
+// Paard (Horse)
+export function drawPaard(ctx, animal, screenX, screenY, scale) {
+    ctx.save();
+    ctx.translate(screenX, screenY);
+    ctx.scale(scale, scale);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, 35, 50, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Body (elongated for horse)
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.ellipse(10, 0, 65, 35, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly
+    ctx.fillStyle = animal.color.belly;
+    ctx.beginPath();
+    ctx.ellipse(10, 15, 50, 20, 0, 0, Math.PI);
+    ctx.fill();
+
+    // Neck
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.moveTo(-30, -10);
+    ctx.lineTo(-45, -40);
+    ctx.lineTo(-25, -45);
+    ctx.lineTo(-10, -20);
+    ctx.closePath();
+    ctx.fill();
+
+    // Head (elongated horse head)
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.ellipse(-40, -45, 25, 18, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Muzzle
+    ctx.fillStyle = animal.color.belly;
+    ctx.beginPath();
+    ctx.ellipse(-55, -40, 12, 10, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Mane
+    ctx.fillStyle = '#2c2c2c';
+    ctx.beginPath();
+    ctx.moveTo(-25, -50);
+    ctx.quadraticCurveTo(-20, -55, -15, -50);
+    ctx.quadraticCurveTo(-10, -45, -5, -40);
+    ctx.quadraticCurveTo(0, -35, 5, -30);
+    ctx.lineTo(0, -25);
+    ctx.lineTo(-10, -30);
+    ctx.lineTo(-20, -40);
+    ctx.closePath();
+    ctx.fill();
+
+    // Ears
+    ctx.fillStyle = animal.color.body;
+    ctx.beginPath();
+    ctx.moveTo(-35, -60);
+    ctx.lineTo(-30, -50);
+    ctx.lineTo(-40, -50);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-25, -58);
+    ctx.lineTo(-20, -48);
+    ctx.lineTo(-30, -48);
+    ctx.closePath();
+    ctx.fill();
+
+    // Legs (4 legs)
+    ctx.fillStyle = animal.color.body;
+    // Front legs
+    ctx.fillRect(-25, 20, 12, 40);
+    ctx.fillRect(-10, 20, 12, 40);
+    // Back legs
+    ctx.fillRect(35, 20, 12, 40);
+    ctx.fillRect(50, 20, 12, 40);
+
+    // Hooves
+    ctx.fillStyle = '#2c2c2c';
+    ctx.fillRect(-25, 55, 12, 8);
+    ctx.fillRect(-10, 55, 12, 8);
+    ctx.fillRect(35, 55, 12, 8);
+    ctx.fillRect(50, 55, 12, 8);
+
+    // Tail
+    ctx.strokeStyle = animal.color.body === '#FFFFFF' ? '#F5F5F5' : animal.color.body;
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(70, -5);
+    ctx.quadraticCurveTo(85, 10, 80, 30);
+    ctx.stroke();
+    
+    // Tail hair
+    ctx.strokeStyle = '#2c2c2c';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(78, 20);
+    ctx.quadraticCurveTo(82, 35, 75, 45);
+    ctx.stroke();
+
+    // Eyes
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(-45, -50, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-35, -48, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nostrils
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.ellipse(-58, -38, 2, 3, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(-52, -36, 2, 3, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawNameAndGlow(ctx, animal, screenX, screenY, scale);
+    ctx.restore();
+}
+
 // Export all drawing functions
 export const animalDrawers = {
     hond: drawHond,
@@ -1093,7 +1221,8 @@ export const animalDrawers = {
     vis: drawVis,
     flamingo: drawFlamingo,
     kikker: drawKikker,
-    koe: drawKoe
+    koe: drawKoe,
+    paard: drawPaard
 };
 
 // Main drawing function

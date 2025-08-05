@@ -1,5 +1,6 @@
 // Inventory module - handles player's inventory system
 import { GAME_CONFIG } from './config.js';
+import { ANIMALS } from './animals.js';
 
 export class Inventory {
     constructor(game) {
@@ -307,7 +308,7 @@ export class Inventory {
         }
         
         // Check for other use cases
-        const usableItems = ['carrot', 'lettuce', 'cucumber', 'corn', 'hay_small', 'hay_medium', 'hay_large'];
+        const usableItems = ['carrot', 'lettuce', 'cucumber', 'corn', 'hay_small', 'hay_medium', 'hay_large', 'apple'];
         return usableItems.includes(item.id);
     }
     
@@ -327,13 +328,50 @@ export class Inventory {
         if (this.game.activeMission) {
             this.giveItemToMissionPig(this.selectedItem);
         } else {
-            // Use item normally
-            this.removeItem(this.selectedItem.id);
-            this.selectedItem = null;
-            this.updateInventoryDisplay();
-            this.updateSelectedItemInfo();
-            this.game.ui.showNotification(`Je hebt ${this.selectedItem.name} gebruikt!`);
+            // Check if player is near an animal with a mission
+            const nearbyAnimal = this.findNearbyAnimalWithMission();
+            if (nearbyAnimal) {
+                // Try to give item to the animal
+                if (this.game.animalChallenge.handleMissionItem(this.selectedItem, nearbyAnimal)) {
+                    // Remove the item if it was used
+                    this.removeItem(this.selectedItem.id);
+                    this.selectedItem = null;
+                    this.updateInventoryDisplay();
+                    this.updateSelectedItemInfo();
+                } else {
+                    this.game.ui.showNotification('Dit dier heeft dit item niet nodig!');
+                }
+            } else {
+                // Use item normally
+                const itemName = this.selectedItem.name;
+                this.removeItem(this.selectedItem.id);
+                this.selectedItem = null;
+                this.updateInventoryDisplay();
+                this.updateSelectedItemInfo();
+                this.game.ui.showNotification(`Je hebt ${itemName} gebruikt!`);
+            }
         }
+    }
+    
+    findNearbyAnimalWithMission() {
+        const animals = ANIMALS[this.game.currentWorld] || [];
+        const playerX = this.game.player.x;
+        const playerY = this.game.player.y;
+        
+        for (const animal of animals) {
+            if (animal.mission) {
+                const distance = Math.sqrt(
+                    Math.pow(playerX - animal.x, 2) + 
+                    Math.pow(playerY - animal.y, 2)
+                );
+                
+                if (distance < 100) { // Close enough to interact
+                    return animal;
+                }
+            }
+        }
+        
+        return null;
     }
     
     placeItemInHome() {
