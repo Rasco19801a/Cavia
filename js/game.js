@@ -110,16 +110,6 @@ export class Game {
                     this.ui.showNotification('Items georganiseerd!');
                 }
             }
-            
-            // W key to toggle world selector
-            if (e.key === 'w' || e.key === 'W') {
-                const worldSelector = document.getElementById('worldSelector');
-                if (worldSelector) {
-                    worldSelector.classList.toggle('hidden');
-                    this.ui.showNotification(worldSelector.classList.contains('hidden') ? 
-                        'Wereld selector verborgen' : 'Wereld selector geopend');
-                }
-            }
         });
         
         window.addEventListener('keyup', (e) => {
@@ -494,7 +484,8 @@ export class Game {
             'jungle': 'de Jungle',
             'zwembad': 'het Zwembad',
             'dierenstad': 'de Dierenstad',
-            'thuis': 'Thuis'
+            'thuis': 'Thuis',
+            'paarden wei': 'de Paarden Weide'
         };
         return names[world] || world;
     }

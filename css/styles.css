@@ -218,33 +218,6 @@ body {
     background: #764ba2;
 }
 
-/* World toggle button */
-.world-toggle-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transition: all 0.3s ease;
-}
-
-.world-toggle-btn:hover {
-    background: #45a049;
-    transform: scale(1.1);
-}
-
-.world-toggle-btn:active {
-    transform: scale(0.95);
-}
-
 /* Controls panel */
 .controls {
     bottom: 10px;
