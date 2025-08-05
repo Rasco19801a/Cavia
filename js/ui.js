@@ -74,6 +74,12 @@ export class UI {
                 
                 // Emit world change event
                 eventSystem.emit(GameEvents.WORLD_CHANGE, world);
+                
+                // Hide the world selector after selection
+                const worldSelector = document.getElementById('worldSelector');
+                if (worldSelector) {
+                    worldSelector.classList.add('hidden');
+                }
             });
         });
     }
