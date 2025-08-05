@@ -118,17 +118,32 @@ export class GuineaPigMissions {
         // Store current mission pig in game object for inventory to access
         this.game.currentMissionPig = this.currentMissionPig;
         
-        // Close mission modal
+        // Close mission modal first
         domManager.closeModal('missionModal');
         
-        // Open inventory with a small delay to ensure modal is fully closed
+        // Wait for modal to close completely before opening inventory
         setTimeout(() => {
             if (this.game.inventory) {
+                // Ensure inventory modal exists
+                if (!this.game.inventory.inventoryModal) {
+                    console.error('Inventory modal not initialized');
+                    this.game.inventory.setupInventoryModal();
+                }
+                
+                // Open inventory
                 this.game.inventory.openInventory();
+                
+                // Add event listener for when inventory closes
+                const checkInventoryClosed = setInterval(() => {
+                    if (!this.game.inventory.isOpen) {
+                        clearInterval(checkInventoryClosed);
+                        // Don't automatically reopen mission modal - let inventory handle it
+                    }
+                }, 100);
             } else {
                 console.error('Inventory not found in game object');
             }
-        }, 150); // Increased delay slightly
+        }, 300); // Increased delay to ensure smooth transition
     }
 
     showMissionModal(pig) {
@@ -219,7 +234,8 @@ export class GuineaPigMissions {
     drawGuineaPigs(ctx, camera) {
         this.otherGuineaPigs.forEach(pig => {
             ctx.save();
-            ctx.translate(pig.x - camera.x, pig.y - camera.y);
+            // Don't apply camera offset here - it's already applied by game's camera transform
+            ctx.translate(pig.x, pig.y);
             
             // Draw shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';

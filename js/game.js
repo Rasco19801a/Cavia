@@ -4,7 +4,7 @@ import { Player } from './player.js';
 import { Camera } from './camera.js';
 import { UI } from './ui.js';
 import { drawWorld } from './worlds.js';
-import { createDierenstadBuildings, createZwembadBuildings, drawInterior } from './buildings.js';
+import { createDierenstadBuildings, createZwembadBuildings, createThuisBuildings, drawInterior } from './buildings.js';
 import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 import { Shop } from './shop.js';
 import { HomeInventory } from './home-inventory.js';
@@ -476,6 +476,8 @@ export class Game {
                 this.buildings = createZwembadBuildings();
                 break;
             case 'thuis':
+                // Create home buildings for consistent structure
+                this.buildings = createThuisBuildings();
                 // Reorganize items when entering home world to prevent overlapping
                 if (this.homeInventory) {
                     this.homeInventory.reorganizeItems();
