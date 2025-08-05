@@ -12,8 +12,14 @@ export class UI {
     }
     
     setupUI() {
+        // Create carrot display
+        this.setupCarrotDisplay();
+        
         // Initial display update
         this.updateDisplay();
+        
+        // Setup world selector
+        this.setupWorldSelector();
         
         // Setup design panel if it exists
         this.setupDesignPanel();
@@ -34,14 +40,69 @@ export class UI {
         });
     }
     
+    setupCarrotDisplay() {
+        // Create carrot display element if it doesn't exist
+        if (!document.getElementById('carrotDisplay')) {
+            const carrotDisplay = document.createElement('div');
+            carrotDisplay.id = 'carrotDisplay';
+            carrotDisplay.className = 'carrots-display';
+            carrotDisplay.innerHTML = `
+                <span class="carrot-icon">🥕</span>
+                <span id="carrotCount">0</span>
+            `;
+            document.body.appendChild(carrotDisplay);
+            
+            // Cache the element in domManager
+            domManager.cacheElement('carrotCount', 'carrotCount');
+        }
+    }
+    
+    setupWorldSelector() {
+        // Setup world selector buttons
+        const worldButtons = document.querySelectorAll('.world-btn');
+        
+        worldButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const world = btn.getAttribute('data-world');
+                
+                // Update active state
+                worldButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Emit world change event
+                eventSystem.emit(GameEvents.WORLD_CHANGE, world);
+            });
+        });
+    }
+    
     updateDisplay() {
-        // Use event system to update display
+        // Update carrot count directly
+        const carrotCount = document.getElementById('carrotCount');
+        if (carrotCount) {
+            carrotCount.textContent = this.player.carrots;
+        }
+        
+        // Also emit event for other systems
         eventSystem.emit(GameEvents.UI_UPDATE_DISPLAY, {
             carrots: this.player.carrots
         });
     }
     
     showNotification(message) {
+        // Create notification element if it doesn't exist
+        if (!document.getElementById('notification')) {
+            const notification = document.createElement('div');
+            notification.id = 'notification';
+            notification.className = 'notification';
+            document.body.appendChild(notification);
+            
+            // Cache the element
+            domManager.cacheElement('notification', 'notification');
+        }
+        
         // Use event system for notifications
         eventSystem.emit(GameEvents.UI_NOTIFICATION, message);
     }

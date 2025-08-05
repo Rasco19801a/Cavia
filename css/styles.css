@@ -1344,3 +1344,29 @@ body {
         font-size: 1em;
     }
 }
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+/* Ensure carrot display is visible */
+.carrots-display {
+    z-index: 100;
+}
