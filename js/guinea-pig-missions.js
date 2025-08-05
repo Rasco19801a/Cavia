@@ -90,9 +90,11 @@ export class GuineaPigMissions {
             closeOnEscape: true
         });
         
-        // Event listener for inventory select button
-        document.getElementById('selectFromInventory').addEventListener('click', () => {
-            this.selectFromInventory();
+        // Event listener for inventory select button using event delegation
+        this.missionModal.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'selectFromInventory') {
+                this.selectFromInventory();
+            }
         });
     }
 

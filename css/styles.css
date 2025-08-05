@@ -328,13 +328,22 @@ body {
         left: 10px;
         right: 10px;
         max-width: none;
-        justify-content: center;
+        justify-content: flex-start;
         background: rgba(255, 255, 255, 0.95);
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        flex-wrap: nowrap;
     }
     
     .world-btn {
         font-size: 12px;
         padding: 6px 10px;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
     
     .controls {
@@ -443,6 +452,17 @@ body {
     .controls p {
         font-size: 10px;
         margin: 2px 0;
+    }
+}
+
+/* iPad specific adjustments */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (orientation: landscape) {
+    .world-selector {
+        bottom: 20px;
+        max-height: 60px;
     }
 }
 
