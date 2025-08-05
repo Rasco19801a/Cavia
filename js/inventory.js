@@ -157,24 +157,41 @@ export class Inventory {
     }
     
     openInventory() {
+        console.log('openInventory called');
+        
         // Check if modal exists
         if (!this.inventoryModal) {
             console.error('Inventory modal not found!');
             this.setupInventoryModal();
         }
         
+        console.log('Before opening:', {
+            isOpen: this.isOpen,
+            modalExists: !!this.inventoryModal,
+            modalClassList: this.inventoryModal?.classList?.toString(),
+            modalInDOM: document.body.contains(this.inventoryModal)
+        });
+        
         this.isOpen = true;
+        
+        // Remove hidden class and explicitly set display
         this.inventoryModal.classList.remove('hidden');
+        this.inventoryModal.style.display = 'flex';
+        
         this.updateInventoryDisplay();
         
-        // Focus on the modal for keyboard events
-        this.inventoryModal.focus();
+        // Focus on the modal for keyboard events after a small delay
+        setTimeout(() => {
+            this.inventoryModal.focus();
+        }, 50);
         
         // Log for debugging
         console.log('Inventory opened', {
             isOpen: this.isOpen,
             modalClassList: this.inventoryModal.classList.toString(),
-            currentMissionPig: this.game.currentMissionPig
+            currentMissionPig: this.game.currentMissionPig,
+            modalDisplay: window.getComputedStyle(this.inventoryModal).display,
+            modalZIndex: window.getComputedStyle(this.inventoryModal).zIndex
         });
     }
     
@@ -182,6 +199,7 @@ export class Inventory {
         this.isOpen = false;
         if (this.inventoryModal) {
             this.inventoryModal.classList.add('hidden');
+            this.inventoryModal.style.display = '';  // Reset display style
         }
         this.selectedItem = null;
         this.updateSelectedItemInfo();
