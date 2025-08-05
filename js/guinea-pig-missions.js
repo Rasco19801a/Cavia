@@ -90,13 +90,8 @@ export class GuineaPigMissions {
             closeOnEscape: true
         });
         
-        // Event listener for inventory select button using event delegation
-        this.missionModal.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent event bubbling
-            if (e.target && e.target.id === 'selectFromInventory') {
-                this.selectFromInventory();
-            }
-        });
+        // Remove the old event delegation approach
+        // We'll add direct listeners when the modal is shown instead
         
         // Prevent clicks inside modal content from closing the modal
         const missionContent = this.missionModal.querySelector('.mission-content');
@@ -115,35 +110,25 @@ export class GuineaPigMissions {
     selectFromInventory() {
         console.log('Select from inventory clicked', this.currentMissionPig);
         
+        // Check if we have a current mission pig
+        if (!this.currentMissionPig) {
+            console.error('No current mission pig!');
+            return;
+        }
+        
         // Store current mission pig in game object for inventory to access
         this.game.currentMissionPig = this.currentMissionPig;
         
         // Close mission modal first
         domManager.closeModal('missionModal');
         
-        // Wait for modal to close completely before opening inventory
-        setTimeout(() => {
-            if (this.game.inventory) {
-                // Ensure inventory modal exists
-                if (!this.game.inventory.inventoryModal) {
-                    console.error('Inventory modal not initialized');
-                    this.game.inventory.setupInventoryModal();
-                }
-                
-                // Open inventory
-                this.game.inventory.openInventory();
-                
-                // Add event listener for when inventory closes
-                const checkInventoryClosed = setInterval(() => {
-                    if (!this.game.inventory.isOpen) {
-                        clearInterval(checkInventoryClosed);
-                        // Don't automatically reopen mission modal - let inventory handle it
-                    }
-                }, 100);
-            } else {
-                console.error('Inventory not found in game object');
-            }
-        }, 300); // Increased delay to ensure smooth transition
+        // Force immediate inventory opening without delay
+        if (this.game.inventory) {
+            console.log('Opening inventory immediately...');
+            this.game.inventory.openInventory();
+        } else {
+            console.error('Inventory not found in game object');
+        }
     }
 
     showMissionModal(pig) {
@@ -151,6 +136,29 @@ export class GuineaPigMissions {
         this.updateMissionModal();
         domManager.openModal({ id: 'missionModal' });
         eventSystem.emit(GameEvents.MISSION_START, pig);
+        
+        // Add direct event listener to button after modal is shown
+        setTimeout(() => {
+            const inventoryBtn = document.getElementById('selectFromInventory');
+            if (inventoryBtn) {
+                // Remove any existing listeners first
+                const newBtn = inventoryBtn.cloneNode(true);
+                inventoryBtn.parentNode.replaceChild(newBtn, inventoryBtn);
+                
+                // Add fresh listener
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Button clicked - opening inventory');
+                    this.selectFromInventory();
+                });
+                
+                // Ensure button is not disabled
+                newBtn.disabled = false;
+                newBtn.style.pointerEvents = 'auto';
+                newBtn.style.cursor = 'pointer';
+            }
+        }, 50);
     }
 
     updateMissionModal() {

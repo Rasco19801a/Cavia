@@ -1,12 +1,13 @@
-// Main entry point - initializes the game
+// Main entry point for the game
 import { Game } from './game.js';
 import { Customization } from './customization.js';
 import { ScreenManager } from './screen-manager.js';
 
-// Wait for DOM to be fully loaded
+// Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('gameCanvas');
+    console.log('DOM loaded, initializing game...');
     
+    const canvas = document.getElementById('gameCanvas');
     if (!canvas) {
         console.error('Canvas element not found!');
         return;
@@ -31,6 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Make game instance available globally for debugging
         window.game = game;
         
+        // Add debug function
+        window.testInventory = () => {
+            if (game.inventory) {
+                console.log('Testing inventory open...');
+                game.inventory.openInventory();
+            } else {
+                console.log('Inventory not found!');
+            }
+        };
+        
         console.log('Cavia Avonturen Wereld is geladen!');
     } else {
         // Initialize screen manager for the selection screens
@@ -51,6 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Make game instance available globally for debugging
             window.game = game;
+            
+            // Add debug function
+            window.testInventory = () => {
+                if (game.inventory) {
+                    console.log('Testing inventory open...');
+                    game.inventory.openInventory();
+                } else {
+                    console.log('Inventory not found!');
+                }
+            };
             
             console.log('Cavia Avonturen Wereld is geladen!');
         });
