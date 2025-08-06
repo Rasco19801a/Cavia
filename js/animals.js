@@ -193,14 +193,24 @@ export class AnimalChallenge {
         // Create mission modal if it doesn't exist
         if (!this.missionModal) {
             this.missionModal = document.createElement('div');
-            this.missionModal.className = 'modal hidden';
+            this.missionModal.className = 'mission-modal hidden';
             this.missionModal.id = 'missionModal';
             this.missionModal.innerHTML = `
-                <div class="modal-content">
-                    <h2 id="missionTitle"></h2>
-                    <p id="missionDescription"></p>
-                    <div id="missionProgress"></div>
+                <div class="mission-content">
                     <button class="modal-close-btn" id="closeMission">✖</button>
+                    <h2 id="missionTitle"></h2>
+                    <div class="mission-pig-icon">🐴</div>
+                    <p id="missionDescription"></p>
+                    <div class="mission-progress">
+                        <div class="progress-bar">
+                            <div id="missionProgressBar" class="progress-fill"></div>
+                        </div>
+                        <p id="missionProgressText">0/0</p>
+                    </div>
+                    <button class="inventory-select-btn" id="selectFromInventoryBtn">
+                        <span class="btn-icon">🎒</span>
+                        <span>Selecteer uit Rugzak</span>
+                    </button>
                 </div>
             `;
             document.body.appendChild(this.missionModal);
@@ -213,8 +223,25 @@ export class AnimalChallenge {
         // Update mission content
         document.getElementById('missionTitle').textContent = animal.name;
         document.getElementById('missionDescription').textContent = animal.mission;
-        document.getElementById('missionProgress').textContent = 
-            `Voortgang: ${animal.missionProgress}/${animal.missionTarget}`;
+        document.getElementById('missionProgressText').textContent = 
+            `${animal.missionProgress}/${animal.missionTarget}`;
+        
+        // Update progress bar
+        const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
+        document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
+        
+        // Setup inventory button
+        const inventoryBtn = document.getElementById('selectFromInventoryBtn');
+        inventoryBtn.onclick = () => {
+            this.missionModal.classList.add('hidden');
+            // Set the active mission for the inventory system
+            this.game.activeMission = {
+                pig: animal,  // The inventory expects a 'pig' property
+                item: animal.missionItem,
+                isHorse: true  // Flag to indicate this is a horse mission
+            };
+            this.game.inventory.open();
+        };
         
         this.missionModal.classList.remove('hidden');
     }
@@ -243,8 +270,10 @@ export class AnimalChallenge {
                 
                 // Update modal if still open
                 if (this.missionModal && !this.missionModal.classList.contains('hidden')) {
-                    document.getElementById('missionProgress').textContent = 
-                        `Voortgang: ${animal.missionProgress}/${animal.missionTarget}`;
+                    document.getElementById('missionProgressText').textContent = 
+                        `${animal.missionProgress}/${animal.missionTarget}`;
+                    const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
+                    document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
                 }
                 
                 return true;
