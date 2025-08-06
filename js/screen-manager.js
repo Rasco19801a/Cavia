@@ -4,31 +4,48 @@ export class ScreenManager {
         this.selectedTables = [];
         this.selectedDifficulties = [];
         
+        console.log('ScreenManager initialized');
         this.setupTablesScreen();
         this.setupDifficultyScreen();
     }
     
     setupTablesScreen() {
+        console.log('Setting up tables screen...');
         const tablesScreen = document.getElementById('tablesScreen');
         const nextBtn = document.getElementById('tablesNextBtn');
         const checkboxes = document.querySelectorAll('.table-checkbox');
+        
+        console.log('Found elements:', {
+            tablesScreen: !!tablesScreen,
+            nextBtn: !!nextBtn,
+            checkboxCount: checkboxes.length
+        });
         
         // Enable/disable next button based on selection
         const updateNextButton = () => {
             const checkedBoxes = document.querySelectorAll('.table-checkbox:checked');
             nextBtn.disabled = checkedBoxes.length === 0;
+            console.log('Update button - checked boxes:', checkedBoxes.length, 'disabled:', nextBtn.disabled);
         };
         
         // Add event listeners to checkboxes
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateNextButton);
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.addEventListener('change', (e) => {
+                console.log(`Checkbox ${index + 1} (value: ${checkbox.value}) changed to:`, e.target.checked);
+                updateNextButton();
+            });
         });
+        
+        console.log('Event listeners attached to', checkboxes.length, 'checkboxes');
         
         // Handle next button click
         nextBtn.addEventListener('click', () => {
+            console.log('Next button clicked');
             // Collect selected tables
             this.selectedTables = Array.from(document.querySelectorAll('.table-checkbox:checked'))
                 .map(cb => parseInt(cb.value));
+            
+            console.log('Selected tables:', this.selectedTables);
             
             // Save to localStorage
             localStorage.setItem('selectedTables', JSON.stringify(this.selectedTables));
@@ -37,6 +54,9 @@ export class ScreenManager {
             tablesScreen.classList.add('hidden');
             document.getElementById('difficultyScreen').classList.remove('hidden');
         });
+        
+        // Initial button state
+        updateNextButton();
     }
     
     setupDifficultyScreen() {
