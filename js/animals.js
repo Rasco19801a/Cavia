@@ -626,6 +626,28 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
             // Draw guinea pig style animal at world coordinates
             drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
+
+                // TE BEWERKEN / TOEGEVOEGD CODE START
+                // Draw mission indicator (exclamation mark) above animals that have an active mission
+                if (animal.mission && animal.missionProgress < animal.missionTarget) {
+                    // Position slightly above the animal head (adjusted for camera already applied)
+                    const indicatorX = animal.x;
+                    const indicatorY = animal.y - 70; // 70px above body center after scaling
+
+                    // Green circle background
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.beginPath();
+                    ctx.arc(indicatorX, indicatorY, 10, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // White exclamation mark
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('!', indicatorX, indicatorY + 1); // Slight vertical tweak for centering
+                }
+                // TE BEWERKEN / TOEGEVOEGD CODE EINDE
         }
     });
 }
