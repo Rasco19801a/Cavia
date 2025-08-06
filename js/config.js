@@ -107,7 +107,7 @@ export const WORLDS = [
     'jungle', 
     'zwembad',
     'dierenstad',
-    'paarden wei',
+    'paarden',
     'thuis'
 ];
 

@@ -27,8 +27,8 @@ export function drawWorld(ctx, worldType, buildings) {
         case 'dierenstad':
             drawDierenstad(ctx, buildings);
             break;
-        case 'paarden wei':
-            drawPaardenWei(ctx);
+        case 'paarden':
+            drawPaarden(ctx);
             break;
         case 'thuis':
             drawThuis(ctx);
@@ -1042,7 +1042,7 @@ function drawThuis(ctx) {
     // Instructions removed
 }
 
-function drawPaardenWei(ctx) {
+function drawPaarden(ctx) {
     // Sky
     ctx.fillStyle = '#87CEEB';
     ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
