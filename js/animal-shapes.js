@@ -1082,128 +1082,136 @@ export function drawKoe(ctx, animal, screenX, screenY, scale) {
     ctx.restore();
 }
 
-// Paard (Horse)
+// Paard (Horse) - Cute style like uploaded image
 export function drawPaard(ctx, animal, screenX, screenY, scale) {
     ctx.save();
     ctx.translate(screenX, screenY);
     ctx.scale(scale, scale);
 
     // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(0, 35, 50, 20, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 65, 40, 15, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body (elongated for horse)
+    // Back legs (behind body)
+    ctx.fillStyle = animal.color.body;
+    // Left back leg
+    ctx.fillRect(-25, 25, 18, 40);
+    // Right back leg
+    ctx.fillRect(7, 25, 18, 40);
+
+    // Body (round and cute)
     ctx.fillStyle = animal.color.body;
     ctx.beginPath();
-    ctx.ellipse(10, 0, 65, 35, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 45, 40, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Belly
+    // Belly (large cream oval)
     ctx.fillStyle = animal.color.belly;
     ctx.beginPath();
-    ctx.ellipse(10, 15, 50, 20, 0, 0, Math.PI);
+    ctx.ellipse(0, 10, 35, 25, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Neck
+    // Front legs
+    ctx.fillStyle = animal.color.body;
+    // Left front leg
+    ctx.fillRect(-20, 25, 18, 40);
+    // Right front leg
+    ctx.fillRect(2, 25, 18, 40);
+
+    // Hooves (dark brown)
+    ctx.fillStyle = '#6B4423';
+    ctx.fillRect(-25, 60, 18, 8);
+    ctx.fillRect(7, 60, 18, 8);
+    ctx.fillRect(-20, 60, 18, 8);
+    ctx.fillRect(2, 60, 18, 8);
+
+    // Head (round and cute)
     ctx.fillStyle = animal.color.body;
     ctx.beginPath();
-    ctx.moveTo(-30, -10);
-    ctx.lineTo(-45, -40);
-    ctx.lineTo(-25, -45);
-    ctx.lineTo(-10, -20);
-    ctx.closePath();
+    ctx.arc(0, -35, 30, 0, Math.PI * 2);
     ctx.fill();
 
-    // Head (elongated horse head)
-    ctx.fillStyle = animal.color.body;
-    ctx.beginPath();
-    ctx.ellipse(-40, -45, 25, 18, -0.3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Muzzle
+    // Snout (light colored)
     ctx.fillStyle = animal.color.belly;
     ctx.beginPath();
-    ctx.ellipse(-55, -40, 12, 10, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(0, -25, 22, 18, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Mane
-    ctx.fillStyle = '#2c2c2c';
+    // Nostrils (pink)
+    ctx.fillStyle = '#DDA0DD';
     ctx.beginPath();
-    ctx.moveTo(-25, -50);
-    ctx.quadraticCurveTo(-20, -55, -15, -50);
-    ctx.quadraticCurveTo(-10, -45, -5, -40);
-    ctx.quadraticCurveTo(0, -35, 5, -30);
-    ctx.lineTo(0, -25);
-    ctx.lineTo(-10, -30);
+    ctx.ellipse(-8, -25, 4, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(8, -25, 4, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears (triangular and cute)
+    ctx.fillStyle = animal.color.body;
+    // Left ear
+    ctx.beginPath();
+    ctx.moveTo(-15, -55);
+    ctx.lineTo(-10, -40);
     ctx.lineTo(-20, -40);
     ctx.closePath();
     ctx.fill();
-
-    // Ears
-    ctx.fillStyle = animal.color.body;
-    ctx.beginPath();
-    ctx.moveTo(-35, -60);
-    ctx.lineTo(-30, -50);
-    ctx.lineTo(-40, -50);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-25, -58);
-    ctx.lineTo(-20, -48);
-    ctx.lineTo(-30, -48);
-    ctx.closePath();
-    ctx.fill();
-
-    // Legs (4 legs)
-    ctx.fillStyle = animal.color.body;
-    // Front legs
-    ctx.fillRect(-25, 20, 12, 40);
-    ctx.fillRect(-10, 20, 12, 40);
-    // Back legs
-    ctx.fillRect(35, 20, 12, 40);
-    ctx.fillRect(50, 20, 12, 40);
-
-    // Hooves
-    ctx.fillStyle = '#2c2c2c';
-    ctx.fillRect(-25, 55, 12, 8);
-    ctx.fillRect(-10, 55, 12, 8);
-    ctx.fillRect(35, 55, 12, 8);
-    ctx.fillRect(50, 55, 12, 8);
-
-    // Tail
-    ctx.strokeStyle = animal.color.body === '#FFFFFF' ? '#F5F5F5' : animal.color.body;
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.moveTo(70, -5);
-    ctx.quadraticCurveTo(85, 10, 80, 30);
-    ctx.stroke();
     
-    // Tail hair
-    ctx.strokeStyle = '#2c2c2c';
-    ctx.lineWidth = 6;
+    // Right ear
     ctx.beginPath();
-    ctx.moveTo(78, 20);
-    ctx.quadraticCurveTo(82, 35, 75, 45);
-    ctx.stroke();
-
-    // Eyes
-    ctx.fillStyle = 'black';
-    ctx.beginPath();
-    ctx.arc(-45, -50, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(-35, -48, 3, 0, Math.PI * 2);
+    ctx.moveTo(15, -55);
+    ctx.lineTo(20, -40);
+    ctx.lineTo(10, -40);
+    ctx.closePath();
     ctx.fill();
 
-    // Nostrils
+    // Inner ears
+    ctx.fillStyle = '#D2B48C';
+    ctx.beginPath();
+    ctx.moveTo(-15, -50);
+    ctx.lineTo(-13, -42);
+    ctx.lineTo(-17, -42);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(15, -50);
+    ctx.lineTo(17, -42);
+    ctx.lineTo(13, -42);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mane (cute and fluffy)
+    ctx.fillStyle = '#8B5A3C';
+    // Top mane
+    ctx.beginPath();
+    ctx.arc(0, -50, 15, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Side mane parts
+    ctx.beginPath();
+    ctx.moveTo(-15, -45);
+    ctx.quadraticCurveTo(-25, -40, -20, -30);
+    ctx.quadraticCurveTo(-15, -25, -10, -30);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(15, -45);
+    ctx.quadraticCurveTo(25, -40, 20, -30);
+    ctx.quadraticCurveTo(15, -25, 10, -30);
+    ctx.closePath();
+    ctx.fill();
+
+    // Eyes (simple black dots)
     ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.ellipse(-58, -38, 2, 3, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(-10, -35, 3, 4, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(-52, -36, 2, 3, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(10, -35, 3, 4, 0, 0, Math.PI * 2);
     ctx.fill();
 
     drawNameAndGlow(ctx, animal, screenX, screenY, scale);

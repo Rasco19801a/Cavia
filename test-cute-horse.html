@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Horse Drawing Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            display: block;
+            margin: 20px auto;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cute Horse Drawing - Like Your Image</h1>
+    <div class="controls">
+        <button onclick="drawOriginalHorse()">Original Horse</button>
+        <button onclick="drawCuteHorse()">Cute Horse (New Style)</button>
+        <button onclick="drawBothHorses()">Compare Both</button>
+    </div>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Function to draw cute horse like in the uploaded image
+        function drawCuteHorseStyle(ctx, x, y, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            // Main body color
+            const bodyColor = '#B8824D';
+            const bellyColor = '#F5DEB3';
+            const maneColor = '#8B5A3C';
+            const hoofColor = '#6B4423';
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.beginPath();
+            ctx.ellipse(0, 65, 40, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Back legs (behind body)
+            ctx.fillStyle = bodyColor;
+            // Left back leg
+            ctx.fillRect(-25, 25, 18, 40);
+            // Right back leg
+            ctx.fillRect(7, 25, 18, 40);
+
+            // Body (round and cute)
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 45, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Belly (light colored oval)
+            ctx.fillStyle = bellyColor;
+            ctx.beginPath();
+            ctx.ellipse(0, 10, 35, 25, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Front legs
+            ctx.fillStyle = bodyColor;
+            // Left front leg
+            ctx.fillRect(-20, 25, 18, 40);
+            // Right front leg
+            ctx.fillRect(2, 25, 18, 40);
+
+            // Hooves (dark brown)
+            ctx.fillStyle = hoofColor;
+            ctx.fillRect(-25, 60, 18, 8);
+            ctx.fillRect(7, 60, 18, 8);
+            ctx.fillRect(-20, 60, 18, 8);
+            ctx.fillRect(2, 60, 18, 8);
+
+            // Head (round and cute)
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.arc(0, -35, 30, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Snout (light colored)
+            ctx.fillStyle = bellyColor;
+            ctx.beginPath();
+            ctx.ellipse(0, -25, 22, 18, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nostrils
+            ctx.fillStyle = '#D2691E';
+            ctx.beginPath();
+            ctx.ellipse(-8, -25, 4, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(8, -25, 4, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ears (triangular and cute)
+            ctx.fillStyle = bodyColor;
+            // Left ear
+            ctx.beginPath();
+            ctx.moveTo(-15, -55);
+            ctx.lineTo(-10, -40);
+            ctx.lineTo(-20, -40);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Right ear
+            ctx.beginPath();
+            ctx.moveTo(15, -55);
+            ctx.lineTo(20, -40);
+            ctx.lineTo(10, -40);
+            ctx.closePath();
+            ctx.fill();
+
+            // Inner ears
+            ctx.fillStyle = '#D2691E';
+            ctx.beginPath();
+            ctx.moveTo(-15, -50);
+            ctx.lineTo(-13, -42);
+            ctx.lineTo(-17, -42);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(15, -50);
+            ctx.lineTo(17, -42);
+            ctx.lineTo(13, -42);
+            ctx.closePath();
+            ctx.fill();
+
+            // Mane (cute and fluffy)
+            ctx.fillStyle = maneColor;
+            // Top mane
+            ctx.beginPath();
+            ctx.arc(0, -50, 15, Math.PI, 0, false);
+            ctx.closePath();
+            ctx.fill();
+
+            // Side mane parts
+            ctx.beginPath();
+            ctx.moveTo(-15, -45);
+            ctx.quadraticCurveTo(-25, -40, -20, -30);
+            ctx.quadraticCurveTo(-15, -25, -10, -30);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(15, -45);
+            ctx.quadraticCurveTo(25, -40, 20, -30);
+            ctx.quadraticCurveTo(15, -25, 10, -30);
+            ctx.closePath();
+            ctx.fill();
+
+            // Eyes (simple black dots)
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.ellipse(-10, -35, 3, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(10, -35, 3, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Original horse drawing function (simplified version)
+        function drawOriginalHorseStyle(ctx, x, y, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.ellipse(0, 35, 50, 20, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Body
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.ellipse(10, 0, 65, 35, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Neck
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.moveTo(-30, -10);
+            ctx.lineTo(-45, -40);
+            ctx.lineTo(-25, -45);
+            ctx.lineTo(-10, -20);
+            ctx.closePath();
+            ctx.fill();
+
+            // Head
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.ellipse(-40, -45, 25, 18, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(-25, 20, 12, 40);
+            ctx.fillRect(-10, 20, 12, 40);
+            ctx.fillRect(35, 20, 12, 40);
+            ctx.fillRect(50, 20, 12, 40);
+
+            // Hooves
+            ctx.fillStyle = '#2c2c2c';
+            ctx.fillRect(-25, 55, 12, 8);
+            ctx.fillRect(-10, 55, 12, 8);
+            ctx.fillRect(35, 55, 12, 8);
+            ctx.fillRect(50, 55, 12, 8);
+
+            // Eyes
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(-45, -50, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawOriginalHorse() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('Original Horse Style', 350, 50);
+            drawOriginalHorseStyle(ctx, 400, 300, 1.5);
+        }
+
+        function drawCuteHorse() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('Cute Horse Style (Like Your Image)', 300, 50);
+            drawCuteHorseStyle(ctx, 400, 300, 2);
+        }
+
+        function drawBothHorses() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('Original Style', 150, 50);
+            ctx.fillText('Cute Style', 550, 50);
+            drawOriginalHorseStyle(ctx, 200, 300, 1.5);
+            drawCuteHorseStyle(ctx, 600, 300, 2);
+        }
+
+        // Draw cute horse by default
+        drawCuteHorse();
+    </script>
+</body>
+</html>
