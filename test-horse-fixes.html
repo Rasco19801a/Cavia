@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Horse Fixes - Mission Modal & Names</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Nunito', sans-serif;
+            background: #f0f4f8;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e8f4f8;
+        }
+        .status.error {
+            background: #ffe8e8;
+            color: #d32f2f;
+        }
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .test-button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .test-button.secondary {
+            background: #2196F3;
+        }
+        .test-button.secondary:hover {
+            background: #1976D2;
+        }
+        .info-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Horse Fixes</h1>
+        <p>This page tests the fixes for:</p>
+        <ul>
+            <li>Empty mission modals for horses</li>
+            <li>Missing horse names in the horse world</li>
+        </ul>
+
+        <div class="info-box">
+            <h3>Test Steps:</h3>
+            <ol>
+                <li>Click "Initialize Game" to set up the game</li>
+                <li>Click "Go to Horse World" to switch to the paarden world</li>
+                <li>Check if horse names are visible in the canvas</li>
+                <li>Click "Test Horse Mission Modal" to open a mission modal</li>
+                <li>Verify the modal shows proper content</li>
+            </ol>
+        </div>
+
+        <div>
+            <button class="test-button" onclick="initGame()">1. Initialize Game</button>
+            <button class="test-button" onclick="goToHorseWorld()">2. Go to Horse World</button>
+            <button class="test-button secondary" onclick="testHorseMissionModal()">3. Test Horse Mission Modal</button>
+            <button class="test-button secondary" onclick="checkHorseNames()">4. Check Horse Names</button>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+        <div id="status" class="status">Status: Ready to test</div>
+
+        <div class="info-box">
+            <h3>Expected Results:</h3>
+            <ul>
+                <li>Horse names should be visible below each horse in the canvas</li>
+                <li>Mission modal should show:
+                    <ul>
+                        <li>Horse name as title</li>
+                        <li>Horse icon (🐴)</li>
+                        <li>Mission description</li>
+                        <li>Progress bar</li>
+                        <li>"Selecteer uit Rugzak" button</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Game } from './js/game.js';
+        import { ANIMALS } from './js/animals.js';
+        
+        let game = null;
+
+        window.initGame = function() {
+            const canvas = document.getElementById('gameCanvas');
+            game = new Game(canvas);
+            game.init();
+            updateStatus('Game initialized successfully', 'success');
+        };
+
+        window.goToHorseWorld = function() {
+            if (!game) {
+                updateStatus('Please initialize the game first!', 'error');
+                return;
+            }
+            
+            game.switchWorld('paarden');
+            updateStatus('Switched to Paarden world', 'success');
+            
+            // Force a render
+            game.update();
+            game.render();
+        };
+
+        window.testHorseMissionModal = function() {
+            if (!game) {
+                updateStatus('Please initialize the game first!', 'error');
+                return;
+            }
+            
+            if (game.currentWorld !== 'paarden') {
+                updateStatus('Please go to the horse world first!', 'error');
+                return;
+            }
+            
+            // Get the first horse
+            const horses = ANIMALS.paarden || [];
+            if (horses.length === 0) {
+                updateStatus('No horses found in the world!', 'error');
+                return;
+            }
+            
+            const firstHorse = horses[0];
+            updateStatus(`Opening mission modal for ${firstHorse.name}...`, 'success');
+            
+            // Show the mission modal
+            game.animalChallenge.showMissionModal(firstHorse);
+            
+            // Check if modal is visible
+            setTimeout(() => {
+                const missionModal = document.querySelector('.mission-modal');
+                if (missionModal && !missionModal.classList.contains('hidden')) {
+                    const title = document.getElementById('missionTitle').textContent;
+                    const description = document.getElementById('missionDescription').textContent;
+                    const progress = document.getElementById('missionProgressText').textContent;
+                    
+                    updateStatus(`Mission modal opened successfully!
+                        - Title: ${title}
+                        - Description: ${description}
+                        - Progress: ${progress}`, 'success');
+                } else {
+                    updateStatus('Mission modal failed to open!', 'error');
+                }
+            }, 100);
+        };
+
+        window.checkHorseNames = function() {
+            if (!game) {
+                updateStatus('Please initialize the game first!', 'error');
+                return;
+            }
+            
+            if (game.currentWorld !== 'paarden') {
+                updateStatus('Please go to the horse world first!', 'error');
+                return;
+            }
+            
+            // Get horses from ANIMALS
+            const horses = ANIMALS.paarden || [];
+            
+            if (horses.length === 0) {
+                updateStatus('No horses defined in ANIMALS!', 'error');
+                return;
+            }
+            
+            const horseInfo = horses.map(h => `${h.name} at (${h.x}, ${h.y})`).join(', ');
+            updateStatus(`Found ${horses.length} horses: ${horseInfo}. Check the canvas to see if their names are visible.`, 'success');
+            
+            // Force a render to ensure names are drawn
+            game.render();
+        };
+
+        function updateStatus(message, type = '') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+
+        // Make functions available globally for onclick handlers
+        window.updateStatus = updateStatus;
+    </script>
+</body>
+</html>

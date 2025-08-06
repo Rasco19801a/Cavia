@@ -73,11 +73,17 @@ export class MissionManager {
     updateModalContent() {
         if (!this.currentMission) return;
 
-        const { name, mission, progress, target } = this.currentMission;
+        const { name, mission, progress, target, isHorse } = this.currentMission;
         
         this.modal.querySelector('#missionTitle').textContent = name;
         this.modal.querySelector('#missionDescription').textContent = mission;
         this.modal.querySelector('#missionProgressText').textContent = `${progress}/${target}`;
+        
+        // Update the icon based on animal type
+        const iconElement = this.modal.querySelector('.mission-pig-icon');
+        if (iconElement) {
+            iconElement.textContent = isHorse ? '🐴' : '🐹';
+        }
         
         const progressPercent = (progress / target) * 100;
         this.modal.querySelector('#missionProgressBar').style.width = `${progressPercent}%`;
@@ -130,6 +136,18 @@ export class MissionManager {
             this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
             this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
             this.game.ui.updateDisplay();
+        }
+    }
+
+    isMissionModalVisible() {
+        return this.modal && !this.modal.classList.contains('hidden');
+    }
+
+    updateMissionProgress(progress, target) {
+        if (this.currentMission) {
+            this.currentMission.progress = progress;
+            this.currentMission.target = target;
+            this.updateModalContent();
         }
     }
 }
