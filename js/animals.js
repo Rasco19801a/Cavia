@@ -51,7 +51,7 @@ export const ANIMALS = {
         { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 480, color: { body: '#000000', belly: '#FFFFFF' } },
         { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 480, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
     ],
-    'paarden wei': [
+    'paarden': [
         { type: 'paard', name: 'Thunder', emoji: '🐴', x: 300, y: 480, color: { body: '#2c2c2c', belly: '#696969' }, 
           mission: 'Ik heb honger! Breng me 3 appels alsjeblieft!', missionProgress: 0, missionTarget: 3, missionItem: 'apple' },
         { type: 'paard', name: 'Bella', emoji: '🐴', x: 600, y: 480, color: { body: '#8B4513', belly: '#D2691E' }, 
@@ -175,7 +175,7 @@ export class AnimalChallenge {
     showChallenge(animal) {
         this.currentAnimal = animal;
         
-        // Check if this animal has a mission (like horses in paarden wei)
+        // Check if this animal has a mission (like horses in paarden)
         if (animal.mission) {
             // Show mission modal instead of challenge modal
             this.showMissionModal(animal);
