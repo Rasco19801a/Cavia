@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Horse Missions</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #e0e0e0;
+        }
+        .status.success { background: #90EE90; }
+        .status.error { background: #FFB6B6; }
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        .test-button:hover { background: #45a049; }
+        .test-button.secondary { background: #2196F3; }
+        .test-button.secondary:hover { background: #0b7dda; }
+        #gameCanvas {
+            border: 2px solid #333;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Paarden Missie Systeem</h1>
+        <p>Deze pagina test of het missie systeem voor paarden correct werkt.</p>
+        
+        <div id="status" class="status">Status: Wachten op initialisatie...</div>
+        
+        <div>
+            <button class="test-button" onclick="initGame()">1. Initialiseer Game</button>
+            <button class="test-button" onclick="goToPaardenWorld()">2. Ga naar Paarden Wereld</button>
+            <button class="test-button secondary" onclick="testHorseClick()">3. Test Paard Klik</button>
+            <button class="test-button secondary" onclick="checkModalState()">4. Check Modal Status</button>
+            <button class="test-button secondary" onclick="manualShowMission()">5. Toon Missie Direct</button>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div id="debug-info" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <h3>Debug Info:</h3>
+            <pre id="debug-content">Nog geen debug info...</pre>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        let game = null;
+        
+        window.initGame = function() {
+            try {
+                game = new Game();
+                window.game = game; // Make it globally accessible
+                updateStatus('Game geïnitialiseerd!', 'success');
+                updateDebug({
+                    gameInitialized: true,
+                    currentWorld: game.currentWorld,
+                    animalChallenge: game.animalChallenge ? 'Ja' : 'Nee'
+                });
+            } catch (error) {
+                updateStatus('Fout bij initialisatie: ' + error.message, 'error');
+                console.error(error);
+            }
+        };
+        
+        window.goToPaardenWorld = function() {
+            if (!game) {
+                updateStatus('Initialiseer eerst de game!', 'error');
+                return;
+            }
+            
+            game.switchWorld('paarden');
+            updateStatus('Switched naar Paarden wereld', 'success');
+            updateDebug({
+                currentWorld: game.currentWorld,
+                animals: game.worlds.paarden?.animals || []
+            });
+        };
+        
+        window.testHorseClick = function() {
+            if (!game || game.currentWorld !== 'paarden') {
+                updateStatus('Ga eerst naar de paarden wereld!', 'error');
+                return;
+            }
+            
+            // Get first horse
+            const horses = game.worlds.paarden?.animals || [];
+            if (horses.length === 0) {
+                updateStatus('Geen paarden gevonden!', 'error');
+                return;
+            }
+            
+            const firstHorse = horses[0];
+            updateStatus(`Simuleer klik op ${firstHorse.name} (${firstHorse.x}, ${firstHorse.y})`, 'success');
+            
+            // Simulate click
+            const event = new MouseEvent('click', {
+                clientX: firstHorse.x,
+                clientY: firstHorse.y
+            });
+            
+            // Call the click handler directly
+            if (game.animalChallenge) {
+                game.animalChallenge.showChallenge(firstHorse);
+                updateStatus(`showChallenge aangeroepen voor ${firstHorse.name}`, 'success');
+            } else {
+                updateStatus('AnimalChallenge niet gevonden!', 'error');
+            }
+            
+            updateDebug({
+                horseName: firstHorse.name,
+                horseMission: firstHorse.mission,
+                missionProgress: firstHorse.missionProgress,
+                missionTarget: firstHorse.missionTarget,
+                missionItem: firstHorse.missionItem
+            });
+        };
+        
+        window.checkModalState = function() {
+            const challengeModal = document.getElementById('challengeModal');
+            const missionModal = document.getElementById('missionModal');
+            
+            updateDebug({
+                challengeModal: {
+                    exists: !!challengeModal,
+                    hidden: challengeModal ? challengeModal.classList.contains('hidden') : 'N/A',
+                    display: challengeModal ? window.getComputedStyle(challengeModal).display : 'N/A'
+                },
+                missionModal: {
+                    exists: !!missionModal,
+                    hidden: missionModal ? missionModal.classList.contains('hidden') : 'N/A',
+                    display: missionModal ? window.getComputedStyle(missionModal).display : 'N/A'
+                }
+            });
+            
+            if (missionModal && !missionModal.classList.contains('hidden')) {
+                updateStatus('Mission modal is zichtbaar!', 'success');
+            } else {
+                updateStatus('Mission modal is niet zichtbaar', 'error');
+            }
+        };
+        
+        window.manualShowMission = function() {
+            if (!game || !game.animalChallenge) {
+                updateStatus('Game of AnimalChallenge niet geïnitialiseerd!', 'error');
+                return;
+            }
+            
+            const horses = game.worlds.paarden?.animals || [];
+            if (horses.length === 0) {
+                updateStatus('Geen paarden gevonden!', 'error');
+                return;
+            }
+            
+            const firstHorse = horses[0];
+            game.animalChallenge.showMissionModal(firstHorse);
+            updateStatus(`Mission modal direct getoond voor ${firstHorse.name}`, 'success');
+        };
+        
+        function updateStatus(message, type = '') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = `Status: ${message}`;
+            statusEl.className = 'status' + (type ? ' ' + type : '');
+        }
+        
+        function updateDebug(data) {
+            const debugEl = document.getElementById('debug-content');
+            debugEl.textContent = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

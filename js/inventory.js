@@ -391,31 +391,41 @@ export class Inventory {
     giveItemToMissionPig(item) {
         const mission = this.game.activeMission;
         if (mission && mission.item === item.id) {
-            const pig = mission.pig;
-            pig.missionProgress++;
+            const animal = mission.pig;  // Can be a pig or horse
+            animal.missionProgress++;
             
             // Remove one of the item
             this.removeItem(item.id);
             
-            if (pig.missionProgress >= pig.missionTarget) {
+            if (animal.missionProgress >= animal.missionTarget) {
                 // Mission complete!
                 this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
                 this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
                 this.game.ui.updateDisplay();
                 
-                // Update mission through guinea pig missions
-                if (this.game.guineaPigMissions) {
-                    this.game.guineaPigMissions.completeMission(pig);
+                // Update mission differently for horses vs guinea pigs
+                if (mission.isHorse) {
+                    // For horses, update through animal challenge
+                    this.game.animalChallenge.updateMissionForAnimal(animal);
+                } else if (this.game.guineaPigMissions) {
+                    // For guinea pigs, use the existing system
+                    this.game.guineaPigMissions.completeMission(animal);
                 }
                 
                 // Close inventory and clear mission
                 this.closeInventory();
                 this.game.activeMission = null;
             } else {
-                this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
+                this.game.ui.showNotification(`Goed zo! Nog ${animal.missionTarget - animal.missionProgress} ${item.name} te gaan!`);
                 
                 // Update mission modal if it exists
-                if (this.game.guineaPigMissions) {
+                if (mission.isHorse && this.game.animalChallenge.missionModal && !this.game.animalChallenge.missionModal.classList.contains('hidden')) {
+                    // Update horse mission modal
+                    document.getElementById('missionProgressText').textContent = 
+                        `${animal.missionProgress}/${animal.missionTarget}`;
+                    const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
+                    document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
+                } else if (this.game.guineaPigMissions) {
                     this.game.guineaPigMissions.updateMissionModal();
                 }
                 
