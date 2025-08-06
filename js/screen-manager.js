@@ -30,8 +30,9 @@ export class ScreenManager {
         
         // Add event listeners to checkboxes
         checkboxes.forEach((checkbox, index) => {
-            checkbox.addEventListener('change', (e) => {
-                console.log(`Checkbox ${index + 1} (value: ${checkbox.value}) changed to:`, e.target.checked);
+            // Keep the original simple approach but with logging
+            checkbox.addEventListener('change', function(e) {
+                console.log(`Checkbox ${index + 1} (value: ${this.value}) changed to:`, this.checked);
                 updateNextButton();
             });
         });
