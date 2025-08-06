@@ -61,12 +61,15 @@ export class UI {
         // Setup world selector buttons
         const worldButtons = document.querySelectorAll('.world-btn');
         
+        console.log('Setting up world selector, found buttons:', worldButtons.length);
+        
         worldButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 const world = btn.getAttribute('data-world');
+                console.log('World button clicked:', world);
                 
                 // Update active state
                 worldButtons.forEach(b => b.classList.remove('active'));
