@@ -484,6 +484,7 @@ export class Game {
             'jungle': 'de Jungle',
             'zwembad': 'het Zwembad',
             'dierenstad': 'de Dierenstad',
+            'paarden': 'de Paarden Wereld',
             'thuis': 'Thuis'
         };
         return names[world] || world;

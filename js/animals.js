@@ -627,27 +627,37 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
             // Draw guinea pig style animal at world coordinates
             drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
 
-                // TE BEWERKEN / TOEGEVOEGD CODE START
                 // Draw mission indicator (exclamation mark) above animals that have an active mission
                 if (animal.mission && animal.missionProgress < animal.missionTarget) {
                     // Position slightly above the animal head (adjusted for camera already applied)
                     const indicatorX = animal.x;
                     const indicatorY = animal.y - 70; // 70px above body center after scaling
 
-                    // Green circle background
+                    // Save context state
+                    ctx.save();
+                    
+                    // Disable anti-aliasing for cleaner rendering
+                    ctx.imageSmoothingEnabled = false;
+                    
+                    // Green circle background with slight pulsing effect
+                    const pulse = Math.sin(Date.now() * 0.003) * 0.1 + 0.9;
                     ctx.fillStyle = '#4CAF50';
+                    ctx.globalAlpha = pulse;
                     ctx.beginPath();
-                    ctx.arc(indicatorX, indicatorY, 10, 0, Math.PI * 2);
+                    ctx.arc(Math.round(indicatorX), Math.round(indicatorY), 10, 0, Math.PI * 2);
                     ctx.fill();
 
                     // White exclamation mark
+                    ctx.globalAlpha = 1;
                     ctx.fillStyle = 'white';
                     ctx.font = 'bold 18px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('!', indicatorX, indicatorY + 1); // Slight vertical tweak for centering
+                    ctx.fillText('!', Math.round(indicatorX), Math.round(indicatorY) + 1); // Slight vertical tweak for centering
+                    
+                    // Restore context state
+                    ctx.restore();
                 }
-                // TE BEWERKEN / TOEGEVOEGD CODE EINDE
         }
     });
 }
