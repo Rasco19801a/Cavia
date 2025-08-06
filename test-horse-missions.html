@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Horse Missions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #87CEEB;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .test-button:hover {
+            background: #45a049;
+        }
+        
+        .test-button.secondary {
+            background: #2196F3;
+        }
+        
+        .test-button.secondary:hover {
+            background: #0b7dda;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #333;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🐴 Test: Paarden Missies</h1>
+        <p>Deze pagina test of de missies bij de paarden correct werken met de inventory integratie.</p>
+        
+        <div class="test-section">
+            <h2>Test Stappen:</h2>
+            <ol>
+                <li>Ga naar de Paarden wereld</li>
+                <li>Klik op een paard met een geel uitroepteken (!) om een missie te openen</li>
+                <li>Klik op "Selecteer uit Rugzak" in de missie modal</li>
+                <li>Selecteer het juiste item uit je inventory</li>
+                <li>Controleer of de missie voortgang wordt bijgewerkt</li>
+            </ol>
+        </div>
+        
+        <div class="controls">
+            <button class="test-button" onclick="goToPaardenWorld()">Ga naar Paarden Wereld</button>
+            <button class="test-button secondary" onclick="addTestItems()">Voeg Test Items Toe</button>
+            <button class="test-button secondary" onclick="checkGameState()">Check Game State</button>
+        </div>
+        
+        <div id="status" class="status">Wachten op game initialisatie...</div>
+        
+        <canvas id="gameCanvas" width="1024" height="576"></canvas>
+    </div>
+    
+    <!-- Game Scripts -->
+    <script type="module">
+        import { Game } from './js/game.js';
+        import { ANIMALS } from './js/animals.js';
+        
+        let game;
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // Initialize game
+        window.addEventListener('load', () => {
+            try {
+                game = new Game();
+                window.game = game; // Make it globally accessible for testing
+                updateStatus('Game geïnitialiseerd. Klik op "Ga naar Paarden Wereld" om te beginnen.', 'success');
+            } catch (error) {
+                updateStatus('Fout bij initialisatie: ' + error.message, 'error');
+                console.error(error);
+            }
+        });
+        
+        window.goToPaardenWorld = function() {
+            if (!game) {
+                updateStatus('Game is nog niet geïnitialiseerd!', 'error');
+                return;
+            }
+            
+            // Switch to paarden world
+            game.currentWorld = 'paarden';
+            game.camera.x = 0;
+            game.camera.y = 0;
+            
+            // Position player in the world
+            game.player.x = 500;
+            game.player.y = 480;
+            
+            updateStatus('Je bent nu in de Paarden wereld. Klik op een paard met een ! om een missie te starten.', 'success');
+        };
+        
+        window.addTestItems = function() {
+            if (!game) {
+                updateStatus('Game is nog niet geïnitialiseerd!', 'error');
+                return;
+            }
+            
+            // Add test items that horses might need
+            const testItems = [
+                { id: 'apple', name: 'Appel', emoji: '🍎', category: 'food', quantity: 10 },
+                { id: 'carrot', name: 'Wortel', emoji: '🥕', category: 'food', quantity: 10 },
+                { id: 'hay_small', name: 'Klein Hooi', emoji: '🌾', category: 'food', quantity: 5 },
+                { id: 'hay_large', name: 'Groot Hooi', emoji: '🌾', category: 'food', quantity: 3 }
+            ];
+            
+            testItems.forEach(item => {
+                for (let i = 0; i < item.quantity; i++) {
+                    game.inventory.addItem(item);
+                }
+            });
+            
+            updateStatus(`Test items toegevoegd aan inventory. Je hebt nu appels, wortels en hooi.`, 'success');
+        };
+        
+        window.checkGameState = function() {
+            if (!game) {
+                updateStatus('Game is nog niet geïnitialiseerd!', 'error');
+                return;
+            }
+            
+            const horses = ANIMALS['paarden'] || [];
+            const horsesWithMissions = horses.filter(h => h.mission);
+            
+            console.log('Game State:', {
+                currentWorld: game.currentWorld,
+                playerPosition: { x: game.player.x, y: game.player.y },
+                animalChallenge: game.animalChallenge ? 'Loaded' : 'Not loaded',
+                missionManager: game.animalChallenge?.missionManager ? 'Loaded' : 'Not loaded',
+                activeMission: game.activeMission,
+                horses: horses.length,
+                horsesWithMissions: horsesWithMissions.length,
+                inventoryItems: game.inventory.items.length
+            });
+            
+            if (horsesWithMissions.length > 0) {
+                console.log('Horses with missions:', horsesWithMissions.map(h => ({
+                    name: h.name,
+                    mission: h.mission,
+                    progress: `${h.missionProgress}/${h.missionTarget}`,
+                    item: h.missionItem
+                })));
+            }
+            
+            updateStatus(`Check console voor game state details. ${horsesWithMissions.length} paarden met missies gevonden.`, 'info');
+        };
+    </script>
+</body>
+</html>

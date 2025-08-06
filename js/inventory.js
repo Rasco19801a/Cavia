@@ -326,7 +326,7 @@ export class Inventory {
         
         // If there's an active mission, give item to mission pig
         if (this.game.activeMission) {
-            this.giveItemToMissionPig(this.selectedItem);
+            this.giveItemToMissionAnimal(this.selectedItem);
         } else {
             // Check if player is near an animal with a mission
             const nearbyAnimal = this.findNearbyAnimalWithMission();
@@ -388,35 +388,42 @@ export class Inventory {
         this.updateSelectedItemInfo();
     }
     
-    giveItemToMissionPig(item) {
+    giveItemToMissionAnimal(item) {
         const mission = this.game.activeMission;
         if (mission && mission.item === item.id) {
-            const pig = mission.pig;
-            pig.missionProgress++;
+            const animal = mission.pig; // Still called 'pig' in the mission data structure
+            animal.missionProgress++;
             
             // Remove one of the item
             this.removeItem(item.id);
             
-            if (pig.missionProgress >= pig.missionTarget) {
+            if (animal.missionProgress >= animal.missionTarget) {
                 // Mission complete!
                 this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
                 this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
                 this.game.ui.updateDisplay();
                 
-                // Update mission through guinea pig missions
-                if (this.game.guineaPigMissions) {
-                    this.game.guineaPigMissions.completeMission(pig);
+                // Update mission based on animal type
+                if (this.game.guineaPigMissions && this.game.currentWorld === 'home') {
+                    // Handle guinea pig missions
+                    this.game.guineaPigMissions.completeMission(animal);
+                } else if (this.game.animalChallenge) {
+                    // Handle other animal missions (horses, etc.)
+                    this.game.animalChallenge.updateMissionForAnimal(animal);
+                    this.game.animalChallenge.missionManager.completeMission();
                 }
                 
                 // Close inventory and clear mission
                 this.closeInventory();
                 this.game.activeMission = null;
             } else {
-                this.game.ui.showNotification(`Goed zo! Nog ${pig.missionTarget - pig.missionProgress} ${item.name} te gaan!`);
+                this.game.ui.showNotification(`Goed zo! Nog ${animal.missionTarget - animal.missionProgress} ${item.name} te gaan!`);
                 
-                // Update mission modal if it exists
-                if (this.game.guineaPigMissions) {
+                // Update mission modal based on animal type
+                if (this.game.guineaPigMissions && this.game.currentWorld === 'home') {
                     this.game.guineaPigMissions.updateMissionModal();
+                } else if (this.game.animalChallenge) {
+                    this.game.animalChallenge.missionManager.updateProgress(animal.missionProgress);
                 }
                 
                 // Update inventory display
