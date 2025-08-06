@@ -190,6 +190,13 @@ export class AnimalChallenge {
     }
 
     showMissionModal(animal) {
+        // Debug logging
+        console.log('showMissionModal called with animal:', animal);
+        console.log('Animal mission:', animal.mission);
+        console.log('Animal missionItem:', animal.missionItem);
+        console.log('Animal missionProgress:', animal.missionProgress);
+        console.log('Animal missionTarget:', animal.missionTarget);
+        
         // Create mission modal if it doesn't exist
         if (!this.missionModal) {
             this.missionModal = document.createElement('div');
@@ -694,6 +701,9 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
 // Check if player clicked on an animal
 export function checkAnimalClick(worldType, worldX, worldY) {
     const animals = ANIMALS[worldType] || [];
+    
+    console.log('checkAnimalClick - worldType:', worldType);
+    console.log('checkAnimalClick - available animals:', animals);
     
     for (const animal of animals) {
         const distance = Math.sqrt(

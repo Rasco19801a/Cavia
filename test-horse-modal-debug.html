@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horse Modal Debug Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .debug-info {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        #missionDescription {
+            background: yellow;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Horse Modal Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testModal()">Test Modal with Horse Mission</button>
+        <button onclick="checkModalElements()">Check Modal Elements</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Output</h2>
+        <div id="debugOutput" class="debug-info">Click a button to see debug info...</div>
+    </div>
+
+    <script type="module">
+        import { Game } from './js/game.js';
+        import { ANIMALS } from './js/animals.js';
+        
+        window.game = new Game();
+        
+        window.testModal = function() {
+            const output = document.getElementById('debugOutput');
+            
+            // Get horses from ANIMALS
+            const horses = ANIMALS['paarden'];
+            output.textContent = 'Available horses:\n' + JSON.stringify(horses, null, 2);
+            
+            if (horses && horses.length > 0) {
+                const firstHorse = horses[0];
+                output.textContent += '\n\nTesting with first horse:\n' + JSON.stringify(firstHorse, null, 2);
+                
+                // Show the modal
+                game.animalChallenge.showMissionModal(firstHorse);
+                
+                // Check modal content after a short delay
+                setTimeout(() => {
+                    checkModalElements();
+                }, 100);
+            }
+        };
+        
+        window.checkModalElements = function() {
+            const output = document.getElementById('debugOutput');
+            let debugInfo = 'Modal Elements Check:\n\n';
+            
+            // Check if modal exists
+            const modal = document.getElementById('missionModal');
+            debugInfo += 'Modal exists: ' + (modal ? 'YES' : 'NO') + '\n';
+            debugInfo += 'Modal hidden: ' + (modal ? modal.classList.contains('hidden') : 'N/A') + '\n\n';
+            
+            // Check each element
+            const elements = ['missionTitle', 'missionDescription', 'missionProgressText', 'missionProgressBar'];
+            elements.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) {
+                    debugInfo += `${id}:\n`;
+                    debugInfo += `  - exists: YES\n`;
+                    debugInfo += `  - content: "${elem.textContent}"\n`;
+                    debugInfo += `  - display: ${window.getComputedStyle(elem).display}\n`;
+                    debugInfo += `  - visibility: ${window.getComputedStyle(elem).visibility}\n`;
+                    if (id === 'missionProgressBar') {
+                        debugInfo += `  - width: ${elem.style.width}\n`;
+                    }
+                } else {
+                    debugInfo += `${id}: NOT FOUND\n`;
+                }
+                debugInfo += '\n';
+            });
+            
+            output.textContent = debugInfo;
+        };
+    </script>
+</body>
+</html>

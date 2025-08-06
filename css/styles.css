@@ -724,7 +724,8 @@ body {
     margin-bottom: 10px;
 }
 
-#missionText {
+#missionText,
+#missionDescription {
     font-size: 18px;
     margin: 20px 0;
     color: #333;
