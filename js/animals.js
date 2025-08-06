@@ -477,9 +477,9 @@ export class AnimalChallenge {
 }
 
 // Draw guinea pig style animal
-function drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY, scale = 0.4) {
+function drawGuineaPigStyleAnimal(ctx, animal, worldX, worldY, scale = 0.4) {
     ctx.save();
-    ctx.translate(screenX, screenY);
+    ctx.translate(worldX, worldY);
     ctx.scale(scale, scale);
 
     // Shadow
@@ -618,20 +618,20 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
     const animals = ANIMALS[worldType] || [];
     
     animals.forEach(animal => {
-        // Draw at world coordinates - camera transform is already applied
+        // Camera transform is already applied by game.js, so use world coordinates directly
         // Only draw if on screen
         const screenX = animal.x - cameraX;
         const screenY = animal.y - cameraY;
         
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
-            // Draw guinea pig style animal at screen coordinates (not world coordinates!)
-            drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY);
+            // Draw guinea pig style animal at world coordinates (camera transform already applied!)
+            drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
 
                 // Draw mission indicator (exclamation mark) above animals that have an active mission
                 if (animal.mission && animal.missionProgress < animal.missionTarget) {
-                    // Position slightly above the animal head (use screen coordinates)
-                    const indicatorX = screenX;
-                    const indicatorY = screenY - 70; // 70px above body center after scaling
+                    // Position slightly above the animal head (use world coordinates)
+                    const indicatorX = animal.x;
+                    const indicatorY = animal.y - 70; // 70px above body center after scaling
 
                     // Save context state
                     ctx.save();

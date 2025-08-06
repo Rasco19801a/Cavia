@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Paarden Beweging</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas {
+            display: block;
+            margin: 20px auto;
+            border: 2px solid #333;
+            background: white;
+        }
+        #info {
+            text-align: center;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #controls {
+            text-align: center;
+            margin: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>Test Paarden Beweging</h2>
+        <p>Camera Positie: <span id="cameraPos">0, 0</span></p>
+        <p>Muis Positie (Wereld): <span id="mousePos">0, 0</span></p>
+    </div>
+    
+    <div id="controls">
+        <button onclick="moveCamera(-50, 0)">← Links</button>
+        <button onclick="moveCamera(50, 0)">Rechts →</button>
+        <button onclick="moveCamera(0, -50)">↑ Omhoog</button>
+        <button onclick="moveCamera(0, 50)">↓ Omlaag</button>
+        <button onclick="resetCamera()">Reset Camera</button>
+    </div>
+    
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script type="module">
+        import { CONFIG } from './js/config.js';
+        import { drawWorld } from './js/worlds.js';
+        import { drawAnimals } from './js/animals.js';
+        import { Camera } from './js/camera.js';
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const camera = new Camera(canvas);
+        
+        // Test player position
+        const testPlayer = { x: 400, y: 400 };
+        
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            camera.applyTransform(ctx);
+            
+            // Draw paarden world
+            drawWorld(ctx, 'paarden', []);
+            
+            // Draw animals
+            drawAnimals(ctx, 'paarden', camera.x, camera.y);
+            
+            // Draw test player
+            ctx.fillStyle = '#FF1493';
+            ctx.beginPath();
+            ctx.arc(testPlayer.x, testPlayer.y, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Update info
+            document.getElementById('cameraPos').textContent = `${Math.round(camera.x)}, ${Math.round(camera.y)}`;
+        }
+        
+        // Mouse tracking
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const screenX = e.clientX - rect.left;
+            const screenY = e.clientY - rect.top;
+            const worldPos = camera.screenToWorld(screenX, screenY);
+            document.getElementById('mousePos').textContent = `${Math.round(worldPos.x)}, ${Math.round(worldPos.y)}`;
+        });
+        
+        // Camera controls
+        window.moveCamera = function(dx, dy) {
+            camera.x += dx;
+            camera.y += dy;
+            camera.x = Math.max(0, Math.min(CONFIG.WORLD_WIDTH - canvas.width, camera.x));
+            camera.y = Math.max(0, Math.min(CONFIG.WORLD_HEIGHT - canvas.height, camera.y));
+            render();
+        };
+        
+        window.resetCamera = function() {
+            camera.x = 0;
+            camera.y = 0;
+            render();
+        };
+        
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
