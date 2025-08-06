@@ -624,14 +624,14 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
         const screenY = animal.y - cameraY;
         
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
-            // Draw guinea pig style animal at world coordinates
-            drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
+            // Draw guinea pig style animal at screen coordinates (not world coordinates!)
+            drawGuineaPigStyleAnimal(ctx, animal, screenX, screenY);
 
                 // Draw mission indicator (exclamation mark) above animals that have an active mission
                 if (animal.mission && animal.missionProgress < animal.missionTarget) {
-                    // Position slightly above the animal head (adjusted for camera already applied)
-                    const indicatorX = animal.x;
-                    const indicatorY = animal.y - 70; // 70px above body center after scaling
+                    // Position slightly above the animal head (use screen coordinates)
+                    const indicatorX = screenX;
+                    const indicatorY = screenY - 70; // 70px above body center after scaling
 
                     // Save context state
                     ctx.save();
