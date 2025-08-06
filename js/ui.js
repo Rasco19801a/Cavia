@@ -67,12 +67,14 @@ export class UI {
                 e.stopPropagation();
                 
                 const world = btn.getAttribute('data-world');
+                console.log('[UI] World button clicked:', world);
                 
                 // Update active state
                 worldButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
                 // Emit world change event
+                console.log('[UI] Emitting WORLD_CHANGE event for:', world);
                 eventSystem.emit(GameEvents.WORLD_CHANGE, world);
             });
         });
