@@ -419,12 +419,9 @@ export class Inventory {
                 this.game.ui.showNotification(`Goed zo! Nog ${animal.missionTarget - animal.missionProgress} ${item.name} te gaan!`);
                 
                 // Update mission modal if it exists
-                if (mission.isHorse && this.game.animalChallenge.missionModal && !this.game.animalChallenge.missionModal.classList.contains('hidden')) {
+                if (mission.isHorse && this.game.animalChallenge.missionManager.isMissionModalVisible()) {
                     // Update horse mission modal
-                    document.getElementById('missionProgressText').textContent = 
-                        `${animal.missionProgress}/${animal.missionTarget}`;
-                    const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
-                    document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
+                    this.game.animalChallenge.missionManager.updateMissionProgress(animal.missionProgress, animal.missionTarget);
                 } else if (this.game.guineaPigMissions) {
                     this.game.guineaPigMissions.updateMissionModal();
                 }

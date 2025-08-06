@@ -1,5 +1,6 @@
 // Animals module - handles animal placement and educational challenges
 import { CONFIG, GAME_CONFIG } from './config.js';
+import { MissionManager } from './mission-manager.js';
 
 // Animal definitions for each world
 export const ANIMALS = {
@@ -98,6 +99,8 @@ const SPELLING_WORDS = {
 export class AnimalChallenge {
     constructor(game) {
         this.game = game;
+        this.currentAnimal = null;
+        this.missionManager = new MissionManager(game);
         this.challengeModal = null;
         this.currentChallenge = null;
         this.tableProgress = {}; // Track progress per table
@@ -197,60 +200,18 @@ export class AnimalChallenge {
         console.log('Animal missionProgress:', animal.missionProgress);
         console.log('Animal missionTarget:', animal.missionTarget);
         
-        // Create mission modal if it doesn't exist
-        if (!this.missionModal) {
-            this.missionModal = document.createElement('div');
-            this.missionModal.className = 'mission-modal hidden';
-            this.missionModal.id = 'missionModal';
-            this.missionModal.innerHTML = `
-                <div class="mission-content">
-                    <button class="modal-close-btn" id="closeMission">✖</button>
-                    <h2 id="missionTitle"></h2>
-                    <div class="mission-pig-icon">🐴</div>
-                    <p id="missionDescription"></p>
-                    <div class="mission-progress">
-                        <div class="progress-bar">
-                            <div id="missionProgressBar" class="progress-fill"></div>
-                        </div>
-                        <p id="missionProgressText">0/0</p>
-                    </div>
-                    <button class="inventory-select-btn" id="selectFromInventoryBtn">
-                        <span class="btn-icon">🎒</span>
-                        <span>Selecteer uit Rugzak</span>
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(this.missionModal);
-            
-            document.getElementById('closeMission').addEventListener('click', () => {
-                this.missionModal.classList.add('hidden');
-            });
-        }
-        
-        // Update mission content
-        document.getElementById('missionTitle').textContent = animal.name;
-        document.getElementById('missionDescription').textContent = animal.mission;
-        document.getElementById('missionProgressText').textContent = 
-            `${animal.missionProgress}/${animal.missionTarget}`;
-        
-        // Update progress bar
-        const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
-        document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
-        
-        // Setup inventory button
-        const inventoryBtn = document.getElementById('selectFromInventoryBtn');
-        inventoryBtn.onclick = () => {
-            this.missionModal.classList.add('hidden');
-            // Set the active mission for the inventory system
-            this.game.activeMission = {
-                pig: animal,  // The inventory expects a 'pig' property
-                item: animal.missionItem,
-                isHorse: true  // Flag to indicate this is a horse mission
-            };
-            this.game.inventory.open();
+        // Use the centralized MissionManager
+        const missionData = {
+            pig: animal,  // The inventory expects a 'pig' property
+            name: animal.name,
+            mission: animal.mission,
+            progress: animal.missionProgress,
+            target: animal.missionTarget,
+            item: animal.missionItem,
+            isHorse: true  // Flag to indicate this is a horse mission
         };
         
-        this.missionModal.classList.remove('hidden');
+        this.missionManager.showMission(missionData);
     }
 
     handleMissionItem(item, animal) {
@@ -267,7 +228,7 @@ export class AnimalChallenge {
                 this.updateMissionForAnimal(animal);
                 
                 // Update modal if still open
-                if (this.missionModal && !this.missionModal.classList.contains('hidden')) {
+                if (this.missionManager.isMissionModalVisible()) {
                     this.showMissionModal(animal);
                 }
                 
@@ -276,11 +237,8 @@ export class AnimalChallenge {
                 this.game.ui.showNotification(`Goed zo! Nog ${animal.missionTarget - animal.missionProgress} ${item.name} te gaan!`);
                 
                 // Update modal if still open
-                if (this.missionModal && !this.missionModal.classList.contains('hidden')) {
-                    document.getElementById('missionProgressText').textContent = 
-                        `${animal.missionProgress}/${animal.missionTarget}`;
-                    const progressPercent = (animal.missionProgress / animal.missionTarget) * 100;
-                    document.getElementById('missionProgressBar').style.width = `${progressPercent}%`;
+                if (this.missionManager.isMissionModalVisible()) {
+                    this.missionManager.updateMissionProgress(animal.missionProgress, animal.missionTarget);
                 }
                 
                 return true;
@@ -633,10 +591,10 @@ function drawGuineaPigStyleAnimal(ctx, animal, worldX, worldY, scale = 0.4) {
     ctx.fillStyle = 'black';
     ctx.font = '12px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(animal.name, screenX, screenY + 40);
+    ctx.fillText(animal.name, worldX, worldY + 40);
 
     ctx.save();
-    ctx.translate(screenX, screenY);
+    ctx.translate(worldX, worldY);
     ctx.scale(scale, scale);
 
     // Interactive glow
