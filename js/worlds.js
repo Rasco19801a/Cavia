@@ -192,11 +192,12 @@ function drawNatuur(ctx) {
     // Trees
     for (let i = 0; i < 10; i++) {
         const x = 200 + i * 150;
-        const y = 450;
+        const trunkHeight = 40;
+        const y = 500 - trunkHeight; // Align trunk bottom with grass
 
         // Tree trunk
         ctx.fillStyle = '#8B4513';
-        ctx.fillRect(x - 10, y, 20, 40);
+        ctx.fillRect(x - 10, y, 20, trunkHeight);
 
         // Tree leaves
         ctx.fillStyle = '#228B22';
@@ -1190,11 +1191,12 @@ function drawPaarden(ctx) {
     // Trees in background
     for (let i = 0; i < 5; i++) {
         const x = 100 + i * 400;
-        const y = 380;
-        
+        const trunkHeight = 60;
+        const y = 500 - trunkHeight; // Align trunk bottom with grass
+
         // Tree trunk
         ctx.fillStyle = '#8B4513';
-        ctx.fillRect(x - 15, y, 30, 60);
+        ctx.fillRect(x - 15, y, 30, trunkHeight);
         
         // Tree leaves
         ctx.fillStyle = '#228B22';
