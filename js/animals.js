@@ -11,9 +11,9 @@ export const ANIMALS = {
         { type: 'duif', name: 'Duif', emoji: '🕊️', x: 1200, y: 400, color: { body: '#778899', belly: '#B0C4DE' } }
     ],
     natuur: [
-        { type: 'das', name: 'Das', emoji: '🦡', x: 400, y: 480, color: { body: '#2F4F4F', belly: '#FFFFFF' } },
-        { type: 'vos', name: 'Vos', emoji: '🦊', x: 700, y: 480, color: { body: '#FF6347', belly: '#FFDAB9' } },
-        { type: 'konijn', name: 'Konijn', emoji: '🐰', x: 1000, y: 480, color: { body: '#F5F5DC', belly: '#FFFFFF' } },
+        { type: 'das', name: 'Das', emoji: '🦡', x: 400, y: 470, color: { body: '#2F4F4F', belly: '#FFFFFF' } },
+        { type: 'vos', name: 'Vos', emoji: '🦊', x: 700, y: 470, color: { body: '#FF6347', belly: '#FFDAB9' } },
+        { type: 'konijn', name: 'Konijn', emoji: '🐰', x: 1000, y: 470, color: { body: '#F5F5DC', belly: '#FFFFFF' } },
         { type: 'hert', name: 'Hert', emoji: '🦌', x: 1300, y: 470, color: { body: '#8B4513', belly: '#DEB887' } }
     ],
     strand: [
@@ -53,15 +53,15 @@ export const ANIMALS = {
         { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 620, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
     ],
     'paarden': [
-        { type: 'paard', name: 'Thunder', emoji: '🐴', x: 300, y: 480, color: { body: '#2c2c2c', belly: '#696969' }, 
+        { type: 'paard', name: 'Thunder', emoji: '🐴', x: 300, y: 470, color: { body: '#2c2c2c', belly: '#696969' }, 
           mission: 'Ik heb honger! Breng me 3 appels alsjeblieft!', missionProgress: 0, missionTarget: 3, missionItem: 'apple' },
-        { type: 'paard', name: 'Bella', emoji: '🐴', x: 600, y: 480, color: { body: '#8B4513', belly: '#D2691E' }, 
+        { type: 'paard', name: 'Bella', emoji: '🐴', x: 600, y: 470, color: { body: '#8B4513', belly: '#D2691E' }, 
           mission: 'Ik wil graag 5 wortels eten!', missionProgress: 0, missionTarget: 5, missionItem: 'carrot' },
-        { type: 'paard', name: 'Storm', emoji: '🐴', x: 900, y: 480, color: { body: '#696969', belly: '#A9A9A9' }, 
+        { type: 'paard', name: 'Storm', emoji: '🐴', x: 900, y: 470, color: { body: '#696969', belly: '#A9A9A9' }, 
           mission: 'Breng me 2 pakketjes hooi!', missionProgress: 0, missionTarget: 2, missionItem: 'hay_small' },
-        { type: 'paard', name: 'Hindi', emoji: '🐴', x: 1200, y: 480, color: { body: '#FFFFFF', belly: '#F5F5F5' }, 
+        { type: 'paard', name: 'Hindi', emoji: '🐴', x: 1200, y: 470, color: { body: '#FFFFFF', belly: '#F5F5F5' }, 
           mission: 'Ik heb zin in 4 appels!', missionProgress: 0, missionTarget: 4, missionItem: 'apple' },
-        { type: 'paard', name: 'Max', emoji: '🐴', x: 1500, y: 480, color: { body: '#D2691E', belly: '#F4A460' }, 
+        { type: 'paard', name: 'Max', emoji: '🐴', x: 1500, y: 470, color: { body: '#D2691E', belly: '#F4A460' }, 
           mission: 'Kan je 3 wortels voor me vinden?', missionProgress: 0, missionTarget: 3, missionItem: 'carrot' }
     ]
 };
