@@ -611,7 +611,9 @@ export class Game {
             }
             
             // Draw player
-            this.player.draw(this.ctx);
+            // Use larger scale in thuis world for better visibility
+            const playerScale = this.currentWorld === 'thuis' ? 0.7 : 0.5;
+            this.player.draw(this.ctx, playerScale);
             
             this.ctx.restore();
         } else {
@@ -636,7 +638,7 @@ export class Game {
                 this.ctx.stroke();
             }
             
-            this.player.draw(this.ctx);
+            this.player.draw(this.ctx, 0.7); // Use larger scale in interiors
             
             this.ctx.restore();
         }
