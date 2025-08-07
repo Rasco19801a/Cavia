@@ -16,13 +16,28 @@ export class ScreenManager {
         // Enable/disable next button based on selection
         const updateNextButton = () => {
             const checkedBoxes = document.querySelectorAll('.table-checkbox:checked');
-            nextBtn.disabled = checkedBoxes.length === 0;
+            if (nextBtn) nextBtn.disabled = checkedBoxes.length === 0;
         };
         
         // Add event listeners to checkboxes
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateNextButton);
+            checkbox.addEventListener('input', updateNextButton);
         });
+        
+        // Also handle label clicks (in case some browsers delay change)
+        if (tablesScreen) {
+            tablesScreen.addEventListener('click', (e) => {
+                const label = e.target.closest('.checkbox-label');
+                if (label) {
+                    // Wait a tick for the checkbox to toggle, then update
+                    setTimeout(updateNextButton, 0);
+                }
+            });
+        }
+        
+        // Initialize state on load
+        updateNextButton();
         
         // Handle next button click
         nextBtn.addEventListener('click', () => {
@@ -47,13 +62,27 @@ export class ScreenManager {
         // Enable/disable next button based on selection
         const updateNextButton = () => {
             const checkedBoxes = document.querySelectorAll('.difficulty-checkbox:checked');
-            nextBtn.disabled = checkedBoxes.length === 0;
+            if (nextBtn) nextBtn.disabled = checkedBoxes.length === 0;
         };
         
         // Add event listeners to checkboxes
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateNextButton);
+            checkbox.addEventListener('input', updateNextButton);
         });
+        
+        // Also handle label clicks (in case some browsers delay change)
+        if (difficultyScreen) {
+            difficultyScreen.addEventListener('click', (e) => {
+                const label = e.target.closest('.checkbox-label');
+                if (label) {
+                    setTimeout(updateNextButton, 0);
+                }
+            });
+        }
+        
+        // Initialize state on load
+        updateNextButton();
         
         // Handle next button click
         nextBtn.addEventListener('click', () => {
