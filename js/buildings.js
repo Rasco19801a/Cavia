@@ -1,6 +1,27 @@
 // Buildings module - handles building creation and interiors
 import { CONFIG } from './config.js';
 
+// Building class
+class Building {
+    constructor(x, y, w, h, color, name, type) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.color = color;
+        this.name = name;
+        this.type = type;
+        this.door = null;
+    }
+    
+    draw(ctx) {
+        if (this.color !== 'transparent') {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+        }
+    }
+}
+
 // Utility function to draw rounded rectangle
 function drawRoundedRect(ctx, x, y, width, height, radius) {
     ctx.beginPath();
