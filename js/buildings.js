@@ -50,12 +50,10 @@ export function createZwembadBuildings() {
     ];
 }
 
-// Create home world as a single large interior building
+// Create home world without any buildings (it's already an interior)
 export function createThuisBuildings() {
-    // Create a single building that represents the entire home interior
-    return [
-        new Building(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT, 'transparent', 'Thuis Interieur', 'thuis_interieur')
-    ];
+    // Home world doesn't need buildings since it's already an interior space
+    return [];
 }
 
 function drawShopInterior(ctx, name) {

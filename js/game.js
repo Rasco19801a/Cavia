@@ -290,6 +290,7 @@ export class Game {
             // Check if clicked on a building
             let clickedBuilding = false;
             
+            // Only check for building clicks in dierenstad (not in thuis/home world)
             if (this.currentWorld === 'dierenstad') {
                 for (const building of this.buildings) {
                     if (building.contains && building.contains(worldCoords.x, worldCoords.y)) {
