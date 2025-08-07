@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Home World Movement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .test-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Nunito', sans-serif;
+            z-index: 1000;
+        }
+        .test-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .test-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>🏠 Home World Movement Test</h2>
+        <p>Click anywhere to move your guinea pig</p>
+        <p>Use arrow keys for keyboard movement</p>
+        <p id="status">Loading...</p>
+        <p id="position">Position: -</p>
+        <p id="inside-status">Inside Building: -</p>
+    </div>
+    
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-panel world-selector" id="worldSelector">
+            <button class="world-btn active" data-world="thuis">🏠 Thuis</button>
+            <button class="world-btn" data-world="dierenstad">🏪 Dierenstad</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gameCanvas');
+            const statusEl = document.getElementById('status');
+            const positionEl = document.getElementById('position');
+            const insideStatusEl = document.getElementById('inside-status');
+            
+            // Initialize game with home world
+            const game = new Game(canvas, {
+                bodyColor: '#8B4513',
+                bellyColor: '#FFE4D5',
+                accessory: 'none'
+            });
+            
+            // Make game globally accessible for debugging
+            window.game = game;
+            
+            // Ensure we start in home world
+            game.changeWorld('thuis');
+            
+            statusEl.textContent = 'Game loaded! Try clicking to move.';
+            
+            // Update position display
+            setInterval(() => {
+                if (game && game.player) {
+                    positionEl.textContent = `Position: (${Math.round(game.player.x)}, ${Math.round(game.player.y)})`;
+                    insideStatusEl.textContent = `Inside Building: ${game.isInside ? 'Yes' : 'No'}`;
+                }
+            }, 100);
+            
+            // Add world switching functionality
+            document.querySelectorAll('.world-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const world = e.target.dataset.world;
+                    game.changeWorld(world);
+                    
+                    // Update active button
+                    document.querySelectorAll('.world-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    statusEl.textContent = `Switched to ${world} world`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
