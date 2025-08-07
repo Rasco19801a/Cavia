@@ -362,6 +362,7 @@ export class AnimalChallenge {
             // Award carrots
             const carrotsEarned = 10;
             this.game.player.addCarrots(carrotsEarned);
+            this.game.ui.updateDisplay();
             
             // Track progress
             if (this.currentChallenge.type === 'math') {
