@@ -3,7 +3,7 @@ import { CONFIG, WORLDS, DEFAULT_WORLD } from './config.js';
 import { Player } from './player.js';
 import { Camera } from './camera.js';
 import { UI } from './ui.js';
-import { drawWorld } from './worlds.js';
+import { drawWorld, clearBackgroundCache } from './worlds.js';
 import { createDierenstadBuildings, createZwembadBuildings, createThuisBuildings, drawInterior } from './buildings.js';
 import { AnimalChallenge, drawAnimals, checkAnimalClick } from './animals.js';
 import { Shop } from './shop.js';
@@ -96,6 +96,8 @@ export class Game {
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        // Clear background cache when canvas is resized
+        clearBackgroundCache();
     }
 
     setupEventListeners() {
