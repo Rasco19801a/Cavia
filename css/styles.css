@@ -5,6 +5,11 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    /* Prevent zooming */
+    touch-action: pan-x pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* Hidden class utility */
@@ -17,6 +22,8 @@ body {
     position: relative;
     width: 100%;
     height: 100vh;
+    /* Prevent zooming */
+    touch-action: manipulation;
 }
 
 /* Game canvas */
