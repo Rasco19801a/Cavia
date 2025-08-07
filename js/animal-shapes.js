@@ -1218,6 +1218,133 @@ export function drawPaard(ctx, animal, screenX, screenY, scale) {
     ctx.restore();
 }
 
+// --- NEW: Exact cute variant to match provided image ---
+export function drawPaardCute(ctx, animal, screenX, screenY, scale) {
+    ctx.save();
+    ctx.translate(screenX, screenY);
+    ctx.scale(scale, scale);
+
+    const bodyColor = animal.color?.body || '#B8824D';
+    const bellyColor = animal.color?.belly || '#F5DEB3';
+    const maneColor = '#8B5A3C';
+    const hoofColor = '#6B4423';
+    const innerEarColor = '#D2B48C';
+    const nostrilColor = '#DDA0DD';
+
+    // Body
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 60, 55, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly
+    ctx.fillStyle = bellyColor;
+    ctx.beginPath();
+    ctx.ellipse(0, 35, 45, 35, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.arc(0, -40, 40, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Muzzle/Snout
+    ctx.fillStyle = bellyColor;
+    ctx.beginPath();
+    ctx.ellipse(0, -25, 28, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.moveTo(-20, -70);
+    ctx.lineTo(-10, -50);
+    ctx.lineTo(-30, -50);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(20, -70);
+    ctx.lineTo(30, -50);
+    ctx.lineTo(10, -50);
+    ctx.closePath();
+    ctx.fill();
+
+    // Inner ears
+    ctx.fillStyle = innerEarColor;
+    ctx.beginPath();
+    ctx.moveTo(-20, -65);
+    ctx.lineTo(-15, -53);
+    ctx.lineTo(-25, -53);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(20, -65);
+    ctx.lineTo(25, -53);
+    ctx.lineTo(15, -53);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mane
+    ctx.fillStyle = maneColor;
+    ctx.beginPath();
+    ctx.arc(0, -65, 18, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Front mane strands
+    ctx.beginPath();
+    ctx.moveTo(-15, -60);
+    ctx.quadraticCurveTo(-20, -55, -15, -50);
+    ctx.quadraticCurveTo(-10, -45, -5, -50);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(15, -60);
+    ctx.quadraticCurveTo(20, -55, 15, -50);
+    ctx.quadraticCurveTo(10, -45, 5, -50);
+    ctx.closePath();
+    ctx.fill();
+
+    // Legs
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(-30, 60, 20, 50);
+    ctx.fillRect(10, 60, 20, 50);
+    ctx.fillRect(-35, 60, 20, 50);
+    ctx.fillRect(15, 60, 20, 50);
+
+    // Hooves
+    ctx.fillStyle = hoofColor;
+    ctx.fillRect(-30, 105, 20, 10);
+    ctx.fillRect(10, 105, 20, 10);
+    ctx.fillRect(-35, 105, 20, 10);
+    ctx.fillRect(15, 105, 20, 10);
+
+    // Nostrils
+    ctx.fillStyle = nostrilColor;
+    ctx.beginPath();
+    ctx.ellipse(-10, -20, 5, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(10, -20, 5, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.ellipse(-15, -40, 4, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(15, -40, 4, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawNameAndGlow(ctx, animal, screenX, screenY, scale);
+    ctx.restore();
+}
+
 // Export all drawing functions
 export const animalDrawers = {
     hond: drawHond,
@@ -1235,6 +1362,10 @@ export const animalDrawers = {
 
 // Main drawing function
 export function drawAnimal(ctx, animal, screenX, screenY, scale = 0.4) {
+    // If a horse has variant 'cute', use the exact cute drawing
+    if (animal.type === 'paard' && animal.variant === 'cute') {
+        return drawPaardCute(ctx, animal, screenX, screenY, scale);
+    }
     const drawFunc = animalDrawers[animal.type];
     if (drawFunc) {
         drawFunc(ctx, animal, screenX, screenY, scale);
