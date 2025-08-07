@@ -168,7 +168,7 @@ export class GuineaPigMissions {
             ctx.fill();
             
             // Draw ears
-            ctx.fillStyle = '#FFB6C1';
+            ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(-30, -25, 8, 0, Math.PI * 2);
             ctx.arc(-20, -25, 8, 0, Math.PI * 2);
