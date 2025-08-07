@@ -573,6 +573,12 @@ export class Game {
     draw() {
         performanceMonitor.startTimer('frame');
         
+        // If full 3D mode is active, skip 2D drawing for exterior worlds only
+        if (window && window.__THREE_GAME_MODE__ && !this.isInside) {
+            performanceMonitor.endTimer('frame');
+            return;
+        }
+        
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         

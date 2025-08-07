@@ -146,6 +146,9 @@
             </div>
         </div>
         
+        <!-- 3D canvas under 2D game canvas -->
+        <canvas id="threeCanvas" class="hidden"></canvas>
+        
         <canvas id="gameCanvas"></canvas>
         
         <div class="ui-panel world-selector hidden" id="worldSelector">
@@ -157,7 +160,8 @@
             <button class="world-btn" data-world="woestijn">🏜️ Woestijn</button>
             <button class="world-btn" data-world="jungle">🌴 Jungle</button>
             <button class="world-btn" data-world="zwembad">🏊 Zwembad</button>
-                            <button class="world-btn" data-world="paarden">🐴 Paarden</button>
+            <button class="world-btn" data-world="paarden">🐴 Paarden</button>
+            <button class="world-btn tertiary" id="toggle3DBtn">🧊 3D aan/uit</button>
         </div>
         
         <div class="ui-panel design-panel hidden">
