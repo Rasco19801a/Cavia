@@ -47,10 +47,10 @@ export const ANIMALS = {
         { type: 'flamingo', name: 'Flamingo', emoji: '🦩', x: 1100, y: 470, color: { body: '#FF69B4', belly: '#FFB6C1' } }
     ],
     dierenstad: [
-        { type: 'paard', name: 'Paard', emoji: '🐴', x: 350, y: 480, color: { body: '#8B4513', belly: '#A0522D' } },
-        { type: 'ezel', name: 'Ezel', emoji: '🫏', x: 650, y: 480, color: { body: '#808080', belly: '#A9A9A9' } },
-        { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 480, color: { body: '#000000', belly: '#FFFFFF' } },
-        { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 480, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
+        { type: 'paard', name: 'Paard', emoji: '🐴', x: 350, y: 620, color: { body: '#8B4513', belly: '#A0522D' } },
+        { type: 'ezel', name: 'Ezel', emoji: '🫏', x: 650, y: 620, color: { body: '#808080', belly: '#A9A9A9' } },
+        { type: 'koe', name: 'Koe', emoji: '🐄', x: 950, y: 620, color: { body: '#000000', belly: '#FFFFFF' } },
+        { type: 'varken', name: 'Varken', emoji: '🐷', x: 1250, y: 620, color: { body: '#FFC0CB', belly: '#FFE4E1' } }
     ],
     'paarden': [
         { type: 'paard', name: 'Thunder', emoji: '🐴', x: 300, y: 480, color: { body: '#2c2c2c', belly: '#696969' }, 

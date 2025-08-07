@@ -344,10 +344,330 @@ export class HomeItemManager {
                 ctx.fillRect(-size/2 + size/3, -size/8, size*2/3 - 5, size/2);
                 break;
                 
+            case 'cucumber':
+                // Draw cucumber
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/4, size/2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Cucumber details
+                ctx.strokeStyle = '#006400';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, -size/2);
+                ctx.lineTo(0, size/2);
+                ctx.stroke();
+                break;
+                
+            case 'corn':
+                // Draw corn
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/3, size/2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Corn kernels
+                ctx.fillStyle = '#FFA500';
+                for (let i = -3; i <= 3; i++) {
+                    for (let j = -5; j <= 5; j++) {
+                        ctx.beginPath();
+                        ctx.arc(i * 5, j * 5, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                break;
+                
+            case 'apple':
+                // Draw apple
+                ctx.fillStyle = '#FF0000';
+                ctx.beginPath();
+                ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Apple stem
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, -size/2);
+                ctx.lineTo(0, -size/2 - 5);
+                ctx.stroke();
+                
+                // Apple leaf
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.ellipse(5, -size/2 - 5, 5, 3, Math.PI/4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'endive':
+            case 'celery':
+            case 'spinach':
+                // Draw leafy vegetables
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Leaf veins
+                ctx.strokeStyle = '#006400';
+                ctx.lineWidth = 1;
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(i * 10, -size/3);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'hay_small':
+            case 'hay_medium':
+            case 'hay_large':
+            case 'hay_premium':
+                // Draw hay bundle
+                ctx.fillStyle = '#DAA520';
+                ctx.fillRect(-size/2, -size/3, size, size*2/3);
+                
+                // Hay strands
+                ctx.strokeStyle = '#B8860B';
+                ctx.lineWidth = 2;
+                for (let i = -4; i <= 4; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * 5, -size/3);
+                    ctx.lineTo(i * 5 + Math.random() * 5 - 2.5, size/3);
+                    ctx.stroke();
+                }
+                
+                // Bundle tie
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-size/2 - 5, -5, size + 10, 10);
+                break;
+                
+            case 'tunnel':
+                // Draw tunnel
+                ctx.fillStyle = '#FF6347';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Tunnel opening
+                ctx.fillStyle = '#2F2F2F';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/3, size/4, 0, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'wheel':
+                // Draw exercise wheel
+                ctx.strokeStyle = '#4682B4';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Wheel spokes
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI * 2) / 8;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(angle) * size/2, Math.sin(angle) * size/2);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'slide':
+                // Draw slide
+                ctx.fillStyle = '#FF69B4';
+                ctx.beginPath();
+                ctx.moveTo(-size/2, size/2);
+                ctx.lineTo(size/2, -size/2);
+                ctx.lineTo(size/2 - 10, -size/2);
+                ctx.lineTo(-size/2 - 10, size/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Slide rails
+                ctx.strokeStyle = '#FF1493';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-size/2, size/2);
+                ctx.lineTo(size/2, -size/2);
+                ctx.moveTo(-size/2 - 10, size/2);
+                ctx.lineTo(size/2 - 10, -size/2);
+                ctx.stroke();
+                break;
+                
+            case 'teddy':
+                // Draw teddy bear
+                ctx.fillStyle = '#8B4513';
+                // Body
+                ctx.beginPath();
+                ctx.arc(0, 5, size/3, 0, Math.PI * 2);
+                ctx.fill();
+                // Head
+                ctx.beginPath();
+                ctx.arc(0, -size/4, size/4, 0, Math.PI * 2);
+                ctx.fill();
+                // Ears
+                ctx.beginPath();
+                ctx.arc(-size/4, -size/3, size/6, 0, Math.PI * 2);
+                ctx.arc(size/4, -size/3, size/6, 0, Math.PI * 2);
+                ctx.fill();
+                // Eyes
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(-size/8, -size/4, 2, 0, Math.PI * 2);
+                ctx.arc(size/8, -size/4, 2, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'blocks':
+                // Draw building blocks
+                const colors = ['#FF0000', '#0000FF', '#FFFF00', '#00FF00'];
+                const blockSize = size/4;
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillStyle = colors[i];
+                    const x = (i % 2) * blockSize - blockSize/2;
+                    const y = Math.floor(i / 2) * blockSize - blockSize/2;
+                    ctx.fillRect(x, y, blockSize - 2, blockSize - 2);
+                }
+                break;
+                
+            case 'puzzle':
+                // Draw puzzle piece
+                ctx.fillStyle = '#9370DB';
+                ctx.beginPath();
+                ctx.moveTo(-size/2, -size/2);
+                ctx.lineTo(0, -size/2);
+                ctx.arc(0, -size/2, size/6, Math.PI, 0, true);
+                ctx.lineTo(size/2, -size/2);
+                ctx.lineTo(size/2, 0);
+                ctx.arc(size/2, 0, size/6, Math.PI * 1.5, Math.PI * 0.5, false);
+                ctx.lineTo(size/2, size/2);
+                ctx.lineTo(-size/2, size/2);
+                ctx.closePath();
+                ctx.fill();
+                break;
+                
+            case 'shampoo':
+                // Draw shampoo bottle
+                ctx.fillStyle = '#FF69B4';
+                ctx.fillRect(-size/4, -size/3, size/2, size*2/3);
+                
+                // Bottle cap
+                ctx.fillStyle = '#FF1493';
+                ctx.fillRect(-size/6, -size/2, size/3, size/6);
+                
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.fillRect(-size/5, -size/6, size*2/5, size/3);
+                break;
+                
+            case 'brush':
+                // Draw brush
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-size/6, -size/2, size/3, size);
+                
+                // Bristles
+                ctx.fillStyle = '#696969';
+                ctx.fillRect(-size/4, -size/2, size/2, size/3);
+                
+                // Bristle lines
+                ctx.strokeStyle = '#2F4F4F';
+                ctx.lineWidth = 1;
+                for (let i = -3; i <= 3; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * 3, -size/2);
+                    ctx.lineTo(i * 3, -size/6);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'bath':
+                // Draw bathtub
+                ctx.fillStyle = '#87CEEB';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Bubbles
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        Math.random() * size - size/2,
+                        Math.random() * size/2 - size/4,
+                        Math.random() * 5 + 2,
+                        0, Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+                break;
+                
+            case 'massage':
+                // Draw massage hands
+                ctx.fillStyle = '#FFE4B5';
+                // Left hand
+                ctx.save();
+                ctx.translate(-size/4, 0);
+                ctx.rotate(-Math.PI/6);
+                ctx.fillRect(-size/6, -size/4, size/3, size/2);
+                // Fingers
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(-size/6 + i * 8, -size/4 - 10, 6, 10);
+                }
+                ctx.restore();
+                
+                // Right hand
+                ctx.save();
+                ctx.translate(size/4, 0);
+                ctx.rotate(Math.PI/6);
+                ctx.fillRect(-size/6, -size/4, size/3, size/2);
+                // Fingers
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(-size/6 + i * 8, -size/4 - 10, 6, 10);
+                }
+                ctx.restore();
+                break;
+                
+            case 'necklace':
+                // Draw necklace
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, 0, size/2, Math.PI * 0.2, Math.PI * 0.8);
+                ctx.stroke();
+                
+                // Pendant
+                ctx.fillStyle = '#FF69B4';
+                ctx.beginPath();
+                ctx.moveTo(0, size/2);
+                ctx.lineTo(-size/6, size/3);
+                ctx.lineTo(size/6, size/3);
+                ctx.closePath();
+                ctx.fill();
+                break;
+                
             default:
-                // Generic item
-                ctx.fillStyle = '#999';
-                ctx.fillRect(-size/2, -size/2, size, size);
+                // Generic item with emoji if available
+                if (item.emoji) {
+                    ctx.font = `${size}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.emoji, 0, 0);
+                } else {
+                    // Fallback to colored square with item name
+                    ctx.fillStyle = item.color || '#999';
+                    ctx.fillRect(-size/2, -size/2, size, size);
+                    
+                    // Draw item type text
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const text = item.type.substring(0, 3).toUpperCase();
+                    ctx.fillText(text, 0, 0);
+                }
                 break;
         }
         
