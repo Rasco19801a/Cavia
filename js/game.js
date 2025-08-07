@@ -454,6 +454,9 @@ export class Game {
             return;
         }
         
+        // Reset canvas transform before changing worlds
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        
         this.currentWorld = world;
         this.player.x = CONFIG.PLAYER_START_X;
         this.player.y = CONFIG.PLAYER_START_Y;
@@ -570,6 +573,9 @@ export class Game {
     
     draw() {
         performanceMonitor.startTimer('frame');
+        
+        // Reset transform before clearing to ensure we clear the entire canvas
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
