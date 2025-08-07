@@ -1,6 +1,134 @@
 // Worlds module - handles rendering of different world environments
 import { CONFIG } from './config.js';
 
+// Background cache system for static elements
+const backgroundCache = new Map();
+
+function getOrCreateBackgroundCanvas(worldType, width, height) {
+    const cacheKey = `${worldType}_${width}_${height}`;
+    
+    if (backgroundCache.has(cacheKey)) {
+        return backgroundCache.get(cacheKey);
+    }
+    
+    // Create off-screen canvas for background
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = width;
+    bgCanvas.height = height;
+    const bgCtx = bgCanvas.getContext('2d');
+    
+    // Draw static background elements based on world type
+    switch(worldType) {
+        case 'natuur':
+            drawNatuurBackground(bgCtx);
+            break;
+        case 'jungle':
+            drawJungleBackground(bgCtx);
+            break;
+        case 'dierenstad':
+            drawDierenstadBackground(bgCtx);
+            break;
+        case 'paarden':
+            drawPaardenBackground(bgCtx);
+            break;
+        // Add more world types as needed
+    }
+    
+    backgroundCache.set(cacheKey, bgCanvas);
+    return bgCanvas;
+}
+
+// Clear cache when needed (e.g., on window resize)
+export function clearBackgroundCache() {
+    backgroundCache.clear();
+}
+
+// Background drawing functions for static elements
+function drawNatuurBackground(ctx) {
+    // Draw flowers once on the background
+    const flowerPositions = [];
+    
+    // Generate and store flower positions
+    for (let i = 0; i < 20; i++) {
+        const x = Math.random() * CONFIG.WORLD_WIDTH;
+        const y = 520 + Math.random() * 200;
+        const color = ['#FF69B4', '#FFD700', '#FF6347', '#DA70D6'][i % 4];
+        
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add small shadow for depth
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.beginPath();
+        ctx.arc(x + 1, y + 1, 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawJungleBackground(ctx) {
+    // Fixed flower positions for jungle
+    const flowerPositions = [
+        {x: 100, y: 670},
+        {x: 250, y: 680},
+        {x: 400, y: 665},
+        {x: 550, y: 690},
+        {x: 700, y: 675},
+        {x: 850, y: 685},
+        {x: 1000, y: 660},
+        {x: 1150, y: 695},
+        {x: 1300, y: 670},
+        {x: 1450, y: 680}
+    ];
+
+    // Exotic flowers
+    flowerPositions.forEach((pos, i) => {
+        const x = pos.x;
+        const y = pos.y;
+
+        ctx.fillStyle = ['#FF1493', '#FF69B4', '#FFD700', '#FF4500'][i % 4];
+        for (let j = 0; j < 5; j++) {
+            const angle = (j * 72) * Math.PI / 180;
+            ctx.beginPath();
+            ctx.ellipse(
+                x + Math.cos(angle) * 10,
+                y + Math.sin(angle) * 10,
+                8, 4, angle, 0, Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        // Flower center
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function drawPaardenBackground(ctx) {
+    // Some flowers in the grass
+    for (let i = 0; i < 30; i++) {
+        const x = Math.random() * CONFIG.WORLD_WIDTH;
+        const y = 520 + Math.random() * 200;
+        
+        // Flower stem
+        ctx.strokeStyle = '#228B22';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 10);
+        ctx.stroke();
+        
+        // Flower petals
+        ctx.fillStyle = ['#FF69B4', '#FFD700', '#FF6347', '#DA70D6'][i % 4];
+        ctx.beginPath();
+        ctx.arc(x, y - 10, 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
 export function drawWorld(ctx, worldType, buildings) {
     switch(worldType) {
         case 'stad':
@@ -50,6 +178,9 @@ function drawStad(ctx, buildings) {
 }
 
 function drawNatuur(ctx) {
+    // Get or create background canvas with static elements
+    const bgCanvas = getOrCreateBackgroundCanvas('natuur', CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    
     // Sky
     ctx.fillStyle = '#87CEEB';
     ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
@@ -78,16 +209,8 @@ function drawNatuur(ctx) {
     ctx.fillStyle = '#4682B4';
     ctx.fillRect(600, 600, 300, 150);
 
-    // Flowers
-    for (let i = 0; i < 20; i++) {
-        const x = Math.random() * CONFIG.WORLD_WIDTH;
-        const y = 520 + Math.random() * 200;
-        
-        ctx.fillStyle = ['#FF69B4', '#FFD700', '#FF6347', '#DA70D6'][i % 4];
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
-    }
+    // Draw the background canvas with flowers
+    ctx.drawImage(bgCanvas, 0, 0);
 }
 
 function drawStrand(ctx) {
@@ -420,6 +543,9 @@ function drawWoestijn(ctx) {
 }
 
 function drawJungle(ctx) {
+    // Get or create background canvas with static elements
+    const bgCanvas = getOrCreateBackgroundCanvas('jungle', CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    
     // Background
     ctx.fillStyle = '#228B22';
     ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
@@ -496,43 +622,8 @@ function drawJungle(ctx) {
         ctx.stroke();
     }
 
-    // Fixed flower positions
-    const flowerPositions = [
-        {x: 100, y: 670},
-        {x: 250, y: 680},
-        {x: 400, y: 665},
-        {x: 550, y: 690},
-        {x: 700, y: 675},
-        {x: 850, y: 685},
-        {x: 1000, y: 660},
-        {x: 1150, y: 695},
-        {x: 1300, y: 670},
-        {x: 1450, y: 680}
-    ];
-
-    // Exotic flowers
-    flowerPositions.forEach((pos, i) => {
-        const x = pos.x;
-        const y = pos.y;
-
-        ctx.fillStyle = ['#FF1493', '#FF69B4', '#FFD700', '#FF4500'][i % 4];
-        for (let j = 0; j < 5; j++) {
-            const angle = (j * 72) * Math.PI / 180;
-            ctx.beginPath();
-            ctx.ellipse(
-                x + Math.cos(angle) * 10,
-                y + Math.sin(angle) * 10,
-                8, 4, angle, 0, Math.PI * 2
-            );
-            ctx.fill();
-        }
-
-        // Flower center
-        ctx.fillStyle = '#FFD700';
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    // Draw the background canvas with flowers
+    ctx.drawImage(bgCanvas, 0, 0);
 }
 
 function drawZwembad(ctx) {
@@ -1043,31 +1134,15 @@ function drawThuis(ctx) {
 }
 
 function drawPaarden(ctx) {
+    // Get or create background canvas with static elements
+    const bgCanvas = getOrCreateBackgroundCanvas('paarden', CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
+    
     // Sky
     ctx.fillStyle = '#87CEEB';
     ctx.fillRect(0, 0, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
     
-    // Sun
-    ctx.fillStyle = '#FFD700';
-    ctx.beginPath();
-    ctx.arc(1800, 100, 50, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Rolling hills in background
+    // Grass
     ctx.fillStyle = '#90EE90';
-    ctx.beginPath();
-    ctx.moveTo(0, 400);
-    ctx.quadraticCurveTo(300, 350, 600, 400);
-    ctx.quadraticCurveTo(900, 300, 1200, 400);
-    ctx.quadraticCurveTo(1500, 350, 1800, 400);
-    ctx.quadraticCurveTo(1900, 380, CONFIG.WORLD_WIDTH, 400);
-    ctx.lineTo(CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT);
-    ctx.lineTo(0, CONFIG.WORLD_HEIGHT);
-    ctx.closePath();
-    ctx.fill();
-    
-    // Grass field
-    ctx.fillStyle = '#228B22';
     ctx.fillRect(0, 500, CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT - 500);
     
     // Wooden fence along the back
@@ -1112,26 +1187,6 @@ function drawPaarden(ctx) {
     ctx.fillStyle = '#4682B4';
     ctx.fillRect(805, 485, 110, 30);
     
-    // Some flowers in the grass
-    for (let i = 0; i < 30; i++) {
-        const x = Math.random() * CONFIG.WORLD_WIDTH;
-        const y = 520 + Math.random() * 200;
-        
-        // Flower stem
-        ctx.strokeStyle = '#228B22';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y - 10);
-        ctx.stroke();
-        
-        // Flower petals
-        ctx.fillStyle = ['#FF69B4', '#FFD700', '#FF6347', '#DA70D6'][i % 4];
-        ctx.beginPath();
-        ctx.arc(x, y - 10, 4, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    
     // Trees in background
     for (let i = 0; i < 5; i++) {
         const x = 100 + i * 400;
@@ -1144,13 +1199,10 @@ function drawPaarden(ctx) {
         // Tree leaves
         ctx.fillStyle = '#228B22';
         ctx.beginPath();
-        ctx.arc(x, y - 20, 40, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x - 20, y - 10, 30, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x + 20, y - 10, 30, 0, Math.PI * 2);
+        ctx.arc(x, y - 30, 40, 0, Math.PI * 2);
         ctx.fill();
     }
+    
+    // Draw the background canvas with flowers
+    ctx.drawImage(bgCanvas, 0, 0);
 }
