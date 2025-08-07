@@ -2,6 +2,7 @@
 import { Game } from './game.js';
 import { Customization } from './customization.js';
 import { ScreenManager } from './screen-manager.js';
+import { initThreeScene, startThreeScene, stopThreeScene, onResize as resizeThree } from './three-scene.js';
 
 // Prevent zooming on the entire document
 document.addEventListener('gesturestart', function(e) {
@@ -47,15 +48,69 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+let game = null;
+let threeEnabled = false;
+let threeInitialized = false;
+
+async function setThreeEnabled(enabled) {
+    const threeCanvas = document.getElementById('threeCanvas');
+    if (!threeCanvas) return;
+
+    if (enabled) {
+        threeCanvas.classList.remove('hidden');
+        if (!threeInitialized) {
+            await initThreeScene(threeCanvas);
+            threeInitialized = true;
+        }
+        startThreeScene();
+        resizeThree();
+    } else {
+        threeCanvas.classList.add('hidden');
+        stopThreeScene();
+    }
+    threeEnabled = enabled;
+}
+
+function setupThreeToggle() {
+    const btn = document.getElementById('toggle3DBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+        await setThreeEnabled(!threeEnabled);
+    });
+}
+
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing game...');
     
     const canvas = document.getElementById('gameCanvas');
+    const threeCanvas = document.getElementById('threeCanvas');
     if (!canvas) {
         console.error('Canvas element not found!');
         return;
     }
+
+    // Match 3D canvas size to container
+    function syncCanvasSizes() {
+        if (!canvas || !threeCanvas) return;
+        // Ensure canvases fill the viewport (CSS handles size visually)
+        // Set actual drawing buffer to client size
+        const setSize = (c) => {
+            const { clientWidth, clientHeight } = c;
+            if (clientWidth && clientHeight) {
+                if (c.width !== clientWidth) c.width = clientWidth;
+                if (c.height !== clientHeight) c.height = clientHeight;
+            }
+        };
+        setSize(canvas);
+        setSize(threeCanvas);
+        resizeThree();
+    }
+
+    window.addEventListener('resize', syncCanvasSizes);
+
+    setupThreeToggle();
+    syncCanvasSizes();
     
     // Check if we should skip the initial screens
     if (ScreenManager.hasSettings() && Customization.loadCustomization().skipCustomization) {
@@ -68,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const gameSettings = ScreenManager.getGameSettings();
         
         // Initialize the game with customization and settings data
-        const game = new Game(canvas, {
+        game = new Game(canvas, {
             ...savedCustomization,
             ...gameSettings
         });
@@ -95,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const customization = new Customization();
         
         // Wait for customization to complete
-        window.addEventListener('startGame', (e) => {
+        window.addEventListener('startGame', async (e) => {
             const gameSettings = ScreenManager.getGameSettings();
             
             // Reset inventory for new game
@@ -103,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('animalChallengeProgress');
             
             // Initialize the game with customization and settings data
-            const game = new Game(canvas, {
+            game = new Game(canvas, {
                 ...e.detail,
                 ...gameSettings
             });
@@ -120,6 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Inventory not found!');
                 }
             };
+
+            // Optionally start 3D when game starts
+            await setThreeEnabled(false);
+            syncCanvasSizes();
             
             console.log('Cavia Avonturen Wereld is geladen!');
         });

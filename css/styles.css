@@ -35,8 +35,28 @@ body {
     height: 100%;
     pointer-events: auto;
     touch-action: none;
-    z-index: 1;
+    z-index: 2;
     cursor: pointer;
+}
+
+/* 3D canvas below 2D canvas */
+#threeCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* let 2D capture input */
+    touch-action: none;
+    z-index: 1;
+}
+
+/* Tertiary button style for 3D toggle */
+.world-btn.tertiary {
+    background: #9e9e9e;
+}
+.world-btn.tertiary:hover {
+    background: #7e7e7e;
 }
 
 /* Customization Screen */
