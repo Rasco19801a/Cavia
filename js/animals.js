@@ -1,6 +1,7 @@
 // Animals module - handles animal placement and educational challenges
 import { CONFIG, GAME_CONFIG } from './config.js';
 import { MissionManager } from './mission-manager.js';
+import { drawAnimal as drawAnimalFromShapes } from './animal-shapes.js';
 
 // Animal definitions for each world
 export const ANIMALS = {
@@ -59,7 +60,7 @@ export const ANIMALS = {
           mission: 'Ik wil graag 5 wortels eten!', missionProgress: 0, missionTarget: 5, missionItem: 'carrot' },
         { type: 'paard', name: 'Storm', emoji: '🐴', x: 900, y: 470, color: { body: '#696969', belly: '#A9A9A9' }, 
           mission: 'Breng me 2 pakketjes hooi!', missionProgress: 0, missionTarget: 2, missionItem: 'hay_small' },
-        { type: 'paard', name: 'Hindi', emoji: '🐴', x: 1200, y: 470, color: { body: '#FFFFFF', belly: '#F5F5F5' }, 
+        { type: 'paard', name: 'Hindi', variant: 'cute', emoji: '🐴', x: 1200, y: 470, color: { body: '#B8824D', belly: '#F5DEB3' }, 
           mission: 'Ik heb zin in 4 appels!', missionProgress: 0, missionTarget: 4, missionItem: 'apple' },
         { type: 'paard', name: 'Max', emoji: '🐴', x: 1500, y: 470, color: { body: '#D2691E', belly: '#F4A460' }, 
           mission: 'Kan je 3 wortels voor me vinden?', missionProgress: 0, missionTarget: 3, missionItem: 'carrot' }
@@ -619,8 +620,13 @@ export function drawAnimals(ctx, worldType, cameraX, cameraY) {
         const screenY = animal.y - cameraY;
         
         if (screenX > -50 && screenX < ctx.canvas.width + 50) {
-            // Draw guinea pig style animal at world coordinates (camera transform already applied!)
-            drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
+            // Draw horses with the detailed shapes renderer (supports variant 'cute')
+            if (animal.type === 'paard') {
+                drawAnimalFromShapes(ctx, animal, animal.x, animal.y, 0.5);
+            } else {
+                // Fallback renderer for all other animals
+                drawGuineaPigStyleAnimal(ctx, animal, animal.x, animal.y);
+            }
 
                 // Draw mission indicator (exclamation mark) above animals that have an active mission
                 if (animal.mission && animal.missionProgress < animal.missionTarget) {
