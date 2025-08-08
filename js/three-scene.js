@@ -8,6 +8,7 @@ let camera = null;
 let animationId = null;
 let cube = null;
 let canvasElement = null;
+let orthoFrustumSize = 4; // controls zoom scale for orthographic camera
 
 async function ensureThreeLoaded() {
     if (three) return three;
@@ -28,8 +29,22 @@ export async function initThreeScene(canvas) {
     scene = new three.Scene();
     scene.background = null; // transparent to let UI show
 
-    camera = new three.PerspectiveCamera(60, canvasElement.clientWidth / canvasElement.clientHeight, 0.1, 1000);
-    camera.position.set(2, 2, 3);
+    // Orthographic camera for isometric view
+    const width = Math.max(1, canvasElement.clientWidth);
+    const height = Math.max(1, canvasElement.clientHeight);
+    const aspect = width / height;
+    const top = orthoFrustumSize;
+    const bottom = -orthoFrustumSize;
+    const left = -orthoFrustumSize * aspect;
+    const right = orthoFrustumSize * aspect;
+    camera = new three.OrthographicCamera(left, right, top, bottom, 0.1, 2000);
+
+    // Position camera in classic isometric direction (equal on x,y,z)
+    const isoDir = new three.Vector3(1, 1, 1).normalize();
+    const distance = 6;
+    const offset = isoDir.multiplyScalar(distance);
+    camera.position.set(offset.x, offset.y, offset.z);
+    camera.lookAt(0, 0, 0);
 
     // Simple lighting
     const ambient = new three.AmbientLight(0xffffff, 0.8);
@@ -96,7 +111,14 @@ export function onResize() {
     const width = canvasElement.clientWidth;
     const height = canvasElement.clientHeight;
     if (width === 0 || height === 0) return;
-    camera.aspect = width / height;
+
+    // Update orthographic bounds
+    const aspect = width / height;
+    camera.left = -orthoFrustumSize * aspect;
+    camera.right = orthoFrustumSize * aspect;
+    camera.top = orthoFrustumSize;
+    camera.bottom = -orthoFrustumSize;
     camera.updateProjectionMatrix();
+
     renderer.setSize(width, height, false);
 }
