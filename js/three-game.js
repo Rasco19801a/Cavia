@@ -10,6 +10,7 @@ let renderer = null;
 let scene = null;
 let camera = null;
 let canvasElement = null;
+let orthoFrustumSize = 600; // Controls zoom scale for world-sized ortho camera
 
 // Scene content
 let ground = null;
@@ -166,20 +167,20 @@ function setupLights() {
     scene.add(directionalLight);
 }
 
-function updateCameraFollow(game) {
-    // Align 3D camera to 2D camera mapping so existing input math holds.
-    const halfW = (canvasElement?.clientWidth || window.innerWidth) / 2;
-    const halfH = (canvasElement?.clientHeight || window.innerHeight) / 2;
+function positionCameraIsometric(targetX, targetZ) {
+    // Classic isometric direction (1,1,1) looking at target
+    const isoDir = new three.Vector3(1, 1, 1).normalize();
+    const desiredDistance = Math.max(CONFIG.WORLD_WIDTH, CONFIG.WORLD_HEIGHT) * 0.8;
+    const offset = isoDir.multiplyScalar(desiredDistance);
+    camera.position.set(targetX + offset.x, offset.y, targetZ + offset.z);
+    camera.lookAt(targetX, 0, targetZ);
+}
 
-    // 2D camera centers on player; emulate with 3D camera looking at player
+function updateCameraFollow(game) {
+    // Center camera on player in isometric manner
     const px = game.player.x;
     const pz = game.player.y;
-
-    // Place camera with a slight elevation and back offset
-    const camHeight = 350;
-    const camDistance = 450;
-    camera.position.set(px - 0, camHeight, pz + camDistance);
-    camera.lookAt(px, 0, pz);
+    positionCameraIsometric(px, pz);
 }
 
 export async function initThreeGame(canvas, game) {
@@ -194,7 +195,18 @@ export async function initThreeGame(canvas, game) {
     scene = new three.Scene();
     scene.background = null;
 
-    camera = new three.PerspectiveCamera(60, (canvasElement.clientWidth || 1) / (canvasElement.clientHeight || 1), 1, 5000);
+    // Orthographic camera for isometric view
+    const width = Math.max(1, canvasElement.clientWidth || window.innerWidth);
+    const height = Math.max(1, canvasElement.clientHeight || window.innerHeight);
+    const aspect = width / height;
+    camera = new three.OrthographicCamera(
+        -orthoFrustumSize * aspect,
+        orthoFrustumSize * aspect,
+        orthoFrustumSize,
+        -orthoFrustumSize,
+        1,
+        10000
+    );
 
     setupLights();
 
@@ -230,7 +242,12 @@ export function onResize() {
     const width = canvasElement.clientWidth || window.innerWidth;
     const height = canvasElement.clientHeight || window.innerHeight;
     if (width === 0 || height === 0) return;
-    camera.aspect = width / height;
+
+    const aspect = width / height;
+    camera.left = -orthoFrustumSize * aspect;
+    camera.right = orthoFrustumSize * aspect;
+    camera.top = orthoFrustumSize;
+    camera.bottom = -orthoFrustumSize;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
 }
