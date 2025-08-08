@@ -20,16 +20,13 @@ export class DOMManager {
         // Game elements
         this.cacheElement('gameCanvas', 'gameCanvas');
         this.cacheElement('worldSelector', 'worldSelector');
-        this.cacheElement('designPanel', '.design-panel');
         
         // UI elements
         this.cacheElement('carrotCount', 'carrotCount');
         this.cacheElement('notification', 'notification');
         
         // Screen elements
-        this.cacheElement('tablesScreen', 'tablesScreen');
-        this.cacheElement('difficultyScreen', 'difficultyScreen');
-        this.cacheElement('customizationScreen', 'customizationScreen');
+        // Removed caching of the selection and customization screens
     }
 
     cacheElement(name, selector) {
