@@ -24,7 +24,7 @@ document.addEventListener('touchend', function(e) {
         e.preventDefault();
     }
     lastTouchEnd = now;
-}, false);
+}, { passive: false });
 
 // Prevent pinch zoom
 document.addEventListener('touchmove', function(e) {
@@ -99,8 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const gameSettings = ScreenManager.getGameSettings();
             
             // Reset inventory for new game
-            localStorage.removeItem('playerInventory');
-            localStorage.removeItem('animalChallengeProgress');
+            try {
+                localStorage.removeItem('playerInventory');
+                localStorage.removeItem('animalChallengeProgress');
+            } catch (err) {
+                console.warn('localStorage remove failed; storage unavailable:', err);
+            }
             
             // Initialize the game with customization and settings data
             const game = new Game(canvas, {

@@ -162,20 +162,28 @@ export class HomeInventory {
         const saveData = {
             missions: this.guineaPigMissions.saveProgress()
         };
-        localStorage.setItem('homeInventoryProgress', JSON.stringify(saveData));
+        try {
+            localStorage.setItem('homeInventoryProgress', JSON.stringify(saveData));
+        } catch (err) {
+            console.warn('homeInventoryProgress save failed; storage unavailable:', err);
+        }
     }
     
     loadProgress() {
-        const savedData = localStorage.getItem('homeInventoryProgress');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                if (data.missions) {
-                    this.guineaPigMissions.loadProgress(data.missions);
+        try {
+            const savedData = localStorage.getItem('homeInventoryProgress');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.missions) {
+                        this.guineaPigMissions.loadProgress(data.missions);
+                    }
+                } catch (e) {
+                    console.error('Failed to parse home inventory progress:', e);
                 }
-            } catch (e) {
-                console.error('Failed to load home inventory progress:', e);
             }
+        } catch (err) {
+            console.warn('homeInventoryProgress load failed; storage unavailable:', err);
         }
     }
     
