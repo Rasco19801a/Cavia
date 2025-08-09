@@ -697,20 +697,28 @@ export class HomeItemManager {
                 color: item.color
             }))
         };
-        localStorage.setItem('homeItems', JSON.stringify(saveData));
+        try {
+            localStorage.setItem('homeItems', JSON.stringify(saveData));
+        } catch (err) {
+            console.warn('homeItems save failed; storage unavailable:', err);
+        }
     }
 
     loadItems() {
-        const savedData = localStorage.getItem('homeItems');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                if (data.items) {
-                    this.items = data.items;
+        try {
+            const savedData = localStorage.getItem('homeItems');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.items) {
+                        this.items = data.items;
+                    }
+                } catch (e) {
+                    console.error('Failed to parse home items:', e);
                 }
-            } catch (e) {
-                console.error('Failed to load home items:', e);
             }
+        } catch (err) {
+            console.warn('homeItems load failed; storage unavailable:', err);
         }
     }
 }

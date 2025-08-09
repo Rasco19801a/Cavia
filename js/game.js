@@ -133,7 +133,7 @@ export class Game {
                 });
                 this.handleClick(clickEvent);
             }
-        });
+        }, { passive: false });
         
         // Drag and drop events
         this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -150,7 +150,7 @@ export class Game {
                 clientY: touch.clientY
             });
             this.handleMouseDown(mouseEvent);
-        });
+        }, { passive: false });
         
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
@@ -161,13 +161,13 @@ export class Game {
                 clientY: touch.clientY
             });
             this.handleMouseMove(mouseEvent);
-        });
+        }, { passive: false });
         
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
             const mouseEvent = new MouseEvent('mouseup', {});
             this.handleMouseUp(mouseEvent);
-        });
+        }, { passive: false });
         
         // World change event using event system
         eventSystem.on(GameEvents.WORLD_CHANGE, (world) => {

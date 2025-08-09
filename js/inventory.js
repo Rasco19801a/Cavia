@@ -469,13 +469,21 @@ export class Inventory {
     }
     
     saveInventory() {
-        localStorage.setItem('guineaPigInventory', JSON.stringify(this.items));
+        try {
+            localStorage.setItem('guineaPigInventory', JSON.stringify(this.items));
+        } catch (err) {
+            console.warn('guineaPigInventory save failed; storage unavailable:', err);
+        }
     }
     
     loadInventory() {
         // Clear inventory on page refresh
         this.items = [];
-        localStorage.removeItem('guineaPigInventory');
+        try {
+            localStorage.removeItem('guineaPigInventory');
+        } catch (err) {
+            console.warn('guineaPigInventory remove failed; storage unavailable:', err);
+        }
     }
     
     resetInventory() {
