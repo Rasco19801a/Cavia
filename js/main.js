@@ -3,49 +3,7 @@ import { Game } from './game.js';
 import { Customization } from './customization.js';
 import { ScreenManager } from './screen-manager.js';
 
-// Prevent zooming on the entire document
-document.addEventListener('gesturestart', function(e) {
-    e.preventDefault();
-});
-
-document.addEventListener('gesturechange', function(e) {
-    e.preventDefault();
-});
-
-document.addEventListener('gestureend', function(e) {
-    e.preventDefault();
-});
-
-// Prevent double-tap zoom
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(e) {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-    }
-    lastTouchEnd = now;
-}, { passive: false });
-
-// Prevent pinch zoom
-document.addEventListener('touchmove', function(e) {
-    if (e.touches.length > 1) {
-        e.preventDefault();
-    }
-}, { passive: false });
-
-// Prevent ctrl/cmd + scroll zoom
-document.addEventListener('wheel', function(e) {
-    if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-    }
-}, { passive: false });
-
-// Prevent keyboard zoom shortcuts
-document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0')) {
-        e.preventDefault();
-    }
-});
+// Zoom/scroll prevention will be scoped to the canvas after DOM is ready
 
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,6 +14,38 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Canvas element not found!');
         return;
     }
+
+    // Scope zoom/scroll prevention to the canvas only
+    // Prevent gesture zoom on iOS/Safari
+    canvas.addEventListener('gesturestart', (e) => e.preventDefault());
+    canvas.addEventListener('gesturechange', (e) => e.preventDefault());
+    canvas.addEventListener('gestureend', (e) => e.preventDefault());
+
+    // Prevent ctrl/cmd + scroll zoom over the canvas
+    canvas.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Prevent keyboard zoom when canvas is focused
+    canvas.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0')) {
+            e.preventDefault();
+        }
+    });
+
+    // Prevent double-tap zoom on touch when interacting with the canvas
+    let lastTouchEndTs = 0;
+    canvas.addEventListener('pointerup', (e) => {
+        if (e.pointerType === 'touch') {
+            const now = Date.now();
+            if (now - lastTouchEndTs <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEndTs = now;
+        }
+    }, { passive: false });
     
     // Check if we should skip the initial screens
     if (ScreenManager.hasSettings() && Customization.loadCustomization().skipCustomization) {

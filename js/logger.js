@@ -28,10 +28,29 @@ const LogLevelColors = {
     [LogLevel.FATAL]: '#9C27B0'
 };
 
+function resolveLogLevel(value) {
+    if (value == null) return LogLevel.INFO;
+    if (typeof value === 'number') return value;
+    const normalized = String(value).toLowerCase();
+    const map = { debug: LogLevel.DEBUG, info: LogLevel.INFO, warn: LogLevel.WARN, error: LogLevel.ERROR, fatal: LogLevel.FATAL };
+    return map[normalized] ?? LogLevel.INFO;
+}
+
+function getInitialLogLevel() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const fromQuery = params.get('log');
+        const fromStorage = localStorage.getItem('logLevel');
+        return resolveLogLevel(fromQuery || fromStorage);
+    } catch {
+        return LogLevel.INFO;
+    }
+}
+
 export class Logger {
     constructor(name = 'Game') {
         this.name = name;
-        this.minLevel = LogLevel.INFO; // Default minimum level
+        this.minLevel = getInitialLogLevel();
         this.logs = [];
         this.maxLogs = 1000; // Maximum logs to keep in memory
         this.handlers = new Map();

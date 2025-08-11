@@ -58,12 +58,14 @@ export class DOMManager {
             this.updateDisplay(data);
         });
 
-        eventSystem.on(GameEvents.UI_MODAL_OPEN, (modalData) => {
+        eventSystem.on(GameEvents.UI_MODAL_OPEN, (data) => {
+            const modalData = typeof data === 'string' ? { id: data } : data;
             this.openModal(modalData);
         });
 
-        eventSystem.on(GameEvents.UI_MODAL_CLOSE, (modalId) => {
-            this.closeModal(modalId);
+        eventSystem.on(GameEvents.UI_MODAL_CLOSE, (data) => {
+            const modalId = typeof data === 'string' ? data : data?.id;
+            if (modalId) this.closeModal(modalId);
         });
     }
 
@@ -139,7 +141,6 @@ export class DOMManager {
 
         if (modal) {
             modal.classList.remove('hidden');
-            eventSystem.emit(GameEvents.UI_MODAL_OPEN, modalData.id);
         }
     }
 
@@ -147,7 +148,6 @@ export class DOMManager {
         const modal = this.modals.get(modalId);
         if (modal) {
             modal.classList.add('hidden');
-            eventSystem.emit(GameEvents.UI_MODAL_CLOSE, modalId);
         }
     }
 

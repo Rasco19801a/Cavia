@@ -118,56 +118,26 @@ export class Game {
             this.keys[e.key] = false;
         });
         
-        // Mouse/Touch controls
+        // Click for interactions
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
-        
-        // Touch controls - handle touchend as click for better mobile support
-        this.canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            if (e.changedTouches.length > 0) {
-                const touch = e.changedTouches[0];
-                const rect = this.canvas.getBoundingClientRect();
-                const clickEvent = new MouseEvent('click', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                this.handleClick(clickEvent);
-            }
+
+        // Unified pointer events for drag/drop and movement
+        this.canvas.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch') e.preventDefault();
+            this.handleMouseDown(e);
         }, { passive: false });
-        
-        // Drag and drop events
-        this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
-        
-        // Touch drag events
-        this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = this.canvas.getBoundingClientRect();
-            const mouseEvent = new MouseEvent('mousedown', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            this.handleMouseDown(mouseEvent);
-        }, { passive: false });
-        
-        this.canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = this.canvas.getBoundingClientRect();
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            this.handleMouseMove(mouseEvent);
-        }, { passive: false });
-        
-        this.canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            const mouseEvent = new MouseEvent('mouseup', {});
-            this.handleMouseUp(mouseEvent);
-        }, { passive: false });
+
+        this.canvas.addEventListener('pointermove', (e) => {
+            this.handleMouseMove(e);
+        });
+
+        this.canvas.addEventListener('pointerup', (e) => {
+            this.handleMouseUp(e);
+        });
+
+        this.canvas.addEventListener('pointercancel', () => {
+            this.isDragging = false;
+        });
         
         // World change event using event system
         eventSystem.on(GameEvents.WORLD_CHANGE, (world) => {
@@ -480,6 +450,7 @@ export class Game {
     
     getWorldName(world) {
         const names = {
+            'stad': 'de Stad',
             'natuur': 'de Natuur',
             'strand': 'het Strand',
             'winter': 'de Winter',
