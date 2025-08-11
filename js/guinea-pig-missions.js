@@ -161,6 +161,23 @@ export class GuineaPigMissions {
             ctx.ellipse(0, 5, 25, 20, 0, 0, Math.PI * 2);
             ctx.fill();
             
+            // Front paws
+            ctx.fillStyle = pig.color.body;
+            ctx.beginPath();
+            ctx.ellipse(-15, 18, 8, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(15, 18, 8, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Back legs (larger)
+            ctx.beginPath();
+            ctx.ellipse(-22, 26, 12, 16, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(22, 26, 12, 16, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
             // Draw head
             ctx.fillStyle = pig.color.body;
             ctx.beginPath();
