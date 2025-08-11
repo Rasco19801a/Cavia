@@ -1,6 +1,6 @@
 // UI Components module - reusable UI elements
 import { domManager } from './dom-manager.js';
-import { eventSystem } from './event-system.js';
+import { eventSystem, GameEvents } from './event-system.js';
 
 export class UIComponents {
     /**
@@ -135,7 +135,7 @@ export class UIComponents {
      */
     static openModal(modal) {
         modal.style.display = 'block';
-        eventSystem.emit('ui:modalOpen', modal.id);
+        eventSystem.emit(GameEvents.UI_MODAL_OPEN, modal.id);
     }
 
     /**
@@ -144,7 +144,7 @@ export class UIComponents {
      */
     static closeModal(modal) {
         modal.style.display = 'none';
-        eventSystem.emit('ui:modalClose', modal.id);
+        eventSystem.emit(GameEvents.UI_MODAL_CLOSE, modal.id);
         
         // Clean up escape handler
         if (modal._escapeHandler) {
