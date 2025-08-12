@@ -84,7 +84,7 @@ export class Player {
         }
     }
 
-    draw(ctx, scale = 0.5) {
+    draw(ctx, scale = 0.5, feetScale = 1) {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.scale(scale, scale);
@@ -125,10 +125,10 @@ export class Player {
         // Feet
         ctx.fillStyle = this.colors.feet;
         ctx.beginPath();
-        ctx.ellipse(-20, 20, 10, 15, 0, 0, Math.PI * 2);
+        ctx.ellipse(-20, 20, 10 * feetScale, 15 * feetScale, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.ellipse(20, 20, 10, 15, 0, 0, Math.PI * 2);
+        ctx.ellipse(20, 20, 10 * feetScale, 15 * feetScale, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Eyes
