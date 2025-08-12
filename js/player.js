@@ -8,7 +8,7 @@ export class Player {
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = null;
         this.targetY = null;
-        this.carrots = 50; // Starting carrots
+        this.carrots = 0; // Starting carrots set to 0
         
         // Apply customization or use defaults
         this.colors = {
