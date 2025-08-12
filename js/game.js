@@ -579,7 +579,7 @@ export class Game {
             }
             
             // Draw player
-            this.player.draw(this.ctx, 0.5, this.currentWorld === 'thuis' ? 0.5 : 1);
+            this.player.draw(this.ctx, 0.5, 1);
             
             this.ctx.restore();
         } else {
@@ -604,14 +604,14 @@ export class Game {
                 this.ctx.stroke();
             }
             
-            this.player.draw(this.ctx, 0.5, this.currentWorld === 'thuis' ? 0.5 : 1);
+            this.player.draw(this.ctx, 0.5, 1);
             
             this.ctx.restore();
         }
         
         performanceMonitor.endTimer('frame');
     }
-
+    
     gameLoop() {
         this.update();
         this.draw();
