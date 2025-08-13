@@ -4,12 +4,17 @@ body {
     background: #87CEEB;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: hidden; /* prevent page scroll */
     /* Prevent zooming */
     touch-action: pan-x pan-y;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+}
+
+:root {
+    /* Fallback to 100vh; updated dynamically on iOS Safari via JS to visualViewport height */
+    --app-height: 100vh;
 }
 
 /* Hidden class utility */
@@ -21,7 +26,7 @@ body {
 .game-container {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: var(--app-height);
     /* Prevent zooming */
     touch-action: manipulation;
 }
@@ -32,7 +37,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: var(--app-height);
     pointer-events: auto;
     touch-action: none;
     z-index: 1;

@@ -8,7 +8,33 @@ import { ScreenManager } from './screen-manager.js';
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing game...');
-    
+
+    // Stabilize viewport height across iOS Safari chrome show/hide
+    const setAppHeight = () => {
+        const vhPx = Math.floor((window.visualViewport?.height || window.innerHeight));
+        document.documentElement.style.setProperty('--app-height', `${vhPx}px`);
+    };
+    setAppHeight();
+    window.addEventListener('resize', setAppHeight);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setAppHeight);
+    }
+
+    // Lock body scroll on iOS Safari to prevent rubber-banding/auto scroll
+    const ua = navigator.userAgent || '';
+    const isIOS = /iP(hone|ad|od)/.test(ua) || (ua.includes('Mac') && 'ontouchend' in document);
+    const isSafari = /Safari\//.test(ua) && !/CriOS|FxiOS|Chrome\//.test(ua);
+    if (isIOS && isSafari) {
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.left = '0';
+        document.body.style.top = '0';
+        document.body.style.right = '0';
+        document.body.style.bottom = '0';
+        document.body.style.overflow = 'hidden';
+        document.body.style.height = 'var(--app-height)';
+    }
+
     const canvas = document.getElementById('gameCanvas');
     if (!canvas) {
         console.error('Canvas element not found!');
