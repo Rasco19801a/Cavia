@@ -493,7 +493,14 @@ export class Game {
                 this.buildings = createThuisBuildings();
                 // Reorganize items when entering home world to prevent overlapping
                 if (this.homeInventory) {
-                    this.homeInventory.reorganizeItems();
+                    // Defer to next tick to avoid blocking the UI thread on world switch
+                    setTimeout(() => {
+                        try {
+                            this.homeInventory.reorganizeItems();
+                        } catch (err) {
+                            console.error('Error reorganizing home items:', err);
+                        }
+                    }, 0);
                 }
                 break;
         }
@@ -534,7 +541,11 @@ export class Game {
         
         // Update home inventory if in home world
         if (this.currentWorld === 'thuis') {
-            this.homeInventory.update();
+            try {
+                this.homeInventory.update();
+            } catch (err) {
+                console.error('Error in homeInventory.update:', err);
+            }
         }
     }
 
@@ -572,15 +583,27 @@ export class Game {
             this.ctx.save();
             this.camera.applyTransform(this.ctx);
             
-            drawWorld(this.ctx, this.currentWorld, this.buildings);
+            try {
+                drawWorld(this.ctx, this.currentWorld, this.buildings);
+            } catch (err) {
+                console.error('Error drawing world:', err);
+            }
             
             // Draw home inventory items in home world
             if (this.currentWorld === 'thuis') {
-                this.homeInventory.draw(this.ctx);
+                try {
+                    this.homeInventory.draw(this.ctx);
+                } catch (err) {
+                    console.error('Error in homeInventory.draw:', err);
+                }
             }
             
             // Draw animals
-            drawAnimals(this.ctx, this.currentWorld, this.camera.x, this.camera.y);
+            try {
+                drawAnimals(this.ctx, this.currentWorld, this.camera.x, this.camera.y);
+            } catch (err) {
+                console.error('Error drawing animals:', err);
+            }
             
             // Draw click target
             if (this.player.targetX !== null && this.player.targetY !== null) {

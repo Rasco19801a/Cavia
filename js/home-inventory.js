@@ -35,14 +35,27 @@ export class HomeInventory {
     }
     
     draw(ctx) {
+        if (!ctx) return;
         // Draw hamster wheel
-        this.drawHamsterWheel(ctx);
+        try {
+            this.drawHamsterWheel(ctx);
+        } catch (err) {
+            console.error('Error drawing hamster wheel:', err);
+        }
         
         // Draw items
-        this.itemManager.drawItems(ctx, this.game.camera);
+        try {
+            this.itemManager.drawItems(ctx, this.game.camera);
+        } catch (err) {
+            console.error('Error drawing home items:', err);
+        }
         
         // Draw other guinea pigs
-        this.guineaPigMissions.drawGuineaPigs(ctx, this.game.camera);
+        try {
+            this.guineaPigMissions.drawGuineaPigs(ctx, this.game.camera);
+        } catch (err) {
+            console.error('Error drawing guinea pigs:', err);
+        }
     }
     
     drawHamsterWheel(ctx) {
@@ -129,7 +142,11 @@ export class HomeInventory {
     
     update() {
         // Update item animations
-        this.itemManager.updateAnimations();
+        try {
+            this.itemManager.updateAnimations();
+        } catch (err) {
+            console.error('Error updating item animations:', err);
+        }
         
         // Update hamster wheel
         if (this.hamsterWheel.spinning) {
