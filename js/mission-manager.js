@@ -136,6 +136,15 @@ export class MissionManager {
             this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
             this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
             this.game.ui.updateDisplay();
+            
+            // Celebration modal with happy animal
+            const emoji = this.currentMission.isHorse ? '🐴' : '🐹';
+            this.game.ui.showCelebrationModal({
+                title: 'Missie voltooid!',
+                message: 'Geweldig gedaan! De missie is afgerond.',
+                rewardText: `+${GAME_CONFIG.MISSION_REWARD} wortels 🥕`,
+                emoji
+            });
         }
     }
 

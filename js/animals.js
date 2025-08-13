@@ -106,11 +106,13 @@ export class AnimalChallenge {
         this.tableProgress = {}; // Track progress per table
         this.completedTables = new Set(); // Track completed tables
         this.correctSpellings = 0; // Track correct spelling answers
+        this.totalCorrectTasks = 0; // Track total correct answers across math and spelling
+        this.totalMilestoneShown = false; // Prevent duplicate 10-correct celebration
         this.audio = new Audio(); // For pronouncing words
         this.setupModal();
         this.loadProgress();
     }
-
+    
     loadProgress() {
         const saved = localStorage.getItem('animalChallengeProgress');
         if (saved) {
@@ -118,6 +120,8 @@ export class AnimalChallenge {
             this.tableProgress = data.tableProgress || {};
             this.completedTables = new Set(data.completedTables || []);
             this.correctSpellings = data.correctSpellings || 0;
+            this.totalCorrectTasks = data.totalCorrectTasks || 0;
+            this.totalMilestoneShown = !!data.totalMilestoneShown;
         }
     }
     
@@ -125,7 +129,9 @@ export class AnimalChallenge {
         const data = {
             tableProgress: this.tableProgress,
             completedTables: Array.from(this.completedTables),
-            correctSpellings: this.correctSpellings
+            correctSpellings: this.correctSpellings,
+            totalCorrectTasks: this.totalCorrectTasks,
+            totalMilestoneShown: this.totalMilestoneShown
         };
         localStorage.setItem('animalChallengeProgress', JSON.stringify(data));
     }
@@ -223,6 +229,14 @@ export class AnimalChallenge {
                 this.game.ui.showNotification(`${animal.name} zegt: Dankjewel! Hier zijn ${CONFIG.MISSION_REWARD} wortels voor jou!`);
                 this.game.player.carrots += CONFIG.MISSION_REWARD;
                 this.game.ui.updateDisplay();
+                
+                // Celebration modal with happy horse
+                this.game.ui.showCelebrationModal({
+                    title: 'Missie voltooid! 🎉',
+                    message: `${animal.name} is super blij!`,
+                    rewardText: `+${CONFIG.MISSION_REWARD} wortels 🥕`,
+                    emoji: '🐴'
+                });
                 
                 // Give new mission
                 this.updateMissionForAnimal(animal);
@@ -364,6 +378,9 @@ export class AnimalChallenge {
             this.game.player.addCarrots(carrotsEarned);
             this.game.ui.updateDisplay();
             
+            // Increment total correct answers (math or spelling)
+            this.totalCorrectTasks++;
+            
             // Track progress
             if (this.currentChallenge.type === 'math') {
                 const table = parseInt(this.currentChallenge.question.split(' × ')[0]);
@@ -384,6 +401,17 @@ export class AnimalChallenge {
                 if (this.correctSpellings === 10) {
                     this.showSpellingMilestoneReward();
                 }
+            }
+            
+            // Show one-time milestone for 10 total correct tasks (math or spelling)
+            if (this.totalCorrectTasks === 10 && !this.totalMilestoneShown) {
+                this.totalMilestoneShown = true;
+                this.game.ui.showCelebrationModal({
+                    title: 'Goed Gedaan! 🎉',
+                    message: 'Je hebt 10 opdrachten goed gemaakt! Knap gedaan!',
+                    rewardText: '',
+                    emoji: '🐹'
+                });
             }
             
             this.saveProgress();
@@ -416,53 +444,25 @@ export class AnimalChallenge {
     showTableCompletionReward(table) {
         // Award 50 carrots for completing a table
         this.game.player.addCarrots(50);
-        
-        // Create celebration modal
-        const modal = document.createElement('div');
-        modal.className = 'celebration-modal';
-        modal.innerHTML = `
-            <div class="celebration-content">
-                <h2>🎉🎊 GEWELDIG! 🎊🎉</h2>
-                <p>Je hebt de tafel van ${table} helemaal onder de knie!</p>
-                <p class="reward-text">Je hebt 50 wortels verdiend! 🥕</p>
-                <p>🎈🎉🎊🥳🎈</p>
-                <button class="celebration-btn" onclick="this.parentElement.parentElement.remove()">Fantastisch!</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (modal.parentElement) {
-                modal.remove();
-            }
-        }, 5000);
+        this.game.ui.updateDisplay();
+        this.game.ui.showCelebrationModal({
+            title: 'Geweldig! 🎉',
+            message: `Je hebt de tafel van ${table} helemaal onder de knie!`,
+            rewardText: 'Je hebt 50 wortels verdiend! 🥕',
+            emoji: '🐹'
+        });
     }
     
     showSpellingMilestoneReward() {
         // Award 50 carrots for 10 correct spellings
         this.game.player.addCarrots(50);
-        
-        // Create celebration modal
-        const modal = document.createElement('div');
-        modal.className = 'celebration-modal';
-        modal.innerHTML = `
-            <div class="celebration-content">
-                <h2>🎉📚 SUPER GOED! 📚🎉</h2>
-                <p>Je hebt 10 woorden perfect gespeld!</p>
-                <p class="reward-text">Je hebt 50 wortels verdiend! 🥕</p>
-                <p>🌟📖✨🎊🌟</p>
-                <button class="celebration-btn" onclick="this.parentElement.parentElement.remove()">Geweldig!</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (modal.parentElement) {
-                modal.remove();
-            }
-        }, 5000);
+        this.game.ui.updateDisplay();
+        this.game.ui.showCelebrationModal({
+            title: 'Super goed! 📚',
+            message: 'Je hebt 10 woorden perfect gespeld!',
+            rewardText: 'Je hebt 50 wortels verdiend! 🥕',
+            emoji: '🐹'
+        });
     }
 
     closeChallenge() {

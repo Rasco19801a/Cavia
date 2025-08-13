@@ -74,7 +74,7 @@ function drawShopInterior(ctx, name) {
     const itemHeight = 250;
     const spacing = 50;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2; // Center the items
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2); // Center with margin
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
@@ -317,7 +317,7 @@ function drawGroenteMarkt(ctx) {
     const itemHeight = 280;
     const spacing = 60;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2);
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
@@ -386,7 +386,7 @@ function drawHooiWinkel(ctx) {
     const itemHeight = 280;
     const spacing = 60;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2);
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
@@ -464,7 +464,7 @@ function drawSpeeltjesShop(ctx) {
     const itemHeight = 280;
     const spacing = 60;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2);
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
@@ -533,7 +533,7 @@ function drawCaviaSpa(ctx) {
     const itemHeight = 280;
     const spacing = 60;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2);
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
@@ -602,7 +602,7 @@ function drawAccessoiresShop(ctx) {
     const itemHeight = 280;
     const spacing = 60;
     const totalWidth = items.length * itemWidth + (items.length - 1) * spacing;
-    const startX = (CONFIG.WORLD_WIDTH - totalWidth) / 2;
+    const startX = Math.max(40, (CONFIG.WORLD_WIDTH - totalWidth) / 2);
     
     items.forEach((item, index) => {
         const x = startX + index * (itemWidth + spacing);
