@@ -94,8 +94,10 @@ export class Game {
     }
 
     resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        const vw = window.innerWidth;
+        const vh = window.visualViewport?.height || window.innerHeight;
+        this.canvas.width = vw;
+        this.canvas.height = vh;
         // Clear background cache when canvas is resized
         clearBackgroundCache();
     }
