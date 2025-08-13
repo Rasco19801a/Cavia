@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Test Home Modal Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Nunito', sans-serif;
+        }
+        .test-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        .test-info h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .test-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .test-info .status {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .test-info .error {
+            color: #f44336;
+        }
+        .test-controls {
+            margin-top: 10px;
+        }
+        .test-controls button {
+            margin: 5px;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+        }
+        .test-controls button:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>🏠 Home Modal Fix Test</h2>
+        <p><strong>Probleem:</strong> De thuis wereld loopt vast wanneer je op een cavia klikt</p>
+        <p><strong>Oplossing:</strong> Modal blokkeert nu correct de game input</p>
+        <hr>
+        <h3>Test Instructies:</h3>
+        <ol>
+            <li>Klik op "Start Game" om het spel te starten</li>
+            <li>Klik op "Ga naar Thuis" om naar de thuis wereld te gaan</li>
+            <li>Klik op een cavia (geel uitroepteken) om een missie modal te openen</li>
+            <li>Probeer te klikken/bewegen - dit zou NIET moeten werken</li>
+            <li>Sluit de modal (X knop of ESC) - beweging zou weer moeten werken</li>
+        </ol>
+        <div class="test-controls">
+            <button onclick="startGame()">Start Game</button>
+            <button onclick="goToHome()">Ga naar Thuis</button>
+            <button onclick="checkModalStatus()">Check Modal Status</button>
+        </div>
+        <p id="status" class="status">Wacht op game start...</p>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        let game = null;
+        
+        window.startGame = function() {
+            const canvas = document.getElementById('gameCanvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            
+            game = new Game(canvas, {
+                bodyColor: '#8B4513',
+                bellyColor: '#D2691E',
+                accessory: 'none'
+            });
+            
+            window.game = game;
+            updateStatus('Game gestart! Klik op "Ga naar Thuis"');
+        };
+        
+        window.goToHome = function() {
+            if (!game) {
+                updateStatus('Start eerst het spel!', true);
+                return;
+            }
+            
+            game.changeWorld('thuis');
+            updateStatus('Je bent nu in de thuis wereld. Klik op een cavia om te testen.');
+        };
+        
+        window.checkModalStatus = function() {
+            if (!game) {
+                updateStatus('Start eerst het spel!', true);
+                return;
+            }
+            
+            const modalOpen = game.isAnyModalOpen();
+            if (modalOpen) {
+                updateStatus('Modal is OPEN - beweging is geblokkeerd ✓', false);
+            } else {
+                updateStatus('Geen modal open - beweging is mogelijk', false);
+            }
+            
+            // Log detailed status
+            console.log('Modal Status Check:');
+            console.log('- Mission Modal:', game.guineaPigMissions?.missionManager?.isMissionModalVisible());
+            console.log('- Inventory:', game.inventory?.isOpen);
+            console.log('- Animal Challenge:', game.animalChallenge?.challengeModal && !game.animalChallenge.challengeModal.classList.contains('hidden'));
+            console.log('- Minigame:', game.minigames?.activeMinigame);
+            console.log('- Celebration:', game.ui?.celebrationModal && !game.ui.celebrationModal.classList.contains('hidden'));
+        };
+        
+        function updateStatus(message, isError = false) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = isError ? 'error' : 'status';
+        }
+        
+        // Monitor clicks to show if they're blocked
+        document.addEventListener('click', function(e) {
+            if (game && e.target.id === 'gameCanvas') {
+                if (game.isAnyModalOpen()) {
+                    console.log('Canvas click blocked - modal is open');
+                    updateStatus('Click geblokkeerd - modal is open ✓');
+                } else {
+                    console.log('Canvas click processed');
+                }
+            }
+        });
+        
+        // Monitor key presses
+        document.addEventListener('keydown', function(e) {
+            if (game && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                if (game.isAnyModalOpen()) {
+                    console.log('Movement key blocked - modal is open');
+                    updateStatus('Bewegingstoets geblokkeerd - modal is open ✓');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

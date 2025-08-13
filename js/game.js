@@ -146,10 +146,49 @@ export class Game {
         });
     }
 
+    isAnyModalOpen() {
+        // Check if any modal is currently open
+        // Check mission modal
+        if (this.guineaPigMissions && this.guineaPigMissions.missionManager && 
+            this.guineaPigMissions.missionManager.isMissionModalVisible()) {
+            return true;
+        }
+        
+        // Check inventory modal
+        if (this.inventory && this.inventory.isOpen) {
+            return true;
+        }
+        
+        // Check animal challenge modal
+        if (this.animalChallenge && this.animalChallenge.challengeModal && 
+            !this.animalChallenge.challengeModal.classList.contains('hidden')) {
+            return true;
+        }
+        
+        // Check minigame modal
+        if (this.minigames && this.minigames.activeMinigame) {
+            return true;
+        }
+        
+        // Check UI celebration modal
+        if (this.ui && this.ui.celebrationModal && 
+            !this.ui.celebrationModal.classList.contains('hidden')) {
+            return true;
+        }
+        
+        return false;
+    }
+
     handleClick(event) {
         const rect = this.canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
+        
+        // Prevent any game interaction when a modal is open
+        if (this.isAnyModalOpen()) {
+            console.log('Click blocked - modal is open');
+            return;
+        }
         
         // Check if inside a shop and clicking on a shop item
         if (this.isInside && this.currentBuilding && this.shop.isShopBuilding(this.currentBuilding.name)) {
@@ -319,6 +358,12 @@ export class Game {
     
     handleMouseDown(e) {
         if (this.currentWorld !== 'thuis' || this.isInside) return;
+        
+        // Prevent dragging when a modal is open
+        if (this.isAnyModalOpen()) {
+            console.log('Drag blocked - modal is open');
+            return;
+        }
         
         const rect = this.canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
@@ -515,9 +560,11 @@ export class Game {
             return;
         }
         
-        // Player movement
-        this.player.moveToTarget();
-        this.player.moveWithKeys(this.keys);
+        // Player movement (only if no modal is open)
+        if (!this.isAnyModalOpen()) {
+            this.player.moveToTarget();
+            this.player.moveWithKeys(this.keys);
+        }
         
         // Apply boundaries
         if (!this.isInside) {
