@@ -179,6 +179,54 @@ export class UI {
         domManager.closeModal(modalId);
     }
     
+    // Celebration modal with confetti
+    showCelebrationModal({ title = 'Goed gedaan!', message = '', rewardText = '', emoji = '' } = {}) {
+        const overlay = document.createElement('div');
+        overlay.className = 'celebration-modal';
+        overlay.innerHTML = `
+            <div class="celebration-content">
+                <button class="modal-close-btn" aria-label="Sluiten">✖</button>
+                <h2>${title}</h2>
+                ${emoji ? `<div style="font-size:60px;margin:10px 0;">${emoji}</div>` : ''}
+                ${message ? `<p>${message}</p>` : ''}
+                ${rewardText ? `<p class="reward-text">${rewardText}</p>` : ''}
+                <button class="celebration-btn">OK</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        // Close handlers
+        const close = () => overlay.parentElement && overlay.remove();
+        overlay.querySelector('.celebration-btn').addEventListener('click', close);
+        overlay.querySelector('.modal-close-btn').addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        
+        // Confetti
+        this.launchConfetti(overlay, 120);
+        
+        // Auto remove
+        setTimeout(close, 6000);
+    }
+    
+    launchConfetti(parent, count = 100) {
+        const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#a29bfe', '#ff6b81', '#70a1ff'];
+        for (let i = 0; i < count; i++) {
+            const piece = document.createElement('span');
+            piece.className = 'confetti-piece';
+            const size = Math.random() * 8 + 6; // 6 - 14px
+            const left = Math.random() * 100; // vw percent
+            const delay = Math.random() * 1.5; // 0 - 1.5s
+            const duration = 2 + Math.random() * 2; // 2 - 4s
+            piece.style.left = left + 'vw';
+            piece.style.width = size + 'px';
+            piece.style.height = (size * 0.6) + 'px';
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDelay = `${delay}s`;
+            piece.style.animationDuration = `${duration}s`;
+            parent.appendChild(piece);
+        }
+    }
+    
     destroy() {
         // Clean up event listeners
         eventSystem.off(GameEvents.PLAYER_COLLECT_ITEM);
