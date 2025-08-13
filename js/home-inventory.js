@@ -161,7 +161,7 @@ export class HomeInventory {
             // Award carrots based on spinning
             const now = Date.now();
             if (now - this.hamsterWheel.lastSpinTime > 1000) {
-                this.game.player.carrots += 1;
+                this.game.player.addCarrots(1);
                 this.hamsterWheel.lastSpinTime = now;
                 this.game.ui.updateDisplay();
             }

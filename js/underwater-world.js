@@ -124,7 +124,7 @@ export class UnderwaterWorld {
         // Check win condition
         if (this.collectedCarrots >= UNDERWATER_CONFIG.CARROTS_TO_COLLECT) {
             this.game.ui.showNotification('Gefeliciteerd! Je hebt alle wortels verzameld!');
-            this.game.player.carrots += GAME_CONFIG.CARROT_REWARD;
+            this.game.player.addCarrots(GAME_CONFIG.CARROT_REWARD);
             this.deactivate();
         }
     }
