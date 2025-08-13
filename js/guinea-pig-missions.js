@@ -87,7 +87,15 @@ export class GuineaPigMissions {
             
             if (pig.missionProgress >= pig.missionTarget) {
                 // Mission complete!
-                this.missionManager.completeMission();
+                this.missionManager.completeMission({
+                    pig,
+                    name: pig.name,
+                    mission: pig.mission,
+                    progress: pig.missionProgress,
+                    target: pig.missionTarget,
+                    item: pig.missionItem,
+                    isHorse: false
+                });
                 
                 // Give new mission
                 this.updateMissionForPig(pig);

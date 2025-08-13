@@ -130,24 +130,27 @@ export class MissionManager {
         }
     }
 
-    completeMission() {
-        if (this.currentMission) {
-            eventSystem.emit(GameEvents.MISSION_COMPLETE, this.currentMission);
-            this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
-            this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
-            this.game.ui.updateDisplay();
-            
-            // Celebration modal with happy animal
-            const emoji = this.currentMission.isHorse ? '🐴' : '🐹';
-            this.game.ui.showCelebrationModal({
-                title: 'Missie voltooid!',
-                message: 'Geweldig gedaan! De missie is afgerond.',
-                rewardText: `+${GAME_CONFIG.MISSION_REWARD} wortels 🥕`,
-                emoji
-            });
-        }
+    completeMission(missionData = null) {
+        const context = this.currentMission || missionData || null;
+        
+        // Emit completion event with available context
+        eventSystem.emit(GameEvents.MISSION_COMPLETE, context || {});
+        
+        // Reward the player
+        this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
+        this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
+        this.game.ui.updateDisplay();
+        
+        // Celebration modal with appropriate animal
+        const emoji = context && context.isHorse ? '🐴' : '🐹';
+        this.game.ui.showCelebrationModal({
+            title: 'Missie voltooid!',
+            message: 'Geweldig gedaan! De missie is afgerond.',
+            rewardText: `+${GAME_CONFIG.MISSION_REWARD} wortels 🥕`,
+            emoji
+        });
     }
-
+    
     isMissionModalVisible() {
         return this.modal && !this.modal.classList.contains('hidden');
     }
