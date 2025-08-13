@@ -144,6 +144,9 @@ export class HomeItemManager {
                 this.dragOffset.y = y - item.y;
                 this.isDragging = true;
                 this.dragStartTime = Date.now();
+                // Capture original position in case we need to revert
+                this.dragStartX = item.x;
+                this.dragStartY = item.y;
                 
                 // Move dragged item to end of array so it renders on top
                 const index = this.items.indexOf(item);
@@ -681,9 +684,12 @@ export class HomeItemManager {
     }
 
     isMouseOverItem(item) {
-        if (!this.game.mouseX || !this.game.mouseY) return false;
-        const worldX = this.game.mouseX + this.game.camera.x;
-        const worldY = this.game.mouseY + this.game.camera.y;
+        // Guard against unset/zero mouse values and ensure numbers
+        if (typeof this.game.mouseX !== 'number' || typeof this.game.mouseY !== 'number') return false;
+        const rect = this.game.canvas.getBoundingClientRect();
+        const screenX = this.game.mouseX - rect.left;
+        const screenY = this.game.mouseY - rect.top;
+        const { x: worldX, y: worldY } = this.game.camera.screenToWorld(screenX, screenY);
         return this.isPointInItem(worldX, worldY, item);
     }
 
@@ -711,7 +717,9 @@ export class HomeItemManager {
                 try {
                     const data = JSON.parse(savedData);
                     if (data.items) {
-                        this.items = data.items;
+                        // Cap items to prevent performance issues from excessive entries
+                        const MAX_ITEMS = GAME_CONFIG.MAX_INVENTORY_ITEMS || 20;
+                        this.items = data.items.slice(0, MAX_ITEMS);
                     }
                 } catch (e) {
                     console.error('Failed to parse home items:', e);
