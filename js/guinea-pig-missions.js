@@ -136,8 +136,10 @@ export class GuineaPigMissions {
 
     checkGuineaPigClick(x, y) {
         for (const pig of this.otherGuineaPigs) {
-            const distance = Math.sqrt(Math.pow(x - pig.x, 2) + Math.pow(y - pig.y, 2));
-            if (distance < 50) {
+            // Require the player to be reasonably close to the guinea pig to interact
+            const clickDistance = Math.hypot(x - pig.x, y - pig.y);
+            const playerDistance = Math.hypot(this.game.player.x - pig.x, this.game.player.y - pig.y);
+            if (clickDistance < 35 && playerDistance < 150) {
                 this.showMissionModal(pig);
                 return true;
             }
