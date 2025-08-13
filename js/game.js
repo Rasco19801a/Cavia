@@ -437,6 +437,16 @@ export class Game {
         this.camera.y = 0;
         this.isInside = false;
         this.currentBuilding = null;
+        this.isDragging = false; // reset home drag state
+        this.waterBathButton = null; // clear any cached button from zwembad
+        if (this.canvas) this.canvas.style.cursor = 'default';
+        
+        // Proactively close any open overlays that could block input
+        try { if (this.inventory && this.inventory.isOpen) this.inventory.closeInventory(); } catch (e) { /* noop */ }
+        try { if (this.guineaPigMissions && this.guineaPigMissions.missionManager && this.guineaPigMissions.missionManager.isMissionModalVisible && this.guineaPigMissions.missionManager.isMissionModalVisible()) { this.guineaPigMissions.missionManager.closeModal(); } } catch (e) { /* noop */ }
+        try { if (this.animalChallenge && this.animalChallenge.challengeModal && !this.animalChallenge.challengeModal.classList.contains('hidden')) { this.animalChallenge.closeChallenge(); } } catch (e) { /* noop */ }
+        try { if (this.minigames && this.minigames.activeMinigame) this.minigames.closeMinigame(); } catch (e) { /* noop */ }
+        
         this.setupWorld();
         console.log(`World changed successfully to: ${this.currentWorld}`);
         
