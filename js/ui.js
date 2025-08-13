@@ -7,6 +7,7 @@ export class UI {
     constructor(player) {
         this.player = player;
         this.notificationTimeout = null;
+        this.celebrationModal = null;  // Track celebration modal
         this.setupUI();
         this.setupEventListeners();
     }
@@ -181,6 +182,12 @@ export class UI {
     
     // Celebration modal with confetti
     showCelebrationModal({ title = 'Goed gedaan!', message = '', rewardText = '', emoji = '' } = {}) {
+        // Remove any existing celebration modal first
+        if (this.celebrationModal) {
+            this.celebrationModal.remove();
+            this.celebrationModal = null;
+        }
+        
         const overlay = document.createElement('div');
         overlay.className = 'celebration-modal';
         overlay.innerHTML = `
@@ -195,8 +202,18 @@ export class UI {
         `;
         document.body.appendChild(overlay);
         
+        // Store reference to the modal
+        this.celebrationModal = overlay;
+        
         // Close handlers
-        const close = () => overlay.parentElement && overlay.remove();
+        const close = () => {
+            if (overlay.parentElement) {
+                overlay.remove();
+            }
+            if (this.celebrationModal === overlay) {
+                this.celebrationModal = null;
+            }
+        };
         overlay.querySelector('.celebration-btn').addEventListener('click', close);
         overlay.querySelector('.modal-close-btn').addEventListener('click', close);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });

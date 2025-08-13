@@ -148,6 +148,7 @@ export class Game {
 
     isAnyModalOpen() {
         // Check if any modal is currently open
+        
         // Check mission modal
         if (this.guineaPigMissions && this.guineaPigMissions.missionManager && 
             this.guineaPigMissions.missionManager.isMissionModalVisible()) {
@@ -171,8 +172,7 @@ export class Game {
         }
         
         // Check UI celebration modal
-        if (this.ui && this.ui.celebrationModal && 
-            !this.ui.celebrationModal.classList.contains('hidden')) {
+        if (this.ui && this.ui.celebrationModal) {
             return true;
         }
         
@@ -186,7 +186,6 @@ export class Game {
         
         // Prevent any game interaction when a modal is open
         if (this.isAnyModalOpen()) {
-            console.log('Click blocked - modal is open');
             return;
         }
         
@@ -361,7 +360,6 @@ export class Game {
         
         // Prevent dragging when a modal is open
         if (this.isAnyModalOpen()) {
-            console.log('Drag blocked - modal is open');
             return;
         }
         
