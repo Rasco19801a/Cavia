@@ -50,7 +50,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 23000;
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
@@ -198,11 +198,11 @@ body {
      gap: 5px;
      max-width: calc(100% - 20px);
      width: auto;
-     z-index: 12000;
+     z-index: 12000; /* stays below all modals */
      pointer-events: auto;
  }
-
-.world-btn {
+ 
+ .world-btn {
      padding: 8px 12px;
      border: none;
      border-radius: 15px;
@@ -214,7 +214,7 @@ body {
      white-space: nowrap;
      pointer-events: auto;
      position: relative;
-     z-index: 12001;
+     z-index: 12001; /* stays below all modals */
  }
 
 .world-btn:hover {
@@ -1208,7 +1208,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 23000;
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
