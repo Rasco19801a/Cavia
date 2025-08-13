@@ -96,6 +96,7 @@ function drawShopInterior(ctx, name) {
         
         // Item price
         ctx.font = '18px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 150);
         
         // Buy button
@@ -339,6 +340,7 @@ function drawGroenteMarkt(ctx) {
         
         // Item price
         ctx.font = '20px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
@@ -417,6 +419,7 @@ function drawHooiWinkel(ctx) {
         
         // Item price
         ctx.font = '20px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
@@ -486,6 +489,7 @@ function drawSpeeltjesShop(ctx) {
         
         // Item price
         ctx.font = '20px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
@@ -555,6 +559,7 @@ function drawCaviaSpa(ctx) {
         
         // Item price
         ctx.font = '20px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button
@@ -624,6 +629,7 @@ function drawAccessoiresShop(ctx) {
         
         // Item price
         ctx.font = '20px Nunito, sans-serif';
+        ctx.fillStyle = '#000000';
         ctx.fillText(`🥕 ${item.price}`, x + itemWidth/2, y + 175);
         
         // Buy button

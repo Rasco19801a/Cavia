@@ -68,6 +68,7 @@
     <!-- Game Scripts -->
     <script type="module">
         import { Game } from './js/game.js';
+        import { ANIMALS } from './js/animals.js';
         
         let game = null;
         
@@ -97,7 +98,7 @@
             updateStatus('Switched naar Paarden wereld', 'success');
             updateDebug({
                 currentWorld: game.currentWorld,
-                animals: game.worlds.paarden?.animals || []
+                animals: ANIMALS.paarden || []
             });
         };
         

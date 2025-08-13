@@ -414,19 +414,22 @@ export class Game {
         console.log(`changeWorld called with: ${world}`);
         console.log(`Current world before change: ${this.currentWorld}`);
         
+        // Normalize common synonyms (e.g., 'home' -> 'thuis')
+        const normalizedWorld = this.normalizeWorldName(world);
+        
         // Validate world parameter
-        if (!WORLDS.includes(world)) {
-            console.error(`Invalid world: ${world}. Valid worlds are:`, WORLDS);
+        if (!WORLDS.includes(normalizedWorld)) {
+            console.error(`Invalid world: ${normalizedWorld}. Valid worlds are:`, WORLDS);
             return;
         }
         
         // Don't change if it's the same world
-        if (this.currentWorld === world) {
+        if (this.currentWorld === normalizedWorld) {
             console.log('Already in this world, no change needed');
             return;
         }
         
-        this.currentWorld = world;
+        this.currentWorld = normalizedWorld;
         this.player.x = CONFIG.PLAYER_START_X;
         this.player.y = CONFIG.PLAYER_START_Y;
         this.player.clearTarget(); // Clear any movement target
@@ -444,7 +447,7 @@ export class Game {
         
         // Show a notification
         if (this.ui && this.ui.showNotification) {
-            this.ui.showNotification(`Welkom in ${this.getWorldName(world)}!`);
+            this.ui.showNotification(`Welkom in ${this.getWorldName(this.currentWorld)}!`);
         }
     }
     
@@ -616,5 +619,36 @@ export class Game {
         this.update();
         this.draw();
         requestAnimationFrame(() => this.gameLoop());
+    }
+
+    // Backward compatibility: older code calls switchWorld('home'), render(), etc.
+    normalizeWorldName(world) {
+        if (!world) return world;
+        const map = {
+            home: 'thuis',
+            huis: 'thuis',
+            city: 'dierenstad',
+            stad: 'stad',
+            horses: 'paarden',
+            horse: 'paarden',
+            desert: 'woestijn',
+            jungle: 'jungle',
+            beach: 'strand',
+            winter: 'winter',
+            pool: 'zwembad'
+        };
+        const lower = String(world).toLowerCase();
+        return map[lower] || world;
+    }
+    
+    // Alias for older API
+    switchWorld(world) {
+        const normalized = this.normalizeWorldName(world);
+        this.changeWorld(normalized);
+    }
+    
+    // Alias for older API
+    render() {
+        this.draw();
     }
 }

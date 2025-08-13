@@ -144,7 +144,7 @@
         function goToHome() {
             if (window.game) {
                 log('Switching to Home world...', 'info');
-                window.game.switchWorld('home');
+                window.game.switchWorld('thuis');
             } else {
                 log('Game not initialized!', 'error');
             }
@@ -152,7 +152,7 @@
         
         function openMissionModal() {
             if (window.game && window.game.guineaPigMissions) {
-                const pigs = window.game.worlds.home?.animals?.filter(a => a.type === 'guinea-pig') || [];
+                const pigs = (window.game && window.game.guineaPigMissions ? window.game.guineaPigMissions.otherGuineaPigs : []) || [];
                 if (pigs.length > 0) {
                     log(`Opening mission modal for pig: ${pigs[0].name}`, 'info');
                     window.game.guineaPigMissions.showMissionModal(pigs[0]);
