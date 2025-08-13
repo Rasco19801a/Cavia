@@ -151,7 +151,7 @@ export class UI {
                 const price = parseInt(btn.dataset.price) || 0;
                 
                 if (this.player.carrots >= price) {
-                    this.player.carrots -= price;
+                    this.player.addCarrots(-price);
                     this.updateDisplay();
                     
                     // Emit item purchase event

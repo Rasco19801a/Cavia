@@ -227,7 +227,7 @@ export class AnimalChallenge {
             if (animal.missionProgress >= animal.missionTarget) {
                 // Mission complete!
                 this.game.ui.showNotification(`${animal.name} zegt: Dankjewel! Hier zijn ${CONFIG.MISSION_REWARD} wortels voor jou!`);
-                this.game.player.carrots += CONFIG.MISSION_REWARD;
+                this.game.player.addCarrots(CONFIG.MISSION_REWARD);
                 this.game.ui.updateDisplay();
                 
                 // Celebration modal with happy horse

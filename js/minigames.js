@@ -183,7 +183,7 @@ export class Minigames {
     
     completePuzzle() {
         this.game.ui.showNotification('Goed gedaan! Je hebt de puzzel opgelost! +5 🥕');
-        this.game.player.carrots += 5;
+        this.game.player.addCarrots(5);
         this.game.ui.updateDisplay();
         
         setTimeout(() => {
@@ -325,7 +325,7 @@ export class Minigames {
     
     completeCatchGame(score) {
         this.game.ui.showNotification(`Geweldig! Je ving ${score} ballen! +${score} 🥕`);
-        this.game.player.carrots += score;
+        this.game.player.addCarrots(score);
         this.game.ui.updateDisplay();
         
         setTimeout(() => {
@@ -471,7 +471,7 @@ export class Minigames {
     
     completeStackGame(score) {
         this.game.ui.showNotification(`Goed gestapeld! Je stapelde ${score} blokken! +${score} 🥕`);
-        this.game.player.carrots += score;
+        this.game.player.addCarrots(score);
         this.game.ui.updateDisplay();
         
         setTimeout(() => {

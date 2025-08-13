@@ -13,6 +13,15 @@ export class Inventory {
         this.setupInventoryButton();
         this.setupInventoryModal();
         this.loadInventory();
+        
+        // Synchroniseer wortels (munten) met inventory-item 'carrot'
+        this.handleCarrotsUpdated = (e) => {
+            const totalCarrots = e?.detail?.carrots ?? this.game.player.carrots;
+            this.syncCarrotItem(totalCarrots);
+        };
+        window.addEventListener('carrotsUpdated', this.handleCarrotsUpdated);
+        // Initieel syncen met huidige stand
+        this.syncCarrotItem(this.game.player.carrots);
     }
     
     setupInventoryButton() {
@@ -109,6 +118,12 @@ export class Inventory {
     }
     
     addItem(itemData) {
+        // Interne representatie: 'carrot' wordt uitsluitend gesynchroniseerd via player.addCarrots
+        if (itemData?.id === 'carrot') {
+            this.game.player.addCarrots(1);
+            this.game.ui.showNotification('Wortel toegevoegd!');
+            return;
+        }
         // Check if item already exists
         const existingItem = this.items.find(i => i.id === itemData.id);
         if (existingItem) {
@@ -130,6 +145,12 @@ export class Inventory {
     }
     
     removeItem(itemId, quantity = 1) {
+        // Voor 'carrot' loopt verbruik via player.addCarrots zodat currency en inventory in sync blijven
+        if (itemId === 'carrot') {
+            this.game.player.addCarrots(-quantity);
+            // De syncCarrotItem handler werkt de inventory-weergave bij via event
+            return;
+        }
         const itemIndex = this.items.findIndex(i => i.id === itemId);
         if (itemIndex !== -1) {
             this.items[itemIndex].quantity -= quantity;
@@ -400,7 +421,7 @@ export class Inventory {
             if (animal.missionProgress >= animal.missionTarget) {
                 // Mission complete!
                 this.game.ui.showNotification(`Missie voltooid! Je hebt ${GAME_CONFIG.MISSION_REWARD} wortels verdiend! 🎉`);
-                this.game.player.carrots += GAME_CONFIG.MISSION_REWARD;
+                this.game.player.addCarrots(GAME_CONFIG.MISSION_REWARD);
                 this.game.ui.updateDisplay();
                 
                 // Update mission differently for horses vs guinea pigs
@@ -488,6 +509,26 @@ export class Inventory {
     
     resetInventory() {
         this.items = [];
+        this.saveInventory();
+        this.updateInventoryDisplay();
+    }
+
+    // Zorg dat het inventory-item 'carrot' gelijk blijft aan player.carrots
+    syncCarrotItem(totalCarrots) {
+        const existing = this.items.find(i => i.id === 'carrot');
+        if (!existing) {
+            const carrotItem = {
+                id: 'carrot',
+                name: 'Wortel',
+                emoji: '🥕',
+                description: 'Een verse wortel',
+                quantity: Math.max(0, totalCarrots),
+                minigame: null
+            };
+            this.items.push(carrotItem);
+        } else {
+            existing.quantity = Math.max(0, totalCarrots);
+        }
         this.saveInventory();
         this.updateInventoryDisplay();
     }

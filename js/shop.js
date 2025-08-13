@@ -10,7 +10,7 @@ export class Shop {
                 { id: 'puzzle', name: 'Puzzel', price: 25, emoji: '🧩', description: 'Een uitdagende puzzel' }
             ],
             'Groente Markt': [
-                { id: 'carrot', name: 'Wortel', price: 5, emoji: '🥕', description: 'Verse wortels voor je cavia' },
+                // Wortel verwijderd uit de shop
                 { id: 'lettuce', name: 'Sla', price: 3, emoji: '🥬', description: 'Knapperige sla' },
                 { id: 'cucumber', name: 'Komkommer', price: 4, emoji: '🥒', description: 'Sappige komkommer' },
                 { id: 'corn', name: 'Mais', price: 6, emoji: '🌽', description: 'Zoete mais' },
@@ -52,7 +52,8 @@ export class Shop {
     buyItem(item) {
         console.log('Before purchase - Carrots:', this.game.player.carrots);
         if (this.game.player.carrots >= item.price) {
-            this.game.player.carrots -= item.price;
+            // Gebruik centrale addCarrots zodat alles synchroniseert
+            this.game.player.addCarrots(-item.price);
             console.log('After purchase - Carrots:', this.game.player.carrots);
             this.inventory.push(item);
             this.purchasedItems.add(item.id); // Track purchased item
