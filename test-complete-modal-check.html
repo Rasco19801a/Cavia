@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Complete Modal Check Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Nunito', sans-serif;
+        }
+        .test-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            max-width: 500px;
+        }
+        .modal-status {
+            display: grid;
+            grid-template-columns: 200px 100px;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .modal-status div {
+            display: flex;
+            align-items: center;
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        .status-open {
+            background: #ff4444;
+        }
+        .status-closed {
+            background: #44ff44;
+        }
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .control-buttons button {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .control-buttons button:hover {
+            background: #5a67d8;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h2>🔍 Complete Modal Status Check</h2>
+        
+        <div class="modal-status">
+            <div><strong>Modal Type</strong></div>
+            <div><strong>Status</strong></div>
+            
+            <div>Mission Modal:</div>
+            <div id="missionStatus">
+                <span>Closed</span>
+                <span class="status-indicator status-closed"></span>
+            </div>
+            
+            <div>Inventory Modal:</div>
+            <div id="inventoryStatus">
+                <span>Closed</span>
+                <span class="status-indicator status-closed"></span>
+            </div>
+            
+            <div>Animal Challenge:</div>
+            <div id="animalStatus">
+                <span>Closed</span>
+                <span class="status-indicator status-closed"></span>
+            </div>
+            
+            <div>Minigame Active:</div>
+            <div id="minigameStatus">
+                <span>None</span>
+                <span class="status-indicator status-closed"></span>
+            </div>
+            
+            <div>Celebration Modal:</div>
+            <div id="celebrationStatus">
+                <span>Closed</span>
+                <span class="status-indicator status-closed"></span>
+            </div>
+            
+            <div style="grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 2px solid #333;">
+                <strong>Overall Status:</strong> 
+                <span id="overallStatus" style="font-weight: bold; color: green;">CAN MOVE ✓</span>
+            </div>
+        </div>
+        
+        <div class="control-buttons">
+            <button onclick="startGame()">Start Game</button>
+            <button onclick="goToHome()">Go to Thuis</button>
+            <button onclick="goToDierenstad()">Go to Dierenstad</button>
+            <button onclick="checkAllModals()">Force Check</button>
+            <button onclick="clearConsole()">Clear Console</button>
+        </div>
+        
+        <div id="warning" class="warning" style="display: none;"></div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script type="module">
+        import { Game } from './js/game.js';
+        
+        let game = null;
+        
+        window.startGame = function() {
+            const canvas = document.getElementById('gameCanvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            
+            game = new Game(canvas, {
+                bodyColor: '#8B4513',
+                bellyColor: '#D2691E',
+                accessory: 'none'
+            });
+            
+            window.game = game;
+            console.log('Game started');
+            
+            // Start monitoring
+            setInterval(updateModalStatus, 100);
+        };
+        
+        window.goToHome = function() {
+            if (!game) {
+                alert('Start game first!');
+                return;
+            }
+            console.log('Switching to Thuis world...');
+            game.changeWorld('thuis');
+        };
+        
+        window.goToDierenstad = function() {
+            if (!game) {
+                alert('Start game first!');
+                return;
+            }
+            console.log('Switching to Dierenstad world...');
+            game.changeWorld('dierenstad');
+        };
+        
+        window.checkAllModals = function() {
+            if (!game) {
+                alert('Start game first!');
+                return;
+            }
+            
+            console.group('Manual Modal Check');
+            console.log('Mission Manager exists:', !!game.guineaPigMissions?.missionManager);
+            if (game.guineaPigMissions?.missionManager) {
+                console.log('Mission Modal Visible:', game.guineaPigMissions.missionManager.isMissionModalVisible());
+            }
+            console.log('Inventory exists:', !!game.inventory);
+            console.log('Inventory isOpen:', game.inventory?.isOpen);
+            console.log('Animal Challenge exists:', !!game.animalChallenge);
+            console.log('Animal Challenge Modal:', game.animalChallenge?.challengeModal);
+            if (game.animalChallenge?.challengeModal) {
+                console.log('Animal Challenge Hidden:', game.animalChallenge.challengeModal.classList.contains('hidden'));
+            }
+            console.log('Minigames exists:', !!game.minigames);
+            console.log('Active Minigame:', game.minigames?.activeMinigame);
+            console.log('UI exists:', !!game.ui);
+            console.log('Celebration Modal:', game.ui?.celebrationModal);
+            console.log('isAnyModalOpen result:', game.isAnyModalOpen());
+            console.groupEnd();
+        };
+        
+        window.clearConsole = function() {
+            console.clear();
+            console.log('Console cleared - monitoring continues...');
+        };
+        
+        function updateModalStatus() {
+            if (!game) return;
+            
+            let anyOpen = false;
+            const warning = document.getElementById('warning');
+            let warningText = '';
+            
+            // Check Mission Modal
+            const missionOpen = game.guineaPigMissions?.missionManager?.isMissionModalVisible();
+            updateStatus('missionStatus', missionOpen, 'Mission Open');
+            if (missionOpen) anyOpen = true;
+            
+            // Check Inventory
+            const inventoryOpen = game.inventory?.isOpen;
+            updateStatus('inventoryStatus', inventoryOpen, 'Inventory Open');
+            if (inventoryOpen) anyOpen = true;
+            
+            // Check Animal Challenge
+            const animalOpen = game.animalChallenge?.challengeModal && 
+                              !game.animalChallenge.challengeModal.classList.contains('hidden');
+            updateStatus('animalStatus', animalOpen, 'Challenge Open');
+            if (animalOpen) anyOpen = true;
+            
+            // Check Minigame
+            const minigameActive = game.minigames?.activeMinigame;
+            updateStatus('minigameStatus', minigameActive, minigameActive || 'None');
+            if (minigameActive) anyOpen = true;
+            
+            // Check Celebration
+            const celebrationOpen = !!game.ui?.celebrationModal;
+            updateStatus('celebrationStatus', celebrationOpen, 'Celebration Open');
+            if (celebrationOpen) anyOpen = true;
+            
+            // Update overall status
+            const overallEl = document.getElementById('overallStatus');
+            if (anyOpen) {
+                overallEl.textContent = 'BLOCKED ⚠️';
+                overallEl.style.color = 'red';
+                
+                // Check if we're in thuis world
+                if (game.currentWorld === 'thuis') {
+                    warningText = 'Movement is blocked in Thuis world due to open modal(s)';
+                }
+            } else {
+                overallEl.textContent = 'CAN MOVE ✓';
+                overallEl.style.color = 'green';
+            }
+            
+            // Show/hide warning
+            if (warningText) {
+                warning.textContent = warningText;
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+        }
+        
+        function updateStatus(elementId, isOpen, openText = 'Open') {
+            const element = document.getElementById(elementId);
+            const text = element.querySelector('span:first-child');
+            const indicator = element.querySelector('.status-indicator');
+            
+            if (isOpen) {
+                text.textContent = openText;
+                indicator.className = 'status-indicator status-open';
+            } else {
+                text.textContent = 'Closed';
+                indicator.className = 'status-indicator status-closed';
+            }
+        }
+        
+        // Auto-start game
+        window.addEventListener('load', () => {
+            setTimeout(startGame, 100);
+        });
+    </script>
+</body>
+</html>
