@@ -521,7 +521,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 20000;
 }
 
 .challenge-content {
@@ -722,7 +722,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 20000;
 }
 
 .mission-content {
@@ -815,7 +815,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2100; /* Higher than mission modal (2000) */
+    z-index: 21000; /* Higher than mission modal (20000) */
 }
 
 .inventory-content {
@@ -998,7 +998,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 20000;
 }
 
 .minigame-content {
@@ -1158,7 +1158,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 20000;
 }
 
 .modal-content-base {
@@ -1428,7 +1428,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 22000;
     animation: fadeIn 0.3s ease-out;
     overflow: hidden;
 }
