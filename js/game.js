@@ -51,6 +51,8 @@ export class Game {
         this.isInside = false;
         this.currentBuilding = null;
         this.keys = {};
+        this._isChangingWorld = false;
+        this._lastWorldChange = 0;
         
         // Drag state
         this.isDragging = false;
@@ -462,6 +464,15 @@ export class Game {
         // Normalize common synonyms (e.g., 'home' -> 'thuis')
         const normalizedWorld = this.normalizeWorldName(world);
         
+        // Prevent overlapping/duplicate world changes
+        if (this._isChangingWorld) {
+            return;
+        }
+        const now = Date.now();
+        if (now - this._lastWorldChange < 150 && this.currentWorld === normalizedWorld) {
+            return;
+        }
+        
         // Validate world parameter
         if (!WORLDS.includes(normalizedWorld)) {
             console.error(`Invalid world: ${normalizedWorld}. Valid worlds are:`, WORLDS);
@@ -473,7 +484,7 @@ export class Game {
             console.log('Already in this world, no change needed');
             return;
         }
-        
+        this._isChangingWorld = true;
         this.currentWorld = normalizedWorld;
         this.player.x = CONFIG.PLAYER_START_X;
         this.player.y = CONFIG.PLAYER_START_Y;
@@ -492,17 +503,25 @@ export class Game {
         try { if (this.animalChallenge && this.animalChallenge.challengeModal && !this.animalChallenge.challengeModal.classList.contains('hidden')) { this.animalChallenge.closeChallenge(); } } catch (e) { /* noop */ }
         try { if (this.minigames && this.minigames.activeMinigame) this.minigames.closeMinigame(); } catch (e) { /* noop */ }
         
-        this.setupWorld();
-        console.log(`World changed successfully to: ${this.currentWorld}`);
+        try {
+            this.setupWorld();
+            console.log(`World changed successfully to: ${this.currentWorld}`);
         
-        // Force multiple redraws to ensure the change is visible
-        this.draw();
-        setTimeout(() => this.draw(), 10);
-        setTimeout(() => this.draw(), 50);
+            // Ensure any celebration overlay is closed to prevent input blocking
+            try {
+                if (this.ui && this.ui.celebrationModal) {
+                    this.ui.celebrationModal.remove();
+                    this.ui.celebrationModal = null;
+                }
+            } catch (e) { /* noop */ }
         
-        // Show a notification
-        if (this.ui && this.ui.showNotification) {
-            this.ui.showNotification(`Welkom in ${this.getWorldName(this.currentWorld)}!`);
+            // Show a notification
+            if (this.ui && this.ui.showNotification) {
+                this.ui.showNotification(`Welkom in ${this.getWorldName(this.currentWorld)}!`);
+            }
+        } finally {
+            this._lastWorldChange = Date.now();
+            this._isChangingWorld = false;
         }
     }
     
