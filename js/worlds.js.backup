@@ -31,12 +31,6 @@ function getOrCreateBackgroundCanvas(worldType, width, height) {
         case 'paarden':
             drawPaardenBackground(bgCtx);
             break;
-        case 'thuis':
-            drawThuisBackground(bgCtx);
-            break;
-        case 'thuis':
-            drawThuisBackground(bgCtx);
-            break;
         // Add more world types as needed
     }
     
