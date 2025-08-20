@@ -45,6 +45,11 @@ export class Game {
         this.inventory = new Inventory(this);
         this.minigames = new Minigames(this);
         
+        // Track running state and the current animation frame so we can cleanly stop the game loop if a new
+        // Game instance is created later (e.g. when the player starts a new game).
+        this.running = true;
+        this._animationFrameId = null;
+        
         // Game state
         this.currentWorld = DEFAULT_WORLD;
         this.buildings = [];
@@ -696,11 +701,31 @@ export class Game {
     }
     
     gameLoop() {
+        // If the game has been stopped (e.g. a new Game instance has replaced this one) do nothing.
+        if (!this.running) {
+            return;
+        }
+
         this.update();
         this.draw();
-        requestAnimationFrame(() => this.gameLoop());
+
+        // Store the id so that we can cancel it later
+        this._animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
 
+    /**
+     * Stop the main game loop and clean up any resources that depend on requestAnimationFrame.
+     * This allows multiple Game instances to be created over the lifetime of the page without
+     * them drawing on top of each other or leaking CPU cycles.
+     */
+    stop() {
+        this.running = false;
+        if (this._animationFrameId) {
+            cancelAnimationFrame(this._animationFrameId);
+            this._animationFrameId = null;
+        }
+    }
+    
     // Backward compatibility: older code calls switchWorld('home'), render(), etc.
     normalizeWorldName(world) {
         if (!world) return world;

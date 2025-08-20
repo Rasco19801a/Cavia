@@ -83,6 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedCustomization = Customization.loadCustomization();
         const gameSettings = ScreenManager.getGameSettings();
         
+        // If a previous game instance is still running (e.g. player restarted), stop its loop first
+        if (window.game && typeof window.game.stop === 'function') {
+            window.game.stop();
+        }
+
         // Initialize the game with customization and settings data
         const game = new Game(canvas, {
             ...savedCustomization,
@@ -122,6 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('localStorage remove failed; storage unavailable:', err);
             }
             
+            // Stop any previous game instance before creating a new one to avoid multiple game loops running
+            if (window.game && typeof window.game.stop === 'function') {
+                window.game.stop();
+            }
+
             // Initialize the game with customization and settings data
             const game = new Game(canvas, {
                 ...e.detail,
